@@ -7,6 +7,8 @@ struct WorldGeneator;
 
 struct ChunkInfo {
     Chunk* chunk;
+    int x;
+    int z;
 };
 
 class World {
@@ -17,6 +19,7 @@ public:
     Chunk* getChunk(int x, int z, bool create = false);
 
     void updateMeshChunks();
+    void generateChunks();
 private:
     ChunkInfo* createChunk(int x, int z);
     double m_chunk_creation_time;

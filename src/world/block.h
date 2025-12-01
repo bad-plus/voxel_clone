@@ -9,8 +9,7 @@ enum class BlockID {
     STONE,
     DIRT,
     GRASS,
-    REDSTONE_BLOCK,
-    IRON_ORE,
+    SNOW_GRASS,
     MY_LOVE
 };
 
@@ -42,6 +41,7 @@ inline std::unordered_map<BlockID, BlockInfo> BlocksInfo = {
     {BlockID::STONE, {"stone", false}},
     {BlockID::DIRT, {"dirt", false}},
     {BlockID::GRASS, {"grass", false}},
+    {BlockID::SNOW_GRASS, {"snow_grass", false}},
     {BlockID::MY_LOVE, {"love", false}}
 };
 

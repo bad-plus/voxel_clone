@@ -76,6 +76,8 @@ set(SOURCE_FILES
     src/world/world.cpp
     src/core/loader.h
     src/core/loader.cpp
+    src/world/perlin_2d.h
+    src/world/perlin_2d.cpp
     src/world/world_generator.h
     src/world/world_generator.cpp
 )

@@ -14,7 +14,7 @@ Render::Render(GameContext* game_context) {
     initRender();
 
     m_debug_render_mode = false;
-    m_render_dist = 5;
+    m_render_dist = 15;
 
     m_world = nullptr;
     m_camera = nullptr;

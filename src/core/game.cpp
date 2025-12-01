@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <string>
+#include <thread>
 
 Game::Game() {
     m_quit = false;
@@ -20,7 +21,7 @@ Game::Game() {
     m_window = new Window("Game test", 800, 600, &m_game_context);
     updateGameContext();
 
-    m_camera = new Camera({10.0f, 14.0f, 10.0f});
+    m_camera = new Camera({10.0f, 130.0f, 10.0f});
     updateGameContext();
 
     m_resources = new Resources();
@@ -77,7 +78,6 @@ Game::~Game() {
 }
 
 void Game::startMainLoop() {
-
     while(!m_quit) {
         double start_game_tick_time = glfwGetTime();
 
@@ -90,6 +90,7 @@ void Game::startMainLoop() {
         
         m_input->update_input();
 
+        m_world->generateChunks();
         m_world->updateMeshChunks();
 
         double end_game_tick_time = glfwGetTime();

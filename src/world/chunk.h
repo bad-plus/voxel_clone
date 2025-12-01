@@ -24,6 +24,9 @@ public:
     void markDirty();
     bool isDirty();
 
+    void generated_status();
+    bool isGenerated();
+
     void updateNeighbors(Chunk* x_p = nullptr, Chunk* z_p = nullptr, Chunk* x_m = nullptr, Chunk* z_m = nullptr);
 private:
     Block* m_blocks;
@@ -35,6 +38,7 @@ private:
     unsigned int m_indices_count;
 
     bool m_dirty;
+    bool m_need_generate;
 
     struct {
         Chunk* x_p;

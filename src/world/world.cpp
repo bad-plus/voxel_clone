@@ -32,7 +32,9 @@ World::~World() {
 ChunkInfo* World::createChunk(int x, int z) {
     double start_creation_time = glfwGetTime();
     ChunkInfo* chunk_info = new ChunkInfo;
-    chunk_info->chunk = m_generator->generateChunk(x, z);
+    chunk_info->x = x;
+    chunk_info->z = z;
+    chunk_info->chunk = new Chunk;
 
     chunk_info->chunk->markDirty();
     double end_creation_time = glfwGetTime();
@@ -91,6 +93,16 @@ void World::updateMeshChunks() {
     for(auto& [key, chunk_info] : m_chunks) {
         if(chunk_info != nullptr) {
             chunk_info->chunk->updateMesh();
+        }
+    }
+}
+
+void World::generateChunks() {
+    for(auto& [key, chunk_info] : m_chunks) {
+        if(chunk_info != nullptr) {
+            if(!chunk_info->chunk->isGenerated()) {
+                m_generator->generateChunk(chunk_info->chunk, chunk_info->x, chunk_info->z);
+            }
         }
     }
 }

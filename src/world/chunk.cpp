@@ -19,6 +19,7 @@ glm::ivec3 toBlocksPos(unsigned int index) {
 Chunk::Chunk() {
     m_neighbors = {nullptr, nullptr, nullptr, nullptr};
     m_dirty = true;
+    m_need_generate = true;
 
     glGenVertexArrays(1, &m_VAO);
     glGenBuffers(1, &m_VBO);
@@ -78,7 +79,7 @@ bool checkBlockTransparent(Block* block) {
 }
 
 void Chunk::updateMesh() {
-    if(!m_dirty) return;
+    if(!m_dirty || m_need_generate) return;
 
     std::vector<GLfloat> vertices;
     std::vector<GLuint> indices;
@@ -261,4 +262,13 @@ void Chunk::updateNeighbors(Chunk* x_p, Chunk* z_p, Chunk* x_m, Chunk* z_m) {
 
 bool Chunk::isDirty() {
     return m_dirty;
+}
+
+
+void Chunk::generated_status() {
+    m_need_generate = false;
+}
+
+bool Chunk::isGenerated() {
+    return !m_need_generate;
 }
