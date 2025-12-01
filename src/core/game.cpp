@@ -35,7 +35,9 @@ Game::Game() {
 
     m_loader->loadResources();
     
-    m_world = new World(&m_game_context);
+    m_world_generator = new WorldGeneator(777);
+
+    m_world = new World(&m_game_context, m_world_generator);
     m_render->setWorld(m_world);
 
     m_window->setCursorEnabled(false);
@@ -69,6 +71,7 @@ Game::~Game() {
     delete m_resources;
     delete m_loader;
     delete m_world;
+    delete m_world_generator;
 
     glfwTerminate();
 }

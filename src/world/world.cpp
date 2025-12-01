@@ -2,10 +2,10 @@
 #include "chunk.h"
 #include "../core/logger.h"
 #include <GLFW/glfw3.h>
+#include "world_generator.h"
 
 constexpr long long pack_chunk_coords(int x, int z) {
     return ((long long)(x & 0xFFFFFFFF)) | ((long long)(z & 0xFFFFFFFF) << 32);
-    
 }
 
 constexpr int unpack_chunk_x(long long key) {
@@ -16,8 +16,9 @@ constexpr int unpack_chunk_z(long long key) {
     return (int)((key >> 32) & 0xFFFFFFFF);
 }
 
-World::World(GameContext* context) {
+World::World(GameContext* context, WorldGeneator* generator) {
     m_game_context = context;
+    m_generator = generator;
 }
 World::~World() {
     for(auto& [key, chunk_info] : m_chunks) {
@@ -28,15 +29,17 @@ World::~World() {
     }
 }
 
-ChunkInfo* World::createChunk() {
+ChunkInfo* World::createChunk(int x, int z) {
     double start_creation_time = glfwGetTime();
     ChunkInfo* chunk_info = new ChunkInfo;
-    chunk_info->chunk = new Chunk();
+    chunk_info->chunk = m_generator->generateChunk(x, z);
+
     chunk_info->chunk->markDirty();
     double end_creation_time = glfwGetTime();
     m_chunk_creation_time = end_creation_time - start_creation_time;
     return chunk_info;
 }
+
 Chunk* World::getChunk(int x, int z, bool create) {
     const long long chunk_index = pack_chunk_coords(x, z);
 
@@ -50,7 +53,7 @@ Chunk* World::getChunk(int x, int z, bool create) {
         return nullptr;
     }
     
-    ChunkInfo* chunk_info = createChunk();
+    ChunkInfo* chunk_info = createChunk(x, z);
     m_chunks[chunk_index] = chunk_info;
     
     Chunk* x_m = getChunk(x - 1, z, false);

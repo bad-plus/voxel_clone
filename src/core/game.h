@@ -7,6 +7,7 @@
 #include "resources.h"
 #include "loader.h"
 #include "../world/world.h"
+#include "../world/world_generator.h"
 
 class Game;
 
@@ -51,6 +52,7 @@ private:
     Resources* m_resources;
     Loader* m_loader;
     World* m_world;
+    WorldGeneator* m_world_generator;
 
     GameContext m_game_context;
 

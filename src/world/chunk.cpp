@@ -27,34 +27,6 @@ Chunk::Chunk() {
     m_blocks = new Block[CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z];
 
     updateMesh();
-
-    for(unsigned int x = 0; x < CHUNK_SIZE_X; x++) {
-        for(unsigned int z = 0; z < CHUNK_SIZE_Z; z++) {
-            float height = 12.0f + 3.0f * sin(x * 0.3f) + 2.0f * cos(z * 0.4f);
-            int terrainHeight = (int)height;
-            
-            for(unsigned int y = 0; y < CHUNK_SIZE_Y; y++) {
-                unsigned int index = toBlocksIndex({x, y, z});
-                
-                BlockID block_id = BlockID::EMPTY;
-                
-                if(y < terrainHeight - 4) {
-                    block_id = BlockID::STONE;
-                }
-                else if(y < terrainHeight - 1) {
-                    block_id = BlockID::DIRT;
-                }
-                else if(y == terrainHeight - 1) {
-                    block_id = BlockID::GRASS;
-                }
-                else if(y < terrainHeight + 3 && (x + z) % 7 == 0 && x % 5 == 2) {
-                    block_id = BlockID::MY_LOVE;
-                }
-                
-                m_blocks[index].setBlockID(block_id);
-            }
-        }
-    }
 }
 
 Chunk::~Chunk() {
@@ -92,10 +64,10 @@ Block* Chunk::getBlock(glm::ivec3 position) {
     return &m_blocks[toBlocksIndex(position)];
 }
 
-Block* Chunk::setBlock(glm::ivec3 position, BlockID block) {
+Block* Chunk::setBlock(glm::ivec3 position, BlockID block, bool mark) {
     unsigned int index = toBlocksIndex(position);
     m_blocks[index].setBlockID(block);
-    markDirty();
+    if(mark) markDirty();
     return &m_blocks[index];
 }
 
