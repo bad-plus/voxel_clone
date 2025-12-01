@@ -30,10 +30,14 @@ Game::Game() {
     updateGameContext();
 
     m_render = new Render(&m_game_context);
-    m_render->updateCamera(m_camera);
+    m_render->setCamera(m_camera);
     updateGameContext();
 
     m_loader->loadResources();
+    
+    m_world = new World(&m_game_context);
+    m_render->setWorld(m_world);
+
     m_window->setCursorEnabled(false);
     startMainLoop();
 }
@@ -64,6 +68,7 @@ Game::~Game() {
     delete m_input_handler;
     delete m_resources;
     delete m_loader;
+    delete m_world;
 
     glfwTerminate();
 }
@@ -81,6 +86,8 @@ void Game::startMainLoop() {
         double end_render_time = glfwGetTime();
         
         m_input->update_input();
+
+        m_world->updateMeshChunks();
 
         double end_game_tick_time = glfwGetTime();
 

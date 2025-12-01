@@ -15,20 +15,19 @@ Render::Render(GameContext* game_context) {
 
     m_debug_render_mode = false;
     m_render_dist = 5;
+
+    m_world = nullptr;
+    m_camera = nullptr;
 }
 Render::~Render() {
 
 }
-
-World* world;
 
 void Render::initRender() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
     glEnable(GL_DEPTH_TEST);
-
-    world = new World(m_game_context);
 }
 
 void Render::render() {
@@ -43,14 +42,16 @@ void Render::render() {
     if(m_debug_render_mode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    renderWorld(world, m_camera, m_render_dist);
+    renderWorld(m_world, m_camera, m_render_dist);
 
     glfwSwapBuffers(window);
-    
-    world->updateMeshChunks();
 }
-void Render::updateCamera(Camera* camera) {
+void Render::setCamera(Camera* camera) {
     m_camera = camera;
+}
+
+void Render::setWorld(World* world) {
+    m_world = world;
 }
 
 void Render::setDebugRenderMode(bool mode) {
@@ -58,6 +59,8 @@ void Render::setDebugRenderMode(bool mode) {
 }
 
 void Render::renderWorld(World* world, Camera* camera, int render_dist) {
+    if(world == nullptr || camera == nullptr) return;
+    
     Shader* world_block_shader = m_game_context->resources->getShader("block_shader");
     TextureAtlas* atlas = m_game_context->resources->getTextureAtlas();
 

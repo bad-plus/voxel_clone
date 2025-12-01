@@ -6,6 +6,7 @@
 #include "input_handler.h"
 #include "resources.h"
 #include "loader.h"
+#include "../world/world.h"
 
 class Game;
 
@@ -49,6 +50,7 @@ private:
     InputHandler* m_input_handler;
     Resources* m_resources;
     Loader* m_loader;
+    World* m_world;
 
     GameContext m_game_context;
 

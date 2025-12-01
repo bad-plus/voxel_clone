@@ -10,7 +10,10 @@ public:
     ~Render();
 
     void render();
-    void updateCamera(Camera* camera);
+
+    void setCamera(Camera* camera);
+    void setWorld(World* world);
+
     void setDebugRenderMode(bool mode);
 
     void renderWorld(World* world, Camera* camera, int render_dist = 5);
@@ -25,6 +28,7 @@ private:
     GameContext* m_game_context;
 
     Camera* m_camera;
+    World* m_world;
 
-    int m_render_dist; // render chunk dist
+    int m_render_dist;
 };
