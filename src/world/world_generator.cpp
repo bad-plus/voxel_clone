@@ -15,6 +15,7 @@ WorldGeneator::~WorldGeneator() {
 
 
 Chunk* WorldGeneator::generateChunk(Chunk* chunk, int x, int z) {
+    LOG_INFO("generation chunk {0} {1}", x, z);
     const int max_terrain_height = 256;
     const float scale = 0.008f;
 
@@ -43,7 +44,6 @@ Chunk* WorldGeneator::generateChunk(Chunk* chunk, int x, int z) {
                 if(py == final_height - 5) block = BlockID::DIRT;
 
                 chunk->setBlock({px, py, pz}, block, false);
-                chunk->generated_status();
             }
         }
     }

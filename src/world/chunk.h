@@ -4,6 +4,7 @@
 
 #include <glm/glm.hpp>
 #include <glad/glad.h>
+#include <mutex>
 
 const unsigned int CHUNK_SIZE_X =        16;
 const unsigned int CHUNK_SIZE_Y =        256; // height
@@ -25,7 +26,6 @@ public:
     bool isDirty();
 
     void generated_status();
-    bool isGenerated();
 
     void updateNeighbors(Chunk* x_p = nullptr, Chunk* z_p = nullptr, Chunk* x_m = nullptr, Chunk* z_m = nullptr);
 private:
@@ -38,7 +38,7 @@ private:
     unsigned int m_indices_count;
 
     bool m_dirty;
-    bool m_need_generate;
+    std::mutex m_dirty_mutex;
 
     struct {
         Chunk* x_p;
@@ -46,4 +46,5 @@ private:
         Chunk* x_m;
         Chunk* z_m;
     } m_neighbors;
+    std::mutex m_neighbors_mutex;
 };

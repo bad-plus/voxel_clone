@@ -14,7 +14,7 @@ Render::Render(GameContext* game_context) {
     initRender();
 
     m_debug_render_mode = false;
-    m_render_dist = 15;
+    m_render_dist = 5;
 
     m_world = nullptr;
     m_camera = nullptr;
@@ -45,6 +45,7 @@ void Render::render() {
     renderWorld(m_world, m_camera, m_render_dist);
 
     glfwSwapBuffers(window);
+    m_world->processUpdateMeshQueue();
 }
 void Render::setCamera(Camera* camera) {
     m_camera = camera;
@@ -95,8 +96,9 @@ void Render::renderWorld(World* world, Camera* camera, int render_dist) {
             world_block_shader->uniformmat4fv("transform", mat);
 
             Chunk* chunk = world->getChunk(global_chunk_position_x, global_chunk_position_z, true);
-
-            if(!chunk->isDirty()) chunk->draw();
+            if(chunk != nullptr) {
+                if(!chunk->isDirty()) chunk->draw();
+            }
         }
     }
 }

@@ -41,6 +41,7 @@ private:
     void initGLFW();
     void startMainLoop();
     void updateGameContext();
+    void worldGenerationThread();
 
     Window* m_window;
     bool m_quit;

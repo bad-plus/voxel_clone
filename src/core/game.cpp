@@ -21,7 +21,7 @@ Game::Game() {
     m_window = new Window("Game test", 800, 600, &m_game_context);
     updateGameContext();
 
-    m_camera = new Camera({10.0f, 130.0f, 10.0f});
+    m_camera = new Camera({10.0f, 160.0f, 10.0f});
     updateGameContext();
 
     m_resources = new Resources();
@@ -41,8 +41,18 @@ Game::Game() {
     m_world = new World(&m_game_context, m_world_generator);
     m_render->setWorld(m_world);
 
+    std::thread world_generation_thread(&Game::worldGenerationThread, this);
+    world_generation_thread.detach();
+
     m_window->setCursorEnabled(false);
     startMainLoop();
+}
+
+void Game::worldGenerationThread() {
+    while(!m_quit) {
+        m_world->processGenerationQueue();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
 }
 
 void Game::updateGameContext() {
@@ -89,9 +99,6 @@ void Game::startMainLoop() {
         double end_render_time = glfwGetTime();
         
         m_input->update_input();
-
-        m_world->generateChunks();
-        m_world->updateMeshChunks();
 
         double end_game_tick_time = glfwGetTime();
 

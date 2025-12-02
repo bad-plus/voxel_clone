@@ -19,9 +19,9 @@ glm::ivec3 toBlocksPos(unsigned int index) {
 Chunk::Chunk() {
     m_neighbors = {nullptr, nullptr, nullptr, nullptr};
     m_dirty = true;
-    m_need_generate = true;
 
     glGenVertexArrays(1, &m_VAO);
+    LOG_INFO("{0}", m_VAO);
     glGenBuffers(1, &m_VBO);
     glGenBuffers(1, &m_EBO);
 
@@ -39,6 +39,7 @@ Chunk::~Chunk() {
 }
 
 void Chunk::markDirty() {
+    std::lock_guard<std::mutex> lock(m_dirty_mutex);
     m_dirty = true;
 }
 
@@ -79,7 +80,7 @@ bool checkBlockTransparent(Block* block) {
 }
 
 void Chunk::updateMesh() {
-    if(!m_dirty || m_need_generate) return;
+    if(!m_dirty) return;
 
     std::vector<GLfloat> vertices;
     std::vector<GLuint> indices;
@@ -254,6 +255,8 @@ void Chunk::draw() {
 }
 
 void Chunk::updateNeighbors(Chunk* x_p, Chunk* z_p, Chunk* x_m, Chunk* z_m) {
+    std::lock_guard<std::mutex> lock(m_neighbors_mutex);
+
     if(x_p != nullptr) m_neighbors.x_p = x_p;
     if(z_p != nullptr) m_neighbors.z_p = z_p;
     if(x_m != nullptr) m_neighbors.x_m = x_m;
@@ -261,14 +264,6 @@ void Chunk::updateNeighbors(Chunk* x_p, Chunk* z_p, Chunk* x_m, Chunk* z_m) {
 }
 
 bool Chunk::isDirty() {
+    std::lock_guard<std::mutex> lock(m_dirty_mutex);
     return m_dirty;
-}
-
-
-void Chunk::generated_status() {
-    m_need_generate = false;
-}
-
-bool Chunk::isGenerated() {
-    return !m_need_generate;
 }
