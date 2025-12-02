@@ -21,7 +21,7 @@ Game::Game() {
     m_window = new Window("Game test", 1280, 720, &m_game_context);
     updateGameContext();
 
-    m_camera = new Camera({10.0f, 300.0f, 10.0f});
+    m_camera = new Camera({10.0f, 200.0f, 10.0f});
     updateGameContext();
 
     m_resources = new Resources();
