@@ -17,11 +17,13 @@ glm::ivec3 toBlocksPos(unsigned int index) {
 }
 
 Chunk::Chunk() {
-    m_neighbors = {nullptr, nullptr, nullptr, nullptr};
+    m_neighbors.x_p.store(nullptr);
+    m_neighbors.z_p.store(nullptr);
+    m_neighbors.x_m.store(nullptr);
+    m_neighbors.z_m.store(nullptr);
     m_dirty = true;
 
     glGenVertexArrays(1, &m_VAO);
-    LOG_INFO("{0}", m_VAO);
     glGenBuffers(1, &m_VBO);
     glGenBuffers(1, &m_EBO);
 
@@ -47,20 +49,20 @@ Block* Chunk::getBlock(glm::ivec3 position) {
     if(position.y < 0 || position.y >= CHUNK_SIZE_Y) return nullptr;
     
     if(position.x < 0) {
-        if(m_neighbors.x_m == nullptr) return nullptr;
-        return m_neighbors.x_m->getBlock({CHUNK_SIZE_X + position.x, position.y, position.z});
+        if(m_neighbors.x_m.load() == nullptr) return nullptr;
+        return m_neighbors.x_m.load()->getBlock({CHUNK_SIZE_X + position.x, position.y, position.z});
     }
     if(position.z < 0) {
-        if(m_neighbors.z_m == nullptr) return nullptr;
-        return m_neighbors.z_m->getBlock({position.x, position.y, CHUNK_SIZE_Z + position.z});
+        if(m_neighbors.z_m.load() == nullptr) return nullptr;
+        return m_neighbors.z_m.load()->getBlock({position.x, position.y, CHUNK_SIZE_Z + position.z});
     }
     if(position.x >= CHUNK_SIZE_X) {
-        if(m_neighbors.x_p == nullptr) return nullptr;
-        return m_neighbors.x_p->getBlock({position.x - CHUNK_SIZE_X, position.y, position.z});
+        if(m_neighbors.x_p.load() == nullptr) return nullptr;
+        return m_neighbors.x_p.load()->getBlock({position.x - CHUNK_SIZE_X, position.y, position.z});
     }
     if(position.z >= CHUNK_SIZE_Z) {
-        if(m_neighbors.z_p == nullptr) return nullptr;
-        return m_neighbors.z_p->getBlock({position.x, position.y, position.z - CHUNK_SIZE_Z});
+        if(m_neighbors.z_p.load() == nullptr) return nullptr;
+        return m_neighbors.z_p.load()->getBlock({position.x, position.y, position.z - CHUNK_SIZE_Z});
     }
     
     return &m_blocks[toBlocksIndex(position)];
@@ -255,12 +257,10 @@ void Chunk::draw() {
 }
 
 void Chunk::updateNeighbors(Chunk* x_p, Chunk* z_p, Chunk* x_m, Chunk* z_m) {
-    std::lock_guard<std::mutex> lock(m_neighbors_mutex);
-
-    if(x_p != nullptr) m_neighbors.x_p = x_p;
-    if(z_p != nullptr) m_neighbors.z_p = z_p;
-    if(x_m != nullptr) m_neighbors.x_m = x_m;
-    if(z_m != nullptr) m_neighbors.z_m = z_m;
+    if(x_p != nullptr) m_neighbors.x_p.store(x_p);
+    if(z_p != nullptr) m_neighbors.z_p.store(z_p);
+    if(x_m != nullptr) m_neighbors.x_m.store(x_m);
+    if(z_m != nullptr) m_neighbors.z_m.store(z_m);
 }
 
 bool Chunk::isDirty() {

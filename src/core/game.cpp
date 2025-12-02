@@ -18,10 +18,10 @@ Game::Game() {
 
     m_input_handler = new InputHandler(&m_game_context);
 
-    m_window = new Window("Game test", 800, 600, &m_game_context);
+    m_window = new Window("Game test", 1280, 720, &m_game_context);
     updateGameContext();
 
-    m_camera = new Camera({10.0f, 160.0f, 10.0f});
+    m_camera = new Camera({10.0f, 300.0f, 10.0f});
     updateGameContext();
 
     m_resources = new Resources();

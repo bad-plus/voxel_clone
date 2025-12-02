@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 #include <mutex>
+#include <atomic>
 
 const unsigned int CHUNK_SIZE_X =        16;
 const unsigned int CHUNK_SIZE_Y =        256; // height
@@ -41,10 +42,9 @@ private:
     std::mutex m_dirty_mutex;
 
     struct {
-        Chunk* x_p;
-        Chunk* z_p;
-        Chunk* x_m;
-        Chunk* z_m;
+        std::atomic<Chunk*> x_p;
+        std::atomic<Chunk*> z_p;
+        std::atomic<Chunk*> x_m;
+        std::atomic<Chunk*> z_m;
     } m_neighbors;
-    std::mutex m_neighbors_mutex;
 };

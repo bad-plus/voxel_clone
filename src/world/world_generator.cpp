@@ -12,10 +12,7 @@ WorldGeneator::~WorldGeneator() {
     delete m_perlin;
 }
 
-
-
 Chunk* WorldGeneator::generateChunk(Chunk* chunk, int x, int z) {
-    LOG_INFO("generation chunk {0} {1}", x, z);
     const int max_terrain_height = 256;
     const float scale = 0.008f;
 
