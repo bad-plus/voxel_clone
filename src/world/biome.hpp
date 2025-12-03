@@ -24,7 +24,7 @@ namespace Biome {
     inline std::unordered_map<BiomeID, BiomeInfo> BiomesInfo = {
         {BiomeID::PLANKS, {
             .base_height = 100,
-            .height_variation = 40,
+            .height_variation = 30,
             
             .top_block = BlockID::GRASS,
             .under_block = BlockID::DIRT
@@ -40,7 +40,7 @@ namespace Biome {
 
         {BiomeID::WINTER, {
             .base_height = 130,
-            .height_variation = 50,
+            .height_variation = 20,
             
             .top_block = BlockID::SNOW_GRASS,
             .under_block = BlockID::DIRT
@@ -72,7 +72,7 @@ namespace Biome {
     std::unordered_map<BiomeID, float> getBiomeWeight(Perlin2D* perlin, int world_x, int world_z) {
         std::unordered_map<BiomeID, float> weights;
         
-        const float biome_scale = 0.003f;
+        const float biome_scale = 0.0001f;
         float noise = perlin->noise((float)(world_x * biome_scale), (float)(world_z * biome_scale) + 1.0f) * 0.5f;
 
         int n = BiomesInfo.size();
