@@ -80,6 +80,7 @@ set(SOURCE_FILES
     src/world/perlin_2d.cpp
     src/world/world_generator.h
     src/world/world_generator.cpp
+    src/world/biome.hpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})

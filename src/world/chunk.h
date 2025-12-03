@@ -8,7 +8,7 @@
 #include <atomic>
 
 const unsigned int CHUNK_SIZE_X =        16;
-const unsigned int CHUNK_SIZE_Y =        256; // height
+const unsigned int CHUNK_SIZE_Y =        512; // height
 const unsigned int CHUNK_SIZE_Z =        16;
 
 struct Chunk;
