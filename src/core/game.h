@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "window.h"
 #include "input.h"
 #include "../render/render.h"
@@ -35,7 +35,7 @@ public:
     void quit();
 
     GameSystemInfo getSystemInfo();
-    
+
     GameSystemInfo m_game_system_info;
 private:
     void initGLFW();
@@ -53,7 +53,7 @@ private:
     Resources* m_resources;
     Loader* m_loader;
     World* m_world;
-    WorldGeneator* m_world_generator;
+    WorldGenerator* m_world_generator;
 
     GameContext m_game_context;
 

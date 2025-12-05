@@ -1,6 +1,7 @@
 #include "game.h"
 #include "window.h"
 #include "logger.h"
+#include "../world/world_generator.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -21,7 +22,7 @@ Game::Game() {
     m_window = new Window("Game test", 1280, 720, &m_game_context);
     updateGameContext();
 
-    m_camera = new Camera({10.0f, 200.0f, 10.0f});
+    m_camera = new Camera({ 10.0f, 200.0f, 10.0f });
     updateGameContext();
 
     m_resources = new Resources();
@@ -35,8 +36,10 @@ Game::Game() {
     updateGameContext();
 
     m_loader->loadResources();
-    
-    m_world_generator = new WorldGeneator(777);
+
+    int seed = 1 + rand();
+    m_world_generator = new WorldGenerator(seed);
+    LOG_INFO("World seed: {0}", seed);
 
     m_world = new World(&m_game_context, m_world_generator);
     m_render->setWorld(m_world);
@@ -49,9 +52,10 @@ Game::Game() {
 }
 
 void Game::worldGenerationThread() {
-    while(!m_quit) {
+    while (!m_quit) {
+        m_world->processUpdateMeshQueue();
         m_world->processGenerationQueue();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 }
 
@@ -88,7 +92,7 @@ Game::~Game() {
 }
 
 void Game::startMainLoop() {
-    while(!m_quit) {
+    while (!m_quit) {
         double start_game_tick_time = glfwGetTime();
 
         m_window->eventProcessing();
@@ -97,7 +101,7 @@ void Game::startMainLoop() {
         double start_render_time = glfwGetTime();
         m_render->render();
         double end_render_time = glfwGetTime();
-        
+
         m_input->update_input();
 
         double end_game_tick_time = glfwGetTime();
@@ -121,7 +125,7 @@ GameSystemInfo Game::getSystemInfo() {
 
 void Game::initGLFW() {
     LOG_INFO("Starting application...");
-    if(!glfwInit()) {
+    if (!glfwInit()) {
         LOG_ERROR("GLFW not initialized");
         return;
     }

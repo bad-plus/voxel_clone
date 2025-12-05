@@ -17,7 +17,7 @@
 
 namespace fs = std::filesystem;
 
-#define TEXTURES_PATH               "resources/textures/blocks/"
+#define TEXTURES_PATH               "/resources/textures/blocks/"
 
 #define ATLAS_SIZE                  1280// px
 #define ATLAS_CHANNELS              4 // color channels

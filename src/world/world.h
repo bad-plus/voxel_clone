@@ -5,7 +5,7 @@
 
 struct Chunk;
 struct GameContext;
-struct WorldGeneator;
+struct WorldGenerator;
 
 struct ChunkInfo {
     Chunk* chunk;
@@ -15,12 +15,12 @@ struct ChunkInfo {
 
 class World {
 public:
-    World(GameContext* context, WorldGeneator* generator);
+    World(GameContext* context, WorldGenerator* generator);
     ~World();
 
     Chunk* getChunk(int x, int z, bool create = false);
 
-    void pushGeneriationQueue(ChunkInfo* chunk);
+    void pushGenerationQueue(ChunkInfo* chunk);
     ChunkInfo* pullGenerationQueue();
 
     void pushToChunks(ChunkInfo* chunk_info);
@@ -39,7 +39,7 @@ private:
     std::unordered_map<long long, ChunkInfo*> m_chunks;
     std::mutex m_chunks_mutex;
 
-    WorldGeneator* m_generator;
+    WorldGenerator* m_generator;
     GameContext* m_game_context;
 
     std::deque<ChunkInfo*> m_generation_queue;

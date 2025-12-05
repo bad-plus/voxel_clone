@@ -1,12 +1,12 @@
-#pragma once
+﻿#pragma once
 
 struct Chunk;
 struct Perlin2D;
 
-class WorldGeneator {
+class WorldGenerator {
 public:
-    WorldGeneator(int seed);
-    ~WorldGeneator();
+    WorldGenerator(int seed);
+    ~WorldGenerator();
 
     Chunk* generateChunk(Chunk* chunk, int x, int z);
 private:

@@ -10,7 +10,10 @@ enum class BlockID {
     DIRT,
     GRASS,
     SNOW_GRASS,
-    MY_LOVE
+    MY_LOVE,
+    SAND,
+    WATER,
+    BEDROCK
 };
 
 struct SideUV {
@@ -42,7 +45,10 @@ inline std::unordered_map<BlockID, BlockInfo> BlocksInfo = {
     {BlockID::DIRT, {"dirt", false}},
     {BlockID::GRASS, {"grass", false}},
     {BlockID::SNOW_GRASS, {"snow_grass", false}},
-    {BlockID::MY_LOVE, {"love", false}}
+    {BlockID::MY_LOVE, {"love", false}},
+    {BlockID::SAND, {"sand", false}},
+    {BlockID::WATER, {"water", true}},
+    {BlockID::BEDROCK, {"bedrock", false}}
 };
 
 

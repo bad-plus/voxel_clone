@@ -1,4 +1,5 @@
 #include "resources.h"
+#include "logger.h"
 
 #include "../render/shader.h"
 #include "../render/texture_atlas.h"

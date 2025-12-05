@@ -5,11 +5,12 @@
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 #include <mutex>
+#include <vector>
 #include <atomic>
 
-const unsigned int CHUNK_SIZE_X =        16;
-const unsigned int CHUNK_SIZE_Y =        512; // height
-const unsigned int CHUNK_SIZE_Z =        16;
+const unsigned int CHUNK_SIZE_X = 16;
+const unsigned int CHUNK_SIZE_Y = 256; // height
+const unsigned int CHUNK_SIZE_Z = 16;
 
 struct Chunk;
 
@@ -22,14 +23,25 @@ public:
     Block* setBlock(glm::ivec3 position, BlockID block, bool mark = false);
 
     void draw();
-    void updateMesh();
     void markDirty();
     bool isDirty();
 
-    void generated_status();
-
     void updateNeighbors(Chunk* x_p = nullptr, Chunk* z_p = nullptr, Chunk* x_m = nullptr, Chunk* z_m = nullptr);
+
+    void calculateMesh();
+    void uploadMeshToGPU();
+
+    std::vector < BlockID > getBlocksSnapshot();
 private:
+    Block* getBlockLocal(glm::ivec3 position);
+
+    struct {
+        std::vector<GLfloat> vertices;
+        std::vector<GLuint> indices;
+
+        std::atomic<bool> ready;
+    } m_ready_gpu; // ready to load gpu
+
     Block* m_blocks;
 
     GLuint m_VBO;

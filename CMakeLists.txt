@@ -1,16 +1,31 @@
-cmake_minimum_required(VERSION 4.1.1)
-
+cmake_minimum_required(VERSION 4.2)
 set(PROJECT_NAME voxel_clone)
-
 project(${PROJECT_NAME})
 
-include (FetchContent)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(OUTPUT_DIR ${CMAKE_SOURCE_DIR}/bin)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+
+foreach(OUTPUTCONFIG IN ITEMS Debug Release RelWithDebInfo MinSizeRel)
+    string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG_UPPER)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} ${OUTPUT_DIR})
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} ${OUTPUT_DIR})
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG_UPPER} ${OUTPUT_DIR})
+endforeach()
+
+include(FetchContent)
 
 # GLFW
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
-    GIT_TAG latest
+    GIT_TAG 3.4
 )
 FetchContent_MakeAvailable(glfw)
 
@@ -22,7 +37,7 @@ target_include_directories(glad PUBLIC external/glad/include)
 FetchContent_Declare(
     glm
     GIT_REPOSITORY https://github.com/g-truc/glm.git
-    GIT_TAG master
+    GIT_TAG 1.0.1
 )
 FetchContent_MakeAvailable(glm)
 
@@ -42,48 +57,22 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(spdlog)
 
-set(SOURCE_FILES 
-    src/main.cpp
-    src/core/stb_image_impl.cpp
-    src/core/game.h
-    src/core/game.cpp
-    src/core/window.h
-    src/core/window.cpp
-    src/core/window_events.cpp
-    src/core/window_callbacks.cpp
-    src/render/shader.h
-    src/render/shader.cpp
-    src/core/logger.h
-    src/core/logger.cpp
-    src/render/texture2D.h
-    src/render/texture2D.cpp
-    src/world/block.h
-    src/world/block.cpp
-    src/world/chunk.h
-    src/world/chunk.cpp
-    src/render/texture_atlas.h
-    src/render/texture_atlas.cpp
-    src/render/camera.hpp
-    src/core/input.h
-    src/core/input.cpp
-    src/render/render.h
-    src/render/render.cpp
-    src/core/input_handler.h
-    src/core/input_handler.cpp
-    src/core/resources.h
-    src/core/resources.cpp
-    src/world/world.h
-    src/world/world.cpp
-    src/core/loader.h
-    src/core/loader.cpp
-    src/world/perlin_2d.h
-    src/world/perlin_2d.cpp
-    src/world/world_generator.h
-    src/world/world_generator.cpp
-    src/world/biome.hpp
+file(GLOB_RECURSE SOURCE_FILES 
+    "src/*.cpp"
+    "src/*.h"
+    "src/*.hpp"
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+
+foreach(SOURCE IN ITEMS ${SOURCE_FILES})
+    get_filename_component(SOURCE_PATH "${SOURCE}" PATH)
+    file(RELATIVE_PATH SOURCE_PATH_REL "${CMAKE_CURRENT_SOURCE_DIR}" "${SOURCE_PATH}")
+    string(REPLACE "/" "\\" GROUP_PATH "${SOURCE_PATH_REL}")
+    source_group("${GROUP_PATH}" FILES "${SOURCE}")
+endforeach()
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${stb_SOURCE_DIR})
 
@@ -94,4 +83,14 @@ target_link_libraries(${PROJECT_NAME}
     spdlog::spdlog
 )
 
-file(COPY resources DESTINATION ${CMAKE_BINARY_DIR})
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD 
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/resources 
+    ${OUTPUT_DIR}/resources
+    COMMENT "Копирование ресурсов в ${OUTPUT_DIR}/resources"
+)
+
+add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_DIR}
+    COMMENT "Создание выходной директории ${OUTPUT_DIR}"
+)
