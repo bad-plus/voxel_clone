@@ -19,7 +19,7 @@ Game::Game() {
 
     m_input_handler = new InputHandler(&m_game_context);
 
-    m_window = new Window("Game test", 1280, 720, &m_game_context);
+    m_window = new Window("Game test", 1700, 860, &m_game_context);
     updateGameContext();
 
     m_camera = new Camera({ 10.0f, 200.0f, 10.0f });
@@ -37,6 +37,7 @@ Game::Game() {
 
     m_loader->loadResources();
 
+    srand((int)glfwGetTime());
     int seed = 1 + rand();
     m_world_generator = new WorldGenerator(seed);
     LOG_INFO("World seed: {0}", seed);

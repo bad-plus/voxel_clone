@@ -30,4 +30,9 @@ void InputHandler::processing() {
         current_render_debug_mode = !current_render_debug_mode;
         m_game_context->render->setDebugRenderMode(current_render_debug_mode);
     }
+
+    if (input->jpressed(GLFW_KEY_R)) {
+        m_game_context->camera->m_position.x = rand();
+        m_game_context->camera->m_position.z = rand();
+    }
 }
