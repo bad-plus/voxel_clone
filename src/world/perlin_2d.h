@@ -7,6 +7,7 @@ public:
     ~Perlin2D();
 
     float noise(float x, float y);
+    int get_seed();
 private:
     float fade(float t);
     float lerp(float a, float b, float t);

@@ -10,6 +10,7 @@
 #include "../world/world_generator.h"
 
 class Game;
+struct World;
 
 struct GameContext {
     Game* game;
@@ -19,6 +20,7 @@ struct GameContext {
     Camera* camera;
     Resources* resources;
     Loader* loader;
+    World* world;
 };
 
 struct GameSystemInfo {

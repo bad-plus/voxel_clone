@@ -1,5 +1,6 @@
 ﻿#include "world.h"
 #include "chunk.h"
+#include "block.h"
 #include "../core/logger.h"
 #include <GLFW/glfw3.h>
 #include "world_generator.h"
@@ -177,4 +178,79 @@ void World::processUpdateMeshQueue() {
     if (chunk_info == nullptr) return;
 
     chunk_info->chunk->calculateMesh();
+}
+
+inline int floorDiv(int a, int b) {
+    return (a / b) - (a % b < 0 ? 1 : 0);
+}
+
+Block* World::getBlock(int world_x, int world_y, int world_z) {
+    int chunk_x = floorDiv(world_x, CHUNK_SIZE_X);
+    int chunk_z = floorDiv(world_z, CHUNK_SIZE_Z);
+
+    int in_chunk_x = world_x % CHUNK_SIZE_X;
+    if (in_chunk_x < 0) in_chunk_x += CHUNK_SIZE_X;
+
+    int in_chunk_y = world_y;
+
+    int in_chunk_z = world_z % CHUNK_SIZE_Z;
+    if (in_chunk_z < 0) in_chunk_z += CHUNK_SIZE_Z;
+
+    Chunk* chunk = getChunk(chunk_x, chunk_z);
+    if (chunk == nullptr) return nullptr;
+
+    return chunk->getBlock({ in_chunk_x, in_chunk_y, in_chunk_z });
+}
+
+void World::setBlock(int world_x, int world_y, int world_z, BlockID block_id) {
+    int chunk_x = floorDiv(world_x, CHUNK_SIZE_X);
+    int chunk_z = floorDiv(world_z, CHUNK_SIZE_Z);
+
+    int in_chunk_x = world_x % CHUNK_SIZE_X;
+    if (in_chunk_x < 0) in_chunk_x += CHUNK_SIZE_X;
+
+    int in_chunk_y = world_y;
+
+    int in_chunk_z = world_z % CHUNK_SIZE_Z;
+    if (in_chunk_z < 0) in_chunk_z += CHUNK_SIZE_Z;
+
+    ChunkInfo* chunk = getChunkProtected(chunk_x, chunk_z);
+    if (chunk == nullptr) return;
+
+    Block* block = chunk->chunk->getBlock({ in_chunk_x, in_chunk_y, in_chunk_z });
+    if (block == nullptr) return;
+
+    block->setBlockID(block_id);
+
+    std::lock_guard<std::mutex> lock(m_chunks_mutex);
+
+    if (in_chunk_x == 0) {
+        auto it = m_chunks.find(pack_chunk_coords(chunk_x - 1, chunk_z));
+        if (it != m_chunks.end()) {
+            pushUpdateMeshQueue(it->second);
+        }
+    }
+
+    if (in_chunk_x == CHUNK_SIZE_X - 1) {
+        auto it = m_chunks.find(pack_chunk_coords(chunk_x + 1, chunk_z));
+        if (it != m_chunks.end()) {
+            pushUpdateMeshQueue(it->second);
+        }
+    }
+
+    if (in_chunk_z == 0) {
+        auto it = m_chunks.find(pack_chunk_coords(chunk_x, chunk_z - 1));
+        if (it != m_chunks.end()) {
+            pushUpdateMeshQueue(it->second);
+        }
+    }
+
+    if (in_chunk_z == CHUNK_SIZE_Z - 1) {
+        auto it = m_chunks.find(pack_chunk_coords(chunk_x, chunk_z + 1));
+        if (it != m_chunks.end()) {
+            pushUpdateMeshQueue(it->second);
+        }
+    }
+
+    pushUpdateMeshQueue(chunk);
 }

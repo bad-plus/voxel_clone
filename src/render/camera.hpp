@@ -17,7 +17,7 @@ enum Camera_Movement {
 
 const GLfloat YAW               = -90.f;
 const GLfloat PITCH             = 0.0f;
-const GLfloat SPEED             = 350.0f;
+const GLfloat SPEED             = 10.0f;
 const GLfloat SENSIVITY         = 0.25f;
 const GLfloat ZOOM              = 45.0f;
 
@@ -34,6 +34,10 @@ public:
     GLfloat m_movement_speed;
     GLfloat m_mouse_sensivity;
     GLfloat m_zoom;
+
+    void setSpeed(int speed) {
+        m_movement_speed = speed;
+    }
 
     Camera(
         glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
@@ -97,6 +101,8 @@ public:
                 break;
             }
         }
+
+        updateCameraVectors();
     }
 
     void processMouseMovement(

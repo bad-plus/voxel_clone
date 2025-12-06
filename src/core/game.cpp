@@ -44,6 +44,7 @@ Game::Game() {
 
     m_world = new World(&m_game_context, m_world_generator);
     m_render->setWorld(m_world);
+    updateGameContext();
 
     std::thread world_generation_thread(&Game::worldGenerationThread, this);
     world_generation_thread.detach();
@@ -68,6 +69,7 @@ void Game::updateGameContext() {
     m_game_context.camera = m_camera;
     m_game_context.resources = m_resources;
     m_game_context.loader = m_loader;
+    m_game_context.world = m_world;
 }
 
 void Game::quit() {

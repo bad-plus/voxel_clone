@@ -58,3 +58,7 @@ float Perlin2D::noise(float x, float y) {
 
     return lerp(x1, x2, v);
 }
+
+int Perlin2D::get_seed() {
+    return m_seed;
+}

@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <deque>
 #include <mutex>
+#include "../world/block.h"
 
 struct Chunk;
 struct GameContext;
@@ -19,6 +20,8 @@ public:
     ~World();
 
     Chunk* getChunk(int x, int z, bool create = false);
+    Block* getBlock(int world_x, int world_y, int world_z);
+    void setBlock(int world_x, int world_y, int world_z, BlockID block_id);
 
     void pushGenerationQueue(ChunkInfo* chunk);
     ChunkInfo* pullGenerationQueue();
