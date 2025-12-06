@@ -12,7 +12,7 @@ void WorldGenerator::generateTerrain(Chunk* chunk, int x, int z) {
 
             auto weights = Biome::getBiomeWeight(m_perlin, world_pos_x, world_pos_z);
             Biome::BiomeID biome = Biome::getDominantBiome(weights);
-            int height = Biome::getHeight(m_perlin, world_pos_x, world_pos_z, weights);
+            int height = Biome::getHeight(m_biome_perlins, world_pos_x, world_pos_z, weights);
 
             for (int py = 0; py < height; py++) {
                 BlockID block = BlockID::EMPTY;

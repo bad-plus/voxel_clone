@@ -213,7 +213,7 @@ namespace Biome {
         return weights;
     }
 
-    inline int getHeight(Perlin2D* perlin, int world_x, int world_z, std::map<BiomeID, float>& weights) {
+    inline int getHeight(std::map<Biome::BiomeID, Perlin2D*>& perlins, int world_x, int world_z, std::map<BiomeID, float>& weights) {
         float result_height = 0.0f;
 
         for (const auto& w : weights) {
@@ -226,25 +226,25 @@ namespace Biome {
 
             float height = 0.0f;
 
-            float noise_continent = (perlin->noise(
+            float noise_continent = (perlins[id]->noise(
                 (float)world_x * info.frequency_continent,
                 (float)world_z * info.frequency_continent) + 1.0f) * 0.5f * info.amplitude_continent;
 
             height += noise_continent;
 
-            float noise_terrain = (perlin->noise(
+            float noise_terrain = (perlins[id]->noise(
                 (float)world_x * info.frequency_terrain,
                 (float)world_z * info.frequency_terrain) + 1.0f) * 0.5f * info.amplitude_terrain;
 
             height += noise_terrain;
 
-            float noise_details = (perlin->noise(
+            float noise_details = (perlins[id]->noise(
                 (float)world_x * info.frequency_details,
                 (float)world_z * info.frequency_details) + 1.0f) * 0.5f * info.amplitude_details;
 
             height += noise_details;
 
-            float noise_ridge_raw = perlin->noise(
+            float noise_ridge_raw = perlins[id]->noise(
                 (float)world_x * info.frequency_ridge,
                 (float)world_z * info.frequency_ridge);
 

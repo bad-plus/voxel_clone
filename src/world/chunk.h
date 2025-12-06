@@ -19,6 +19,8 @@ public:
     Chunk();
     ~Chunk();
 
+    int getTopBlockPosition(int x, int z);
+
     Block* getBlock(glm::ivec3 position);
     Block* setBlock(glm::ivec3 position, BlockID block, bool mark = false);
 

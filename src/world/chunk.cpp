@@ -361,3 +361,14 @@ bool Chunk::isDirty() {
     std::lock_guard<std::mutex> lock(m_dirty_mutex);
     return m_dirty;
 }
+
+int Chunk::getTopBlockPosition(int x, int z) {
+    for (int y = CHUNK_SIZE_Y - 1; y >= 0; y--) {
+        Block* block = getBlockLocal({ x, y, z });
+
+        if (block->getBlockID() != BlockID::EMPTY) {
+            return y;
+        }
+    }
+    return 0;
+}
