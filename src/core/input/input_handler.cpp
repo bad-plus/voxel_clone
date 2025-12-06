@@ -40,7 +40,7 @@ void InputHandler::processing() {
 
     if (input->jclicked(GLFW_MOUSE_BUTTON_1)) {
         const float max_dist = 10.f;
-        const float step = 0.05f;
+        const float step = 0.01f;
 
         float curr_dist = 0.0f;
 
