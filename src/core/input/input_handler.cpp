@@ -1,8 +1,8 @@
 ﻿#include "input_handler.h"
-#include "game.h"
+#include "../game.h"
 #include "input.h"
-#include "../world/chunk.h"
-#include "../world/block.h"
+#include "../../world/chunk.h"
+#include "../../world/block.h"
 
 #include <GLFW/glfw3.h>
 

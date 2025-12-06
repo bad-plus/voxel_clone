@@ -1,7 +1,7 @@
 #include "game.h"
-#include "window.h"
+#include "window/window.h"
 #include "logger.h"
-#include "../world/world_generator.h"
+#include "../world/generation/world_generator.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -37,7 +37,7 @@ Game::Game() {
 
     m_loader->loadResources();
 
-    srand((int)glfwGetTime());
+    srand((time(NULL)));
     int seed = 1 + rand();
     m_world_generator = new WorldGenerator(seed);
     LOG_INFO("World seed: {0}", seed);

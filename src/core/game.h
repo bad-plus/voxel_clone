@@ -1,13 +1,13 @@
 ﻿#pragma once
-#include "window.h"
-#include "input.h"
+#include "window/window.h"
+#include "input/input.h"
 #include "../render/render.h"
 #include "../render/camera.hpp"
-#include "input_handler.h"
-#include "resources.h"
-#include "loader.h"
+#include "input/input_handler.h"
+#include "../utils/resource/resources.h"
+#include "../utils/resource/loader.h"
 #include "../world/world.h"
-#include "../world/world_generator.h"
+#include "../world/generation/world_generator.h"
 
 class Game;
 struct World;

@@ -1,5 +1,5 @@
 #include "texture2D.h"
-#include "../core/logger.h"
+#include "../../core/logger.h"
 
 #include "stb_image.h"
 

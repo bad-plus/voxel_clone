@@ -1,8 +1,8 @@
 #include "window.h"
-#include "../render/camera.hpp"
-#include "logger.h"
-#include "input.h"
-#include "game.h"
+#include "../../render/camera.hpp"
+#include "../logger.h"
+#include "../input/input.h"
+#include "../game.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

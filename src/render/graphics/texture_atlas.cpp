@@ -1,7 +1,7 @@
 #include "texture_atlas.h"
-#include "../core/logger.h"
+#include "../../core/logger.h"
 
-#include "../world/block.h"
+#include "../../world/block.h"
 
 #include "stb_image.h"
 #include "stb_rect_pack.h"
@@ -69,7 +69,6 @@ LoadedTexture loadTexture(const std::string path) {
         throw std::runtime_error(std::string("Failed to load texture: ") + path);
     }
 
-    // Преобразуем в RGBA если нужно
     if(tex.channels != 4) {
         auto rgba_data = convertToRGBA(tex.data, tex.width, tex.height, tex.channels);
         stbi_image_free(tex.data);

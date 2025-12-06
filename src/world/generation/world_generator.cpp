@@ -1,8 +1,8 @@
 ﻿#include "world_generator.h"
-#include "block.h"
-#include "chunk.h"
+#include "../block.h"
+#include "../chunk.h"
 #include "perlin_2d.h"
-#include "../core/logger.h"
+#include "../../core/logger.h"
 #include "biome.hpp"
 
 WorldGenerator::WorldGenerator(int seed) {
@@ -24,7 +24,7 @@ Chunk* WorldGenerator::generateChunk(Chunk* chunk, int x, int z) {
             int height = Biome::getHeight(m_perlin, world_pos_x, world_pos_z, weights);
 
             for (int py = 0; py < height; py++) {
-                BlockID block = BlockID::STONE;
+                BlockID block = BlockID::EMPTY;
 
                 if (py == height - 1) block = Biome::BiomesInfo[biome].top_block;
                 else if (py < height - 1 && py > height - 6) block = Biome::BiomesInfo[biome].under_block;

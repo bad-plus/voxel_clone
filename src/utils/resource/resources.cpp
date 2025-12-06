@@ -1,8 +1,8 @@
 #include "resources.h"
-#include "logger.h"
+#include "../../core/logger.h"
 
-#include "../render/shader.h"
-#include "../render/texture_atlas.h"
+#include "../../render/graphics/shader.h"
+#include "../../render/graphics/texture_atlas.h"
 
 Resources::Resources() {
     

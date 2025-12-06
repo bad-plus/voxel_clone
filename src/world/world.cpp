@@ -3,7 +3,7 @@
 #include "block.h"
 #include "../core/logger.h"
 #include <GLFW/glfw3.h>
-#include "world_generator.h"
+#include "generation/world_generator.h"
 #include <thread>
 
 constexpr long long pack_chunk_coords(int x, int z) {

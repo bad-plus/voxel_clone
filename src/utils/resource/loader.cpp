@@ -1,7 +1,7 @@
 #include "loader.h"
-#include "game.h"
-#include "../render/shader.h"
-#include "../render/texture_atlas.h"
+#include "../../core/game.h"
+#include "../../render/graphics/shader.h"
+#include "../../render/graphics/texture_atlas.h"
 
 Loader::Loader(GameContext* context) {
     m_game_context = context;

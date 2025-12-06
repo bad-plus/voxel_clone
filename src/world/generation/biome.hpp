@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "block.h"
+#include "../block.h"
 #include "perlin_2d.h"
 #include <map>
 #include <vector>
@@ -148,10 +148,24 @@ namespace Biome {
         return x * x * x * (x * (x * 6 - 15) + 10);
     }
 
+    inline BiomeID getDominantBiome(const std::map<BiomeID, float>& weights) {
+        BiomeID dominant = BiomeID::PLANKS;
+        float max_weight = -1.0f;
+
+        for (const auto& w : weights) {
+            if (w.second > max_weight) {
+                dominant = w.first;
+                max_weight = w.second;
+            }
+        }
+
+        return dominant;
+    }
+
     inline std::map<BiomeID, float> getBiomeWeight(Perlin2D* perlin, int world_x, int world_z) {
         std::map<BiomeID, float> weights;
 
-        const float biome_scale = 0.0001f;
+        const float biome_scale = 0.0001f; 
         float noise = perlin->noise((float)(world_x * biome_scale), (float)(world_z * biome_scale) + 1.0f) * 0.5f + 0.5f;
 
         float total_rarity = 0.0f;
@@ -174,10 +188,12 @@ namespace Biome {
             float center = (start + end) / 2.0f;
             float half = (end - start) / 2.0f;
 
-            float t = 1.0f - std::fabs(noise - center) / half;
+            float blend_zone = 0.8f;
+
+            float t = 1.0f - std::fabs(noise - center) / (half * (1.0f + blend_zone));
             if (t < 0.0f) t = 0.0f;
 
-            float w = smoother(t);
+            float w = smoother(smoother(t));
             weights[b.first] = w;
             sum += w;
             i++;
@@ -195,20 +211,6 @@ namespace Biome {
         }
 
         return weights;
-    }
-
-    inline BiomeID getDominantBiome(const std::map<BiomeID, float>& weights) {
-        BiomeID dominant = BiomeID::PLANKS;
-        float max_weight = -1.0f;
-
-        for (const auto& w : weights) {
-            if (w.second > max_weight) {
-                dominant = w.first;
-                max_weight = w.second;
-            }
-        }
-
-        return dominant;
     }
 
     inline int getHeight(Perlin2D* perlin, int world_x, int world_z, std::map<BiomeID, float>& weights) {
@@ -249,7 +251,9 @@ namespace Biome {
             float noise_ridge = (1.0f - std::fabs(noise_ridge_raw)) * info.amplitude_ridge;
             height += noise_ridge;
 
-            result_height += (info.base_height + height) * weight;
+            float smooth_weight = smoother(smoother(smoother(weight)));
+
+            result_height += (info.base_height + height) * smooth_weight;
         }
 
         return (int)result_height;

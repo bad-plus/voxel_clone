@@ -1,5 +1,5 @@
 #include "input.h"
-#include "logger.h"
+#include "../logger.h"
 
 Input::Input() {
     for(int i = 0; i < KEYS_COUNT + MOUSE_BUTTONS; i++) {
