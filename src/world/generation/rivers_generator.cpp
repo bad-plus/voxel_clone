@@ -5,11 +5,11 @@
 #include "../../core/logger.h"
 #include "perlin_2d.h"
 
-const float frenquency_rivers = 0.05f;
+const float frenquency_rivers = 0.001f;
 const float amplitude_rivers = 30.0f;
 
-const float start_river_noise_value = 0.01f;
-const float end_river_noise_value = 0.2f;
+const float start_river_noise_value = 0.49f;
+const float end_river_noise_value = 0.5f;
 
 void WorldGenerator::generateRivers(Chunk* chunk, int x, int z) {
     for (int px = 0; px < CHUNK_SIZE_X; px++) {

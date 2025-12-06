@@ -13,6 +13,7 @@ public:
 private:
     void generateTerrain(Chunk* chunk, int x, int z);
     void generateRivers(Chunk* chunk, int x, int z);
+    void generateBedrock(Chunk* chunk, int x, int z);
 
     int m_seed;
     Perlin2D* m_perlin;

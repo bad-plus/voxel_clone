@@ -28,5 +28,6 @@ WorldGenerator::~WorldGenerator() {
 Chunk* WorldGenerator::generateChunk(Chunk* chunk, int x, int z) {
     generateTerrain(chunk, x, z);
     generateRivers(chunk, x, z);
+    generateBedrock(chunk, x, z);
     return chunk;
 }

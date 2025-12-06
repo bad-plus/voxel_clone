@@ -19,7 +19,6 @@ void WorldGenerator::generateTerrain(Chunk* chunk, int x, int z) {
 
                 if (py == height - 1) block = Biome::BiomesInfo[biome].top_block;
                 else if (py < height - 1 && py > height - 6) block = Biome::BiomesInfo[biome].under_block;
-                else if (py == 0) block = BlockID::BEDROCK;
                 else block = BlockID::STONE;
 
                 chunk->setBlock({ px, py, pz }, block, false);

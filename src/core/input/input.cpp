@@ -54,8 +54,8 @@ void Input::mouse_move(double x_pos, double y_pos) {
     double delta_x = m_mouse_pos_x - x_pos;
     double delta_y = y_pos - m_mouse_pos_y;
     
-    m_mouse_delta_x += delta_x;
-    m_mouse_delta_y += delta_y;
+    m_mouse_delta_x += -delta_x;
+    m_mouse_delta_y += -delta_y;
 
     m_mouse_pos_x = x_pos;
     m_mouse_pos_y = y_pos;

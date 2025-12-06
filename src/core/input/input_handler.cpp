@@ -15,6 +15,8 @@ InputHandler::~InputHandler() {
 
 bool current_render_debug_mode = false;
 
+BlockID selected_block = BlockID::STONE;
+
 void InputHandler::processing() {
     Input* input = m_game_context->input;
     double system_tick_time = m_game_context->game->getSystemInfo().update_tick_time;
@@ -58,6 +60,66 @@ void InputHandler::processing() {
 
             if (block != nullptr && block->getBlockID() != BlockID::EMPTY) {
                 m_game_context->world->setBlock(pos_x, pos_y, pos_z, BlockID::EMPTY);
+                break;
+            }
+
+            curr_dist += step;
+        }
+    }
+
+    if (input->jclicked(GLFW_MOUSE_BUTTON_2)) {
+        const float max_dist = 10.f;
+        const float step = 0.01f;
+
+        float curr_dist = 0.0f;
+
+        glm::vec3 start_pos = m_game_context->camera->m_position;
+        glm::vec3 direction = glm::normalize(m_game_context->camera->m_front);
+
+        while (curr_dist < max_dist) {
+            glm::vec3 ray_pos = start_pos + direction * curr_dist;
+
+            int pos_x = (int)floor(ray_pos.x);
+            int pos_y = (int)floor(ray_pos.y);
+            int pos_z = (int)floor(ray_pos.z);
+
+            Block* block = m_game_context->world->getBlock(pos_x, pos_y, pos_z);
+
+            if (block != nullptr && block->getBlockID() != BlockID::EMPTY) {
+                curr_dist -= step;
+                ray_pos = start_pos + direction * curr_dist;
+                pos_x = (int)floor(ray_pos.x);
+                pos_y = (int)floor(ray_pos.y);
+                pos_z = (int)floor(ray_pos.z);
+
+                m_game_context->world->setBlock(pos_x, pos_y, pos_z, selected_block);
+                break;
+            }
+
+            curr_dist += step;
+        }
+    }
+
+    if (input->jclicked(GLFW_MOUSE_BUTTON_3)) {
+        const float max_dist = 10.f;
+        const float step = 0.01f;
+
+        float curr_dist = 0.0f;
+
+        glm::vec3 start_pos = m_game_context->camera->m_position;
+        glm::vec3 direction = glm::normalize(m_game_context->camera->m_front);
+
+        while (curr_dist < max_dist) {
+            glm::vec3 ray_pos = start_pos + direction * curr_dist;
+
+            int pos_x = (int)floor(ray_pos.x);
+            int pos_y = (int)floor(ray_pos.y);
+            int pos_z = (int)floor(ray_pos.z);
+
+            Block* block = m_game_context->world->getBlock(pos_x, pos_y, pos_z);
+
+            if (block != nullptr && block->getBlockID() != BlockID::EMPTY) {
+                selected_block = block->getBlockID();
                 break;
             }
 
