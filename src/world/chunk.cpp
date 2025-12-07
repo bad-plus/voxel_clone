@@ -11,11 +11,11 @@ struct NeighborsSnapshot {
     std::vector < BlockID > z_m;
 };
 
-unsigned int toBlocksIndex(glm::ivec3 position) {
+static unsigned int toBlocksIndex(glm::ivec3 position) {
     return position.x + position.z * CHUNK_SIZE_X + position.y * CHUNK_SIZE_X * CHUNK_SIZE_Z;
 }
 
-glm::ivec3 toBlocksPos(unsigned int index) {
+static glm::ivec3 toBlocksPos(const unsigned int index) {
     return {
         index % CHUNK_SIZE_X,                      // x
         index / (CHUNK_SIZE_X * CHUNK_SIZE_Z),     // y
@@ -99,12 +99,12 @@ Block* Chunk::setBlock(glm::ivec3 position, BlockID block, bool mark) {
     return &m_blocks[index];
 }
 
-bool checkBlockTransparent(Block* block) {
+static bool checkBlockTransparent(Block* block) {
     if (block == nullptr) return true;
     return BlocksInfo[block->getBlockID()].isTransparent;
 }
 
-bool checkBlockTransparentSafe(const std::vector<BlockID>& snapshot, glm::ivec3 pos, NeighborsSnapshot& neighbors) {
+static bool checkBlockTransparentSafe(const std::vector<BlockID>& snapshot, glm::ivec3 pos, NeighborsSnapshot& neighbors) {
     if (pos.y < 0 || pos.y >= CHUNK_SIZE_Y) return true;
 
     if (pos.x < 0) {

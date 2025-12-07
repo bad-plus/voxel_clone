@@ -1,28 +1,28 @@
 #pragma once
 
-#define KEYS_COUNT              512
-#define MOUSE_BUTTONS           16
+constexpr unsigned int KEYS_COUNT =         512;
+constexpr unsigned int MOUSE_BUTTONS =      16;
 
 class Input {
 public:
     Input();
     ~Input();
 
-    void press_button(int key);
-    void release_button(int key);
+    void press_button(const int key);
+    void release_button(const int key);
 
-    void mouse_press_button(int key);
-    void mouse_release_button(int key);
+    void mouse_press_button(const int key);
+    void mouse_release_button(const int key);
 
     void mouse_move(double x_pos, double y_pos);
 
     void update_input();
 
-    bool pressed(int key);
-    bool jpressed(int key);
+    bool pressed(const int key) const;
+    bool jpressed(const int key) const;
 
-    bool clicked(int key);
-    bool jclicked(int key);
+    bool clicked(const int key) const;
+    bool jclicked(const int key) const;
 
     double m_mouse_pos_x;
     double m_mouse_pos_y;

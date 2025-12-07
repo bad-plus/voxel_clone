@@ -6,6 +6,7 @@
 
 enum class BlockID { 
     EMPTY = 0,
+    ERROR,
     STONE,
     DIRT,
     GRASS,
@@ -34,13 +35,14 @@ struct BlockTexture {
 };
 
 struct BlockInfo {
-    std::string name;
-    bool isTransparent;
-    BlockTexture texture;
+    std::string name = "";
+    bool isTransparent = false;
+    BlockTexture texture = {};
 };
 
 inline std::unordered_map<BlockID, BlockInfo> BlocksInfo = {
     {BlockID::EMPTY, {"", true}},
+    {BlockID::ERROR, {"error", false}},
     {BlockID::STONE, {"stone", false}},
     {BlockID::DIRT, {"dirt", false}},
     {BlockID::GRASS, {"grass", false}},

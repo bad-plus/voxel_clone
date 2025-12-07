@@ -30,7 +30,7 @@ public:
 
     void processGenerationQueue();
 
-    void pushUpdateMeshQueue(ChunkInfo* chunk_info);
+    void pushUpdateMeshQueue(ChunkInfo* chunk_info, bool priority = false);
     ChunkInfo* pullUpdateMeshQueue();
     void processUpdateMeshQueue();
 private:

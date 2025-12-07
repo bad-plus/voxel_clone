@@ -2,6 +2,12 @@
 #include "../logger.h"
 
 Input::Input() {
+    m_mouse_pos_x = 0.0f;
+    m_mouse_pos_y = 0.0f;
+
+    m_mouse_delta_x = 0.0f;
+    m_mouse_delta_y = 0.0f;
+
     for(int i = 0; i < KEYS_COUNT + MOUSE_BUTTONS; i++) {
         m_jkeys[i] = false;
         m_keys[i] = false;
@@ -13,30 +19,30 @@ Input::~Input() {
 
 }
 
-void Input::press_button(int key) {
-    if(key < 0 || key > KEYS_COUNT) {
+void Input::press_button(const int key) {
+    if (key < 0 || key > KEYS_COUNT) {
         LOG_WARN("Invalid key code: {0}", key);
         return;
     }
     m_jkeys[key] = true;
 }
-void Input::release_button(int key) {
-    if(key < 0 || key > KEYS_COUNT) {
+void Input::release_button(const int key) {
+    if (key < 0 || key > KEYS_COUNT) {
         LOG_WARN("Invalid key code: {0}", key);
         return;
     }
     m_jkeys[key] = false;
 }
 
-void Input::mouse_press_button(int key) {
-    if(key < 0 || key > MOUSE_BUTTONS) {
+void Input::mouse_press_button(const int key) {
+    if (key < 0 || key > MOUSE_BUTTONS) {
         LOG_WARN("Invalid key code: {0}", key);
         return;
     }
     m_jkeys[KEYS_COUNT + key] = true;
 }
-void Input::mouse_release_button(int key) {
-    if(key < 0 || key > MOUSE_BUTTONS) {
+void Input::mouse_release_button(const int key) {
+    if (key < 0 || key > MOUSE_BUTTONS) {
         LOG_WARN("Invalid key code: {0}", key);
         return;
     }
@@ -70,14 +76,14 @@ void Input::update_input() {
     m_mouse_delta_y = 0.0f;
 }
 
-bool Input::pressed(int key) {
-    if(key < 0 || key > KEYS_COUNT) {
+bool Input::pressed(const int key) const {
+    if (key < 0 || key > KEYS_COUNT) {
         LOG_WARN("Invalid key code: {0}", key);
         return false;
     }
     return m_jkeys[key];
 }
-bool Input::jpressed(int key) {
+bool Input::jpressed(const int key) const {
     if(key < 0 || key > KEYS_COUNT) {
         LOG_WARN("Invalid key code: {0}", key);
         return false;
@@ -86,14 +92,14 @@ bool Input::jpressed(int key) {
     else return false;
 }
 
-bool Input::clicked(int key) {
+bool Input::clicked(const int key) const {
     if(key < 0 || key > MOUSE_BUTTONS) {
         LOG_WARN("Invalid key code: {0}", key);
         return false;
     }
     return m_jkeys[KEYS_COUNT + key];
 }
-bool Input::jclicked(int key) {
+bool Input::jclicked(const int key) const {
     if(key < 0 || key > MOUSE_BUTTONS) {
         LOG_WARN("Invalid key code: {0}", key);
         return false;

@@ -15,26 +15,26 @@ namespace Biome {
     };
 
     struct BiomeInfo {
-        float base_height;
+        float base_height = 10.0f;
 
         // Continent
-        float frequency_continent;
-        float amplitude_continent;
+        float frequency_continent = 0.0f;
+        float amplitude_continent = 0.0f;
 
         // Terrain
-        float frequency_terrain;
-        float amplitude_terrain;
+        float frequency_terrain = 0.0f;
+        float amplitude_terrain = 0.0f;
 
         // Details
-        float frequency_details;
-        float amplitude_details;
+        float frequency_details = 0.0f;
+        float amplitude_details = 0.0f;
 
         // Ridge
-        float frequency_ridge;
-        float amplitude_ridge;
+        float frequency_ridge = 0.0f;
+        float amplitude_ridge = 0.0f;
 
-        BlockID top_block;
-        BlockID under_block;
+        BlockID top_block = BlockID::ERROR;
+        BlockID under_block = BlockID::ERROR;
 
         float rarity = 1.0f;
     };
