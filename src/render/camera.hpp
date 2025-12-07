@@ -15,11 +15,11 @@ enum Camera_Movement {
     RIGHT
 };
 
-const GLfloat YAW               = -90.f;
-const GLfloat PITCH             = 0.0f;
-const GLfloat SPEED             = 10.0f;
-const GLfloat SENSIVITY         = 0.25f;
-const GLfloat ZOOM              = 45.0f;
+constexpr GLfloat YAW               = -90.f;
+constexpr GLfloat PITCH             = 0.0f;
+constexpr GLfloat SPEED             = 10.0f;
+constexpr GLfloat SENSIVITY         = 0.25f;
+constexpr GLfloat ZOOM              = 45.0f;
 
 class Camera {
 public:

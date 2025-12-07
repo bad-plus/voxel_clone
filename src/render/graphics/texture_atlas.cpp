@@ -17,12 +17,12 @@
 
 namespace fs = std::filesystem;
 
-#define TEXTURES_PATH               "../resources/textures/blocks/"
+constexpr char TEXTURES_PATH[] = "../resources/textures/blocks/";
 
-#define ATLAS_SIZE                  1280// px
-#define ATLAS_CHANNELS              4 // color channels
+constexpr unsigned int ATLAS_SIZE =             1280; // px
+constexpr unsigned int ATLAS_CHANNELS =         4; // color channels
 
-#define ATLAS_TILE_SIZE             32
+constexpr unsigned int ATLAS_TILE_SIZE =        32;
 
 std::unique_ptr<unsigned char[]> convertToRGBA(
     unsigned char* data, int width, int height, int channels) {

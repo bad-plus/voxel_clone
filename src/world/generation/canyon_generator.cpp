@@ -5,11 +5,11 @@
 #include "../../core/logger.h"
 #include "perlin_2d.h"
 
-const float frenquency_canyon = 0.001f;
-const float amplitude_canyon = 130.0f;
-const float len_canyon = 0.1f;
+constexpr float frequency_canyon = 0.001f;
+constexpr float amplitude_canyon = 130.0f;
+constexpr float len_canyon = 0.1f;
 
-const float canyon_start_noise_value = 0.85f;
+constexpr float canyon_start_noise_value = 0.85f;
 
 void WorldGenerator::generateCanyon(Chunk* chunk, int x, int z) {
     for (int px = 0; px < CHUNK_SIZE_X; px++) {
@@ -18,8 +18,8 @@ void WorldGenerator::generateCanyon(Chunk* chunk, int x, int z) {
             int world_z = z * CHUNK_SIZE_Z + pz;
 
             float canyon_noise = (m_perlin_canyon->noise(
-                (float)world_x * frenquency_canyon,
-                (float)world_z * frenquency_canyon * len_canyon) + 1.0f) * 0.5f;
+                (float)world_x * frequency_canyon,
+                (float)world_z * frequency_canyon * len_canyon) + 1.0f) * 0.5f;
             
             if (canyon_noise > canyon_start_noise_value) {
                 int height = chunk->getTopBlockPosition(px, pz);

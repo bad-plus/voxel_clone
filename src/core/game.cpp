@@ -78,7 +78,7 @@ void Game::quit() {
 }
 
 Game::~Game() {
-    LOG_INFO("Clossing application...");
+    LOG_INFO("Closing application...");
     m_quit = true;
 
     delete m_window;

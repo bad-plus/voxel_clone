@@ -8,9 +8,9 @@
 #include <vector>
 #include <atomic>
 
-const unsigned int CHUNK_SIZE_X = 16;
-const unsigned int CHUNK_SIZE_Y = 512; // height
-const unsigned int CHUNK_SIZE_Z = 16;
+constexpr unsigned int CHUNK_SIZE_X = 16;
+constexpr unsigned int CHUNK_SIZE_Y = 512; // height
+constexpr unsigned int CHUNK_SIZE_Z = 16;
 
 struct Chunk;
 

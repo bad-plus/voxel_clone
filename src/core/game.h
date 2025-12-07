@@ -58,5 +58,4 @@ private:
     WorldGenerator* m_world_generator;
 
     GameContext m_game_context;
-
 };
