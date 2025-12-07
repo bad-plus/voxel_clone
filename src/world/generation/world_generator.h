@@ -13,6 +13,7 @@ public:
 private:
     void generateTerrain(Chunk* chunk, int x, int z);
     void generateRivers(Chunk* chunk, int x, int z);
+    void generateCanyon(Chunk* chunk, int x, int z);
     void generateBedrock(Chunk* chunk, int x, int z);
 
     int m_seed;
@@ -21,4 +22,5 @@ private:
     std::map<Biome::BiomeID, Perlin2D*> m_biome_perlins;
 
     Perlin2D* m_perlin_river;
+    Perlin2D* m_perlin_canyon;
 };

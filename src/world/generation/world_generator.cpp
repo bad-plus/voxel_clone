@@ -9,6 +9,7 @@ WorldGenerator::WorldGenerator(int seed) {
     m_perlin = new Perlin2D(m_seed);
 
     m_perlin_river = new Perlin2D(m_seed + 1);
+    m_perlin_canyon = new Perlin2D(m_seed + 2);
 
     m_biome_perlins[Biome::BiomeID::PLANKS] = new Perlin2D(m_seed + 10);
     m_biome_perlins[Biome::BiomeID::HILLS] = new Perlin2D(m_seed + 11);
@@ -19,6 +20,7 @@ WorldGenerator::WorldGenerator(int seed) {
 WorldGenerator::~WorldGenerator() {
     delete m_perlin;
     delete m_perlin_river;
+    delete m_perlin_canyon;
 
     for (auto& perlin : m_biome_perlins) {
         delete perlin.second;
@@ -28,6 +30,7 @@ WorldGenerator::~WorldGenerator() {
 Chunk* WorldGenerator::generateChunk(Chunk* chunk, int x, int z) {
     generateTerrain(chunk, x, z);
     generateRivers(chunk, x, z);
+    generateCanyon(chunk, x, z);
     generateBedrock(chunk, x, z);
     return chunk;
 }
