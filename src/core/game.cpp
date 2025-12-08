@@ -2,6 +2,7 @@
 #include "window/window.h"
 #include "logger.h"
 #include "../world/generation/world_generator.h"
+#include "../ecs/core/ecs.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -17,12 +18,7 @@ Game::Game() {
     m_input = new Input();
     updateGameContext();
 
-    m_input_handler = new InputHandler(&m_game_context);
-
-    m_window = new Window("Game test", 1700, 860, &m_game_context);
-    updateGameContext();
-
-    m_camera = new Camera({ 10.0f, 200.0f, 10.0f });
+    m_window = new Window("Game test", 1700, 760, &m_game_context);
     updateGameContext();
 
     m_resources = new Resources();
@@ -32,7 +28,6 @@ Game::Game() {
     updateGameContext();
 
     m_render = new Render(&m_game_context);
-    m_render->setCamera(m_camera);
     updateGameContext();
 
     m_loader->loadResources();
@@ -44,10 +39,18 @@ Game::Game() {
 
     m_world = new World(&m_game_context, m_world_generator);
     m_render->setWorld(m_world);
+
+    Entity player_entity = m_world->CreatePlayer();
+    m_render->setPlayerEntity(player_entity);
     updateGameContext();
+
+    m_input_handler = new InputHandler(&m_game_context);
+    m_input_handler->setPlayerEntity(player_entity);
 
     std::thread world_generation_thread(&Game::worldGenerationThread, this);
     world_generation_thread.detach();
+
+    updateGameContext();
 
     m_window->setCursorEnabled(false);
     startMainLoop();

@@ -5,6 +5,7 @@
 #include "../world/chunk.h"
 #include "../core/logger.h"
 #include "../world/world.h"
+#include "../ecs/core/ecs.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -14,10 +15,9 @@ Render::Render(GameContext* game_context) {
     initRender();
 
     m_debug_render_mode = false;
-    m_render_dist = 12;
+    m_render_dist = 15;
 
     m_world = nullptr;
-    m_camera = nullptr;
 }
 Render::~Render() {
 
@@ -42,12 +42,9 @@ void Render::render() {
     if (m_debug_render_mode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    renderWorld(m_world, m_camera, m_render_dist);
+    renderWorld(m_world, m_render_dist);
 
     glfwSwapBuffers(window);
-}
-void Render::setCamera(Camera* camera) {
-    m_camera = camera;
 }
 
 void Render::setWorld(World* world) {
@@ -58,8 +55,10 @@ void Render::setDebugRenderMode(bool mode) {
     m_debug_render_mode = mode;
 }
 
-void Render::renderWorld(World* world, Camera* camera, int render_dist) {
-    if (world == nullptr || camera == nullptr) return;
+void Render::renderWorld(World* world, int render_dist) {
+    if (world == nullptr) return;
+    ECS* ecs = m_game_context->world->getECS();
+
 
     Shader* world_block_shader = m_game_context->resources->getShader("block_shader");
     if (world_block_shader == nullptr) {
@@ -76,14 +75,18 @@ void Render::renderWorld(World* world, Camera* camera, int render_dist) {
     world_block_shader->uniformi1("ourTexture1", 0);
 
     glm::mat4 view(1.0f);
-    view = camera->getViewMatrix();
+    view = getCameraViewMatrix(ecs, m_player_entity);
+
+    auto& player_input = ecs->storage<PlayerInput>().get(m_player_entity);
+    auto& player_transform = ecs->storage<Transform>().get(m_player_entity);
+    auto& player_camera = ecs->storage<PlayerCamera>().get(m_player_entity);
 
     glm::mat4 projection(1.0f);
-    projection = glm::perspective(camera->m_zoom, (float)m_render_width / (float)m_render_height, 0.1f, 1000.0f);
+    projection = glm::perspective(player_camera.zoom, (float)m_render_width / (float)m_render_height, 0.1f, 1000.0f);
 
 
-    int chunk_offset_x = camera->m_position.x / CHUNK_SIZE_X;
-    int chunk_offset_z = camera->m_position.z / CHUNK_SIZE_Z;
+    int chunk_offset_x = player_transform.position.x / CHUNK_SIZE_X;
+    int chunk_offset_z = player_transform.position.x / CHUNK_SIZE_Z;
 
     for (int x = -render_dist; x < render_dist; x++) {
         for (int z = -render_dist; z < render_dist; z++) {
@@ -105,4 +108,8 @@ void Render::renderWorld(World* world, Camera* camera, int render_dist) {
             }
         }
     }
+}
+
+void Render::setPlayerEntity(Entity entity) {
+    m_player_entity = entity;
 }

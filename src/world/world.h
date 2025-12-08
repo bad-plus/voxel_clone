@@ -3,10 +3,12 @@
 #include <deque>
 #include <mutex>
 #include "../world/block.h"
+#include "../ecs/core/entity.h"
 
 struct Chunk;
 struct GameContext;
 struct WorldGenerator;
+struct ECS;
 
 struct ChunkInfo {
     Chunk* chunk;
@@ -33,6 +35,9 @@ public:
     void pushUpdateMeshQueue(ChunkInfo* chunk_info, bool priority = false);
     ChunkInfo* pullUpdateMeshQueue();
     void processUpdateMeshQueue();
+
+    Entity CreatePlayer();
+    ECS* getECS();
 private:
     ChunkInfo* getChunkProtected(int x, int z);
 
@@ -50,4 +55,6 @@ private:
 
     std::deque<ChunkInfo*> m_update_mesh_queue;
     std::mutex m_update_mesh_queue_mutex;
+
+    ECS* m_ecs;
 };

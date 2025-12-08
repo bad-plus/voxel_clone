@@ -10,12 +10,12 @@ void WorldGenerator::generateBedrock(Chunk* chunk, int x, int z) {
             int world_pos_x = (x * CHUNK_SIZE_X) + px;
             int world_pos_z = (z * CHUNK_SIZE_Z) + pz;
 
-            const float base_frenquency = 1.1f;
+            const float base_frequency = 1.1f;
     
             for (int py = 0; py < 5; py++) {
                 float noise = (m_perlin->noise(
-                    (float)world_pos_x * base_frenquency + (py * 1000.f),
-                    (float)world_pos_z * base_frenquency - (py * 1000.f)) + 1.0f) * 0.5f;
+                    (float)world_pos_x * base_frequency + (py * 1000.f),
+                    (float)world_pos_z * base_frequency - (py * 1000.f)) + 1.0f) * 0.5f;
 
                 if (noise > (0.50f) || py == 0) {
                     chunk->setBlock({ px, py, pz }, BlockID::BEDROCK);

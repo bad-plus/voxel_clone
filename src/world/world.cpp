@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include "generation/world_generator.h"
 #include <thread>
+#include "../ecs/core/ecs.h"
 
 static constexpr long long pack_chunk_coords(int x, int z) {
     return ((long long)(x & 0xFFFFFFFF)) | ((long long)(z & 0xFFFFFFFF) << 32);
@@ -22,6 +23,8 @@ World::World(GameContext* context, WorldGenerator* generator) {
     m_game_context = context;
     m_generator = generator;
     m_chunk_creation_time = 0.0;
+
+    m_ecs = new ECS();
 }
 
 World::~World() {
@@ -31,6 +34,8 @@ World::~World() {
             delete chunk_info;
         }
     }
+
+    delete m_ecs;
 }
 
 ChunkInfo* World::createChunk(int x, int z) {
@@ -254,4 +259,21 @@ void World::setBlock(int world_x, int world_y, int world_z, BlockID block_id) {
     }
 
     pushUpdateMeshQueue(chunk, true);
+}
+
+Entity World::CreatePlayer() {
+    Entity entity = m_ecs->create();
+    m_ecs->storage<Transform>().add(entity, { {0.0f, 250.0f, 0.0f}, {0.0f, 0.0f, 0.0f} });
+    m_ecs->storage<Velocity>().add(entity, { 0.0f, 0.0f, 0.0f });
+    m_ecs->storage<PlayerCamera>().add(entity, PlayerCamera());
+    m_ecs->storage<PlayerInput>().add(entity, PlayerInput());
+    m_ecs->storage<PlayerState>().add(entity, PlayerState());
+    m_ecs->storage<PlayerTag>().add(entity, PlayerTag());
+    m_ecs->storage<Collider>().add(entity, {0.4f, 1.9f, 0.4f});
+
+    return entity;
+}
+
+ECS* World::getECS() {
+    return m_ecs;
 }

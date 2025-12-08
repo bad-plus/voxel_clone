@@ -37,6 +37,7 @@ struct BlockTexture {
 struct BlockInfo {
     std::string name = "";
     bool isTransparent = false;
+    bool is_solid_surface = true;
     BlockTexture texture = {};
 };
 

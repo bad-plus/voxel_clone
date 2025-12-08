@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../ecs/core/entity.h"
+
 struct Camera;
 struct GameContext;
 struct World;
@@ -11,12 +13,12 @@ public:
 
     void render();
 
-    void setCamera(Camera* camera);
     void setWorld(World* world);
+    void setPlayerEntity(Entity entity);
 
     void setDebugRenderMode(bool mode);
 
-    void renderWorld(World* world, Camera* camera, int render_dist = 5);
+    void renderWorld(World* world, int render_dist = 5);
 private:
     void initRender();
 
@@ -27,8 +29,9 @@ private:
 
     GameContext* m_game_context;
 
-    Camera* m_camera;
     World* m_world;
+    Entity m_player_entity;
+
 
     int m_render_dist;
 };
