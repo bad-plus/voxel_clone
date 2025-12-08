@@ -1,15 +1,15 @@
 #pragma once
 
-struct GameContext;
+struct Resources;
 
 class Loader {
 public:
-    Loader(GameContext* context);
+    Loader(Resources* resources);
     ~Loader();
 
     void loadResources();
     void loadShaders();
     void loadAtlas();
 private:
-    GameContext* m_game_context;
+    Resources* m_resources;
 };

@@ -3,8 +3,8 @@
 #include "../../render/graphics/shader.h"
 #include "../../render/graphics/texture_atlas.h"
 
-Loader::Loader(GameContext* context) {
-    m_game_context = context;
+Loader::Loader(Resources* resources) {
+    m_resources = resources;
 }
 Loader::~Loader() {
 
@@ -15,8 +15,8 @@ void Loader::loadResources() {
     loadShaders();
 }
 void Loader::loadShaders() {
-    m_game_context->resources->loadShader("block_shader", "world_block.vert", "world_block.frag");
+    m_resources->loadShader("block_shader", "world_block.vert", "world_block.frag");
 }
 void Loader::loadAtlas() {
-    m_game_context->resources->loadTextureAtlas();
+    m_resources->loadTextureAtlas();
 }

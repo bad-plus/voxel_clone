@@ -8,53 +8,52 @@
 #include <GLFW/glfw3.h>
 #include <string>
 #include <thread>
+#include <random>
 
 Game::Game() {
-	m_quit = false;
+	m_quit.store(false);
 
 	initGLFW();
 	initLogger();
 
-	m_input = new Input();
+	m_input = std::make_unique<Input>();
 	updateGameContext();
 
-	m_window = new Window("Game test", 1700, 760, &m_game_context);
+	m_window = std::make_unique<Window>("Game test", 1280, 720, &m_game_context);
 	updateGameContext();
 
-	m_resources = new Resources();
+	m_resources = std::make_unique<Resources>();
 	updateGameContext();
 
-	m_loader = new Loader(&m_game_context);
+	m_loader = std::make_unique<Loader>(m_resources.get());
 	updateGameContext();
 
-	m_render = new Render(&m_game_context);
+	m_render = std::make_unique<Render>(&m_game_context);
 	updateGameContext();
 
 	m_loader->loadResources();
 
-	srand((time(NULL)));
-	int seed = 1 + rand();
-	m_world_generator = new WorldGenerator(seed);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dis(1, INT_MAX);
+	int seed = dis(gen);
+
+	m_world_generator = std::make_unique<WorldGenerator>(seed);
 	LOG_INFO("World seed: {0}", seed);
 
-	m_world = new World(&m_game_context, m_world_generator);
-	m_render->setWorld(m_world);
+	m_world = std::make_unique<World>(&m_game_context, m_world_generator.get());
+	m_render->setWorld(m_world.get());
 
 	Entity player_entity = m_world->CreatePlayer();
 	m_render->setPlayerEntity(player_entity);
 	updateGameContext();
 
-	m_input_handler = new InputHandler(&m_game_context);
+	m_input_handler = std::make_unique<InputHandler>(&m_game_context);
 	m_input_handler->setPlayerEntity(player_entity);
 
-	std::thread world_generation_thread(&Game::worldGenerationThread, this);
-	world_generation_thread.detach();
-
-	std::thread world_updater_thread(&Game::worldUpdaterThread, this);
-	world_updater_thread.detach();
-
-	std::thread movement_updater_thread(&Game::movementUpdaterThread, this);
-	movement_updater_thread.detach();
+	m_threads.emplace_back(&Game::worldGenerationThread, this);
+	m_threads.emplace_back(&Game::worldUpdaterThread, this);
+	m_threads.emplace_back(&Game::movementUpdaterThread, this);
 
 	updateGameContext();
 
@@ -144,33 +143,28 @@ void Game::worldUpdaterThread() {
 
 void Game::updateGameContext() {
     m_game_context.game = this;
-    m_game_context.input = m_input;
-    m_game_context.window = m_window;
-    m_game_context.render = m_render;
-    m_game_context.camera = m_camera;
-    m_game_context.resources = m_resources;
-    m_game_context.loader = m_loader;
-    m_game_context.world = m_world;
+    m_game_context.input = m_input.get();
+    m_game_context.window = m_window.get();
+    m_game_context.render = m_render.get();
+    m_game_context.resources = m_resources.get();
+    m_game_context.loader = m_loader.get();
+    m_game_context.world = m_world.get();
 }
 
 void Game::quit() {
-    m_quit = true;
+	m_quit.store(true);
     m_window->quit();
 }
 
 Game::~Game() {
     LOG_INFO("Closing application...");
-    m_quit = true;
+	quit();
 
-    delete m_window;
-    delete m_input;
-    delete m_camera;
-    delete m_render;
-    delete m_input_handler;
-    delete m_resources;
-    delete m_loader;
-    delete m_world;
-    delete m_world_generator;
+	for (auto& thread : m_threads) {
+		if (thread.joinable()) {
+			thread.join();
+		}
+	}
 
     glfwTerminate();
 }
@@ -209,9 +203,8 @@ GameSystemInfo Game::getSystemInfo() {
 
 void Game::initGLFW() {
     LOG_INFO("Starting application...");
-    if (!glfwInit()) {
-        LOG_ERROR("GLFW not initialized");
-        return;
+	if (!glfwInit()) {
+		throw std::runtime_error("Failed to initialize GLFW");
     }
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);

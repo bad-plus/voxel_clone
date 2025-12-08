@@ -10,14 +10,13 @@
 #include "../world/generation/world_generator.h"
 
 class Game;
-struct World;
+
 
 struct GameContext {
 	Game* game;
 	Window* window;
 	Input* input;
 	Render* render;
-	Camera* camera;
 	Resources* resources;
 	Loader* loader;
 	World* world;
@@ -45,15 +44,17 @@ private:
 	void worldUpdaterThread();
 	void movementUpdaterThread();
 
-	Window* m_window;
-	bool m_quit;
-	Input* m_input;
-	Render* m_render;
-	Camera* m_camera;
-	InputHandler* m_input_handler;
-	Resources* m_resources;
-	Loader* m_loader;
-	World* m_world;
-	WorldGenerator* m_world_generator;
+	std::atomic<bool> m_quit{ false };
+	std::vector<std::thread> m_threads;
+
+	std::unique_ptr<Window> m_window;
+	std::unique_ptr<Input> m_input;
+	std::unique_ptr<Render> m_render;
+	std::unique_ptr<InputHandler> m_input_handler;
+	std::unique_ptr<Resources> m_resources;
+	std::unique_ptr<Loader> m_loader;
+	std::unique_ptr<World> m_world;
+	std::unique_ptr<WorldGenerator> m_world_generator;
+
 	GameContext m_game_context;
 };
