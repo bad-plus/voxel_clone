@@ -64,13 +64,16 @@ void InputHandler::processing() {
 	}
 	else player_input.sneak = false;
 
-	m_player_camera_system.update(*ecs, (float)system_tick_time);
-	m_player_movement_system.update(*ecs, (float)system_tick_time, m_game_context->world);
-    m_world_collision_system.update(*ecs, (float)system_tick_time, m_game_context->world);
-    m_gravity_system.update(*ecs, (float)system_tick_time);
+    if (input->jpressed(GLFW_KEY_O)) {
+        player_input.fly_speedup *= 2.0f;
+    }
 
-	player_input.mouse_delta_x = 0.0f;
-	player_input.mouse_delta_y = 0.0f;
+    if (input->jpressed(GLFW_KEY_P)) {
+		player_input.fly_speedup *= 0.5f;
+	}
+
+    m_player_camera_system.update(*ecs, system_tick_time);
+    m_player_movement_system.update(*ecs, system_tick_time, m_game_context->world);
 }
 
 /*void InputHandler::processing() {

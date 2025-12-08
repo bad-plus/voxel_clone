@@ -1,4 +1,4 @@
-#include "game.h"
+﻿#include "game.h"
 #include "window/window.h"
 #include "logger.h"
 #include "../world/generation/world_generator.h"
@@ -10,50 +10,92 @@
 #include <thread>
 
 Game::Game() {
-    m_quit = false;
+	m_quit = false;
 
-    initGLFW();
-    initLogger();
+	initGLFW();
+	initLogger();
 
-    m_input = new Input();
-    updateGameContext();
+	m_input = new Input();
+	updateGameContext();
 
-    m_window = new Window("Game test", 1700, 760, &m_game_context);
-    updateGameContext();
+	m_window = new Window("Game test", 1700, 760, &m_game_context);
+	updateGameContext();
 
-    m_resources = new Resources();
-    updateGameContext();
+	m_resources = new Resources();
+	updateGameContext();
 
-    m_loader = new Loader(&m_game_context);
-    updateGameContext();
+	m_loader = new Loader(&m_game_context);
+	updateGameContext();
 
-    m_render = new Render(&m_game_context);
-    updateGameContext();
+	m_render = new Render(&m_game_context);
+	updateGameContext();
 
-    m_loader->loadResources();
+	m_loader->loadResources();
 
-    srand((time(NULL)));
-    int seed = 1 + rand();
-    m_world_generator = new WorldGenerator(seed);
-    LOG_INFO("World seed: {0}", seed);
+	srand((time(NULL)));
+	int seed = 1 + rand();
+	m_world_generator = new WorldGenerator(seed);
+	LOG_INFO("World seed: {0}", seed);
 
-    m_world = new World(&m_game_context, m_world_generator);
-    m_render->setWorld(m_world);
+	m_world = new World(&m_game_context, m_world_generator);
+	m_render->setWorld(m_world);
 
-    Entity player_entity = m_world->CreatePlayer();
-    m_render->setPlayerEntity(player_entity);
-    updateGameContext();
+	Entity player_entity = m_world->CreatePlayer();
+	m_render->setPlayerEntity(player_entity);
+	updateGameContext();
 
-    m_input_handler = new InputHandler(&m_game_context);
-    m_input_handler->setPlayerEntity(player_entity);
+	m_input_handler = new InputHandler(&m_game_context);
+	m_input_handler->setPlayerEntity(player_entity);
 
-    std::thread world_generation_thread(&Game::worldGenerationThread, this);
-    world_generation_thread.detach();
+	std::thread world_generation_thread(&Game::worldGenerationThread, this);
+	world_generation_thread.detach();
 
-    updateGameContext();
+	std::thread world_updater_thread(&Game::worldUpdaterThread, this);
+	world_updater_thread.detach();
 
-    m_window->setCursorEnabled(false);
-    startMainLoop();
+	std::thread movement_updater_thread(&Game::movementUpdaterThread, this);
+	movement_updater_thread.detach();
+
+	updateGameContext();
+
+	m_window->setCursorEnabled(false);
+	startMainLoop();
+}
+
+void Game::movementUpdaterThread() {
+	const int tickrate = 60;
+	const double dt = 1.0 / tickrate;
+
+	double accumulator = 0.0;
+	double last_time = glfwGetTime();
+
+	while (!m_quit) {
+		double current_time = glfwGetTime();
+		double frame_time = current_time - last_time;
+		last_time = current_time;
+
+		if (frame_time > 0.25) {
+			frame_time = dt;
+		}
+
+		accumulator += frame_time;
+
+		while (accumulator >= dt) {
+			m_world->tick_movement();
+			accumulator -= dt;
+		}
+
+		double time_until_next_tick = dt - accumulator;
+		if (time_until_next_tick > 0.002) {
+			int sleep_ms = static_cast<int>((time_until_next_tick - 0.001) * 1000);
+			if (sleep_ms > 0) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
+			}
+		}
+		else {
+			std::this_thread::yield();
+		}
+	}
 }
 
 void Game::worldGenerationThread() {
@@ -62,6 +104,42 @@ void Game::worldGenerationThread() {
         m_world->processGenerationQueue();
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
+}
+
+void Game::worldUpdaterThread() {
+	const int tickrate = 24;
+	const double dt = 1.0 / tickrate;
+
+	double accumulator = 0.0;
+	double last_time = glfwGetTime();
+
+	while (!m_quit) { 
+		double current_time = glfwGetTime();
+		double frame_time = current_time - last_time;
+		last_time = current_time;
+
+		if (frame_time > 0.25) {
+			frame_time = dt;
+		}
+
+		accumulator += frame_time;
+
+		while (accumulator >= dt) {
+			m_world->tick();
+			accumulator -= dt;
+		}
+
+		double time_until_next_tick = dt - accumulator;
+		if (time_until_next_tick > 0.002) {
+			int sleep_ms = static_cast<int>((time_until_next_tick - 0.001) * 1000);
+			if (sleep_ms > 0) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
+			}
+		}
+		else {
+			std::this_thread::yield();
+		}
+	}
 }
 
 void Game::updateGameContext() {

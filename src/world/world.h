@@ -9,6 +9,10 @@ struct Chunk;
 struct GameContext;
 struct WorldGenerator;
 struct ECS;
+struct CameraSystem;
+struct PlayerMovementSystem;
+struct WorldCollisionSystem;
+struct GravitySystem;
 
 struct ChunkInfo {
     Chunk* chunk;
@@ -38,6 +42,9 @@ public:
 
     Entity CreatePlayer();
     ECS* getECS();
+
+    void tick();
+    void tick_movement();
 private:
     ChunkInfo* getChunkProtected(int x, int z);
 
@@ -56,5 +63,12 @@ private:
     std::deque<ChunkInfo*> m_update_mesh_queue;
     std::mutex m_update_mesh_queue_mutex;
 
-    ECS* m_ecs;
+    struct {
+        ECS* ecs;
+		PlayerMovementSystem* player_movement_system;
+		WorldCollisionSystem* world_collision_system;
+		GravitySystem* gravity_system;
+    } m_ecs;
+
+    double last_tick_time;
 };

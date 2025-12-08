@@ -13,49 +13,47 @@ class Game;
 struct World;
 
 struct GameContext {
-    Game* game;
-    Window* window;
-    Input* input;
-    Render* render;
-    Camera* camera;
-    Resources* resources;
-    Loader* loader;
-    World* world;
+	Game* game;
+	Window* window;
+	Input* input;
+	Render* render;
+	Camera* camera;
+	Resources* resources;
+	Loader* loader;
+	World* world;
 };
 
 struct GameSystemInfo {
-    double update_tick_time;
-    double render_time;
-    double chunk_creation_time;
+	double update_tick_time;
+	double render_time;
+	double chunk_creation_time;
 };
 
 class Game {
 public:
-    Game();
-    ~Game();
+	Game();
+	~Game();
+	void quit();
+	GameSystemInfo getSystemInfo();
+	GameSystemInfo m_game_system_info;
 
-    void quit();
-
-    GameSystemInfo getSystemInfo();
-
-    GameSystemInfo m_game_system_info;
 private:
-    void initGLFW();
-    void startMainLoop();
-    void updateGameContext();
-    void worldGenerationThread();
+	void initGLFW();
+	void startMainLoop();
+	void updateGameContext();
+	void worldGenerationThread();
+	void worldUpdaterThread();
+	void movementUpdaterThread();
 
-    Window* m_window;
-    bool m_quit;
-
-    Input* m_input;
-    Render* m_render;
-    Camera* m_camera;
-    InputHandler* m_input_handler;
-    Resources* m_resources;
-    Loader* m_loader;
-    World* m_world;
-    WorldGenerator* m_world_generator;
-
-    GameContext m_game_context;
+	Window* m_window;
+	bool m_quit;
+	Input* m_input;
+	Render* m_render;
+	Camera* m_camera;
+	InputHandler* m_input_handler;
+	Resources* m_resources;
+	Loader* m_loader;
+	World* m_world;
+	WorldGenerator* m_world_generator;
+	GameContext m_game_context;
 };

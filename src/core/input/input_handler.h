@@ -2,8 +2,6 @@
 #include "../../ecs/core/ecs.h"
 #include "../../ecs/systems/player_camera_system.h"
 #include "../../ecs/systems/player_movement_system.h"
-#include "../../ecs/systems/world_collision_system.h"
-#include "../../ecs/systems/gravity_system.h"
 
 struct GameContext;
 
@@ -20,6 +18,4 @@ private:
 
     CameraSystem m_player_camera_system;
     PlayerMovementSystem m_player_movement_system;
-    WorldCollisionSystem m_world_collision_system;
-    GravitySystem m_gravity_system;
 };

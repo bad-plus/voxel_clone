@@ -7,6 +7,10 @@
 #include <thread>
 #include "../ecs/core/ecs.h"
 
+#include "../ecs/systems/player_camera_system.h"
+#include "../ecs/systems/world_collision_system.h"
+#include "../ecs/systems/gravity_system.h"
+
 static constexpr long long pack_chunk_coords(int x, int z) {
     return ((long long)(x & 0xFFFFFFFF)) | ((long long)(z & 0xFFFFFFFF) << 32);
 }
@@ -24,7 +28,11 @@ World::World(GameContext* context, WorldGenerator* generator) {
     m_generator = generator;
     m_chunk_creation_time = 0.0;
 
-    m_ecs = new ECS();
+    m_ecs.ecs = new ECS();
+    last_tick_time = 0;
+
+	m_ecs.world_collision_system = new WorldCollisionSystem;
+	m_ecs.gravity_system = new GravitySystem;
 }
 
 World::~World() {
@@ -35,7 +43,10 @@ World::~World() {
         }
     }
 
-    delete m_ecs;
+    delete m_ecs.ecs;
+
+    delete m_ecs.world_collision_system;
+    delete m_ecs.gravity_system;
 }
 
 ChunkInfo* World::createChunk(int x, int z) {
@@ -262,19 +273,43 @@ void World::setBlock(int world_x, int world_y, int world_z, BlockID block_id) {
 }
 
 Entity World::CreatePlayer() {
-    Entity entity = m_ecs->create();
-    m_ecs->storage<Transform>().add(entity, { {0.0f, 250.0f, 0.0f}, {0.0f, 0.0f, 0.0f} });
-    m_ecs->storage<Velocity>().add(entity, { 0.0f, 0.0f, 0.0f });
-    m_ecs->storage<PlayerCamera>().add(entity, PlayerCamera());
-    m_ecs->storage<PlayerInput>().add(entity, PlayerInput());
-    m_ecs->storage<PlayerState>().add(entity, PlayerState());
-    m_ecs->storage<PlayerTag>().add(entity, PlayerTag());
-    m_ecs->storage<Collider>().add(entity, {0.4f, 1.9f, 0.4f});
-    m_ecs->storage<Mass>().add(entity, { 1.0f });
+    ECS* ecs = getECS();
+    Entity entity = ecs->create();
+    ecs->storage<Transform>().add(entity, { {0.0f, 250.0f, 0.0f}, {0.0f, 0.0f, 0.0f} });
+    ecs->storage<Velocity>().add(entity, { 0.0f, 0.0f, 0.0f });
+    ecs->storage<PlayerCamera>().add(entity, PlayerCamera());
+    ecs->storage<PlayerInput>().add(entity, PlayerInput());
+    ecs->storage<PlayerState>().add(entity, PlayerState());
+    ecs->storage<PlayerTag>().add(entity, PlayerTag());
+    ecs->storage<Collider>().add(entity, {0.4f, 1.9f, 0.4f});
+    ecs->storage<Mass>().add(entity, { 1.0f });
 
     return entity;
 }
 
 ECS* World::getECS() {
-    return m_ecs;
+    return m_ecs.ecs;
+}
+
+void World::tick() {
+    if (last_tick_time == 0) last_tick_time = glfwGetTime();
+
+    float tick_delta = (float)(glfwGetTime() - last_tick_time);
+    ECS* ecs = m_ecs.ecs;
+
+	
+
+    last_tick_time = glfwGetTime();
+}
+
+void World::tick_movement() {
+	if (last_tick_time == 0) last_tick_time = glfwGetTime();
+
+	float tick_delta = (float)(glfwGetTime() - last_tick_time);
+	ECS* ecs = m_ecs.ecs;
+
+	m_ecs.world_collision_system->update(*ecs, tick_delta, this);
+	m_ecs.gravity_system->update(*ecs, tick_delta);
+
+	last_tick_time = glfwGetTime();
 }
