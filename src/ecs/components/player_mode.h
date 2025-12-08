@@ -2,7 +2,8 @@
 
 enum class PlayerMode {
 	SURVIVAL,
-	CREATIVE
+	CREATIVE,
+	SPECTATOR
 };
 
 struct PlayerState {

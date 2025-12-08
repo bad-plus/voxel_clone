@@ -49,8 +49,9 @@ void InputHandler::processing() {
 	if (input->jpressed(GLFW_KEY_M)) {
 		auto& player_state = ecs->storage<PlayerState>().get(m_player_entity);
 
-		if (player_state.mode == PlayerMode::CREATIVE) player_state.mode = PlayerMode::SURVIVAL;
-		else player_state.mode = PlayerMode::CREATIVE;
+        if (player_state.mode == PlayerMode::CREATIVE) player_state.mode = PlayerMode::SURVIVAL;
+        else if (player_state.mode == PlayerMode::SURVIVAL) player_state.mode = PlayerMode::SPECTATOR;
+        else player_state.mode = PlayerMode::CREATIVE;
 	}
 
 	if (input->pressed(GLFW_KEY_SPACE)) {
@@ -66,6 +67,7 @@ void InputHandler::processing() {
 	m_player_camera_system.update(*ecs, (float)system_tick_time);
 	m_player_movement_system.update(*ecs, (float)system_tick_time, m_game_context->world);
     m_world_collision_system.update(*ecs, (float)system_tick_time, m_game_context->world);
+    m_gravity_system.update(*ecs, (float)system_tick_time);
 
 	player_input.mouse_delta_x = 0.0f;
 	player_input.mouse_delta_y = 0.0f;

@@ -9,6 +9,7 @@
 #include "../components/player_input.h"
 #include "../components/player_mode.h"
 #include "../components/collider.h"
+#include "../components/mass.h"
 
 #include <typeinfo>
 
@@ -22,6 +23,7 @@ public:
 		registerComponent<PlayerInput>();
 		registerComponent<PlayerState>();
 		registerComponent<Collider>();
+		registerComponent<Mass>();
 	}
 	~ECS() {
 		for (auto& pair : m_components) {

@@ -34,8 +34,16 @@ public:
 
 			float speed = (st.mode == PlayerMode::SURVIVAL) ? 10.0f : (15.0f * inp.fly_speedup);
 
-			float delta_x = (forward_flat.x * inp.move_forward + right.x * inp.move_right) * speed;
-			float delta_z = (forward_flat.z * inp.move_forward + right.z * inp.move_right) * speed;
+			if (st.mode == PlayerMode::SPECTATOR) {
+				vel.x = forward.x * inp.move_forward * speed + right.x * inp.move_right * speed;
+				vel.y = forward.y * inp.move_forward * speed;
+				vel.z = forward.z * inp.move_forward * speed + right.z * inp.move_right * speed;
+
+				if (inp.fly_up) vel.y += speed;
+				if (inp.fly_down) vel.y -= speed;
+
+				continue;
+			}
 
 			if (st.mode == PlayerMode::CREATIVE) {
 				float delta_y = 0.0f;
@@ -43,31 +51,15 @@ public:
 				if (inp.fly_up) delta_y = speed;
 				if (inp.fly_down) delta_y = -speed;
 
-				vel.x = delta_x;
+				vel.x = (forward_flat.x * inp.move_forward + right.x * inp.move_right) * speed;
 				vel.y = delta_y;
-				vel.z = delta_z;
+				vel.z = (forward_flat.z * inp.move_forward + right.z * inp.move_right) * speed;
 
 				continue;
 			}
 
-			vel.x = delta_x;
-			vel.z = delta_z;
-
-			if (inp.jump) {
-				
-			}
-
-			// Gravity
-
-			const float gravity = 9.8f;
-
-			if (vel.y <= 40 && vel.y < 0) {
-				vel.y -= gravity * delta_time * 2.0f;
-			}
-			else {
-				vel.y -= gravity * delta_time;
-			}
-
+			vel.x = (forward_flat.x * inp.move_forward + right.x * inp.move_right) * speed;
+			vel.z = (forward_flat.z * inp.move_forward + right.z * inp.move_right) * speed;
 		}
 	}
 };

@@ -23,16 +23,31 @@ public:
 			auto& vel = ecs.storage<Velocity>().get(e);
 			auto& col = ecs.storage<Collider>().get(e);
 
-			bool has_player_input = ecs.storage<PlayerInput>().has(e);
 			bool has_player_state = ecs.storage<PlayerState>().has(e);
+			bool skip_collision = false;
 			bool is_survival = false;
 			bool wants_jump = false;
 
-			if (has_player_input && has_player_state) {
-				auto& inp = ecs.storage<PlayerInput>().get(e);
+			if (has_player_state) {
 				auto& st = ecs.storage<PlayerState>().get(e);
+
+				if (st.mode == PlayerMode::SPECTATOR) {
+					skip_collision = true;
+				}
+
 				is_survival = (st.mode == PlayerMode::SURVIVAL);
-				wants_jump = inp.jump;
+
+				if (ecs.storage<PlayerInput>().has(e)) {
+					auto& inp = ecs.storage<PlayerInput>().get(e);
+					wants_jump = inp.jump;
+				}
+			}
+
+			if (skip_collision) {
+				trans.position.x += vel.x * dt;
+				trans.position.y += vel.y * dt;
+				trans.position.z += vel.z * dt;
+				continue;
 			}
 
 			float new_x = trans.position.x + vel.x * dt;

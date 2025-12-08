@@ -270,6 +270,7 @@ Entity World::CreatePlayer() {
     m_ecs->storage<PlayerState>().add(entity, PlayerState());
     m_ecs->storage<PlayerTag>().add(entity, PlayerTag());
     m_ecs->storage<Collider>().add(entity, {0.4f, 1.9f, 0.4f});
+    m_ecs->storage<Mass>().add(entity, { 1.0f });
 
     return entity;
 }
