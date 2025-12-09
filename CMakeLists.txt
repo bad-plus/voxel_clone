@@ -49,6 +49,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(stb)
 
+# FreeType
+FetchContent_Declare (
+	freetype
+	GIT_REPOSITORY https://gitlab.freedesktop.org/freetype/freetype.git
+	GIT_TAG VER-2-14-1
+)
+FetchContent_MakeAvailable(freetype)
+
 # spdlog
 FetchContent_Declare(
     spdlog
@@ -80,6 +88,7 @@ target_link_libraries(${PROJECT_NAME}
     glfw
     glad
     glm
+	freetype
     spdlog::spdlog
 )
 
@@ -87,10 +96,8 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_SOURCE_DIR}/resources 
     ${OUTPUT_DIR}/resources
-    COMMENT "Копирование ресурсов в ${OUTPUT_DIR}/resources"
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_DIR}
-    COMMENT "Создание выходной директории ${OUTPUT_DIR}"
 )

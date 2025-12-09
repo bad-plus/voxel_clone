@@ -1,14 +1,21 @@
 ﻿#include "game.h"
-#include "window/window.h"
 #include "logger.h"
-#include "../world/generation/world_generator.h"
+
+#include "window/window.h"
 #include "../ecs/core/ecs.h"
+#include "../utils/resource/resources.h"
+#include "../utils/resource/loader.h"
+#include "../world/world.h"
+#include "../world/generation/world_generator.h"
+#include "../render/render.h"
+#include "input/input_handler.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <string>
 #include <thread>
 #include <random>
+#include <memory>
 
 Game::Game() {
 	m_quit.store(false);

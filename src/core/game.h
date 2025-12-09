@@ -1,15 +1,18 @@
 ﻿#pragma once
-#include "window/window.h"
-#include "input/input.h"
-#include "../render/render.h"
-#include "../render/camera.hpp"
-#include "input/input_handler.h"
-#include "../utils/resource/resources.h"
-#include "../utils/resource/loader.h"
-#include "../world/world.h"
-#include "../world/generation/world_generator.h"
+#include <vector>
+#include <memory>
+#include <thread>
 
-class Game;
+struct Window;
+struct Input;
+struct Render;
+struct InputHandler;
+struct Resources;
+struct Loader;
+struct World;
+struct WorldGenerator;
+
+#include "input/input.h"
 
 struct GameSystemInfo {
 	double update_tick_time;

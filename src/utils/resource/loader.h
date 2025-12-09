@@ -10,6 +10,7 @@ public:
     void loadResources();
     void loadShaders();
     void loadAtlas();
+    void loadFonts();
 private:
     Resources* m_resources;
 };

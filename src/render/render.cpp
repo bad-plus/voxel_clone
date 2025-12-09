@@ -6,6 +6,10 @@
 #include "../core/logger.h"
 #include "../world/world.h"
 #include "../ecs/core/ecs.h"
+#include "../core/window/window.h"
+#include "../utils/resource/resources.h"
+#include "camera.hpp"
+#include "graphics/text.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -31,6 +35,7 @@ void Render::initRender() {
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
     glEnable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void Render::render() {
@@ -45,9 +50,15 @@ void Render::render() {
     if (m_debug_render_mode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	glDisable(GL_BLEND);
     renderWorld(m_world, m_render_dist);
+	// ui
+	glEnable(GL_BLEND);
 
-    glfwSwapBuffers(window);
+	Text test_t(m_resources->getFont("arial_22"), "test_str", 10, 5, 1.0f, {1.0f, 1.0f, 1.0f}, m_render_width, m_render_height);
+	test_t.setShader(m_resources->getShader("text_shader"));
+	test_t.draw();
+	glfwSwapBuffers(window);
 }
 
 void Render::setWorld(World* world) {

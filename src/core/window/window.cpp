@@ -1,11 +1,11 @@
-#include "window.h"
+﻿#include "window.h"
 #include "../logger.h"
 #include "../../render/camera.hpp"
 #include "../game.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
+    
 Window::Window(const char* title, int width, int height, Input* input) {
     m_glfw_window = glfwCreateWindow(width, height, title, nullptr, nullptr);
 

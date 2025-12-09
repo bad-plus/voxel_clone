@@ -3,6 +3,7 @@
 
 #include "../../render/graphics/shader.h"
 #include "../../render/graphics/texture_atlas.h"
+#include "font.h"
 
 Resources::Resources() {
     
@@ -31,4 +32,12 @@ TextureAtlas* Resources::loadTextureAtlas() {
 }
 TextureAtlas* Resources::getTextureAtlas() {
     return m_texture_atlas;
+}
+
+Font* Resources::loadFont(const char* font_name, const char* font_path, int font_size) {
+    m_fonts[font_name] = new Font(font_path, font_size);
+    return m_fonts[font_name];
+}
+Font* Resources::getFont(const char* font_name) {
+    return m_fonts[font_name];
 }

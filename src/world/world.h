@@ -7,10 +7,8 @@
 #include "../ecs/core/entity.h"
 
 struct Chunk;
-struct GameContext;
 struct WorldGenerator;
 struct ECS;
-struct CameraSystem;
 struct PlayerMovementSystem;
 struct WorldCollisionSystem;
 struct GravitySystem;

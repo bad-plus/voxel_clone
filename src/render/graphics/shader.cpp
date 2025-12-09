@@ -22,7 +22,7 @@ std::string readFile(const std::string& file_path) {
 }
 
 Shader::Shader(const char* vertex_path, const char* fragment_path) {
-    const std::string shader_base_path = "/resources/shaders/";
+    const std::string shader_base_path = "../resources/shaders/";
 
     std::string vertex_code = readFile(shader_base_path + vertex_path);
     std::string fragment_code = readFile(shader_base_path + fragment_path);
