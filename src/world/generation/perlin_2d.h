@@ -26,4 +26,6 @@ private:
 
 	int m_seed;
 	std::array<uint8_t, 512> m_perm;
+	float m_offset_x;
+	float m_offset_z;
 };

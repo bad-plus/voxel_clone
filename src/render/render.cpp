@@ -10,6 +10,10 @@
 #include "../utils/resource/resources.h"
 #include "camera.hpp"
 #include "graphics/text.h"
+#include <utility>
+#include <vector>
+#include <cmath>
+#include <algorithm>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -22,7 +26,7 @@ Render::Render(Window* window, ECS* ecs, Resources* resources) {
     initRender();
 
     m_debug_render_mode = false;
-    m_render_dist = 15;
+    m_render_dist = 20;
 
     m_world = nullptr;
 }
@@ -69,6 +73,26 @@ void Render::setDebugRenderMode(bool mode) {
     m_debug_render_mode = mode;
 }
 
+std::vector<std::pair<int, int>> genCircleReady(int cx, int cz, int radius) {
+	std::vector<std::pair<int, int>> out;
+
+	for (int x = -radius; x <= radius; x++) {
+		for (int z = -radius; z <= radius; z++) {
+			if (x * x + z * z <= radius * radius) {
+				out.emplace_back(cx + x, cz + z);
+			}
+		}
+	}
+
+	std::sort(out.begin(), out.end(), [cx, cz](const auto& a, const auto& b) {
+		int dist_a = (a.first - cx) * (a.first - cx) + (a.second - cz) * (a.second - cz);
+		int dist_b = (b.first - cx) * (b.first - cx) + (b.second - cz) * (b.second - cz);
+		return dist_a < dist_b;
+		});
+
+	return out;
+}
+
 void Render::renderWorld(World* world, int render_dist) {
 	if (world == nullptr) return;
 	ECS* ecs = m_world->getECS();
@@ -102,24 +126,21 @@ void Render::renderWorld(World* world, int render_dist) {
 	int chunk_offset_x = player_transform.position.x / CHUNK_SIZE_X;
 	int chunk_offset_z = player_transform.position.z / CHUNK_SIZE_Z;
 
-	for (int x = -render_dist; x < render_dist; x++) {
-		for (int z = -render_dist; z < render_dist; z++) {
-			float global_chunk_position_x = chunk_offset_x + x;
-			float global_chunk_position_z = chunk_offset_z + z;
+	auto go_draw = genCircleReady(chunk_offset_x, chunk_offset_z, render_dist);
 
-			glm::mat4 model = glm::translate(
-				glm::mat4(1.0f),
-				glm::vec3((float)(global_chunk_position_x * (float)CHUNK_SIZE_X),
-					0.0f,
-					(float)(global_chunk_position_z * (float)CHUNK_SIZE_Z)));
+	for (auto& [x, z] : go_draw) {
+		glm::mat4 model = glm::translate(
+			glm::mat4(1.0f),
+			glm::vec3((float)(x * (float)CHUNK_SIZE_X),
+				0.0f,
+				(float)(z * (float)CHUNK_SIZE_Z)));
 
-			glm::mat4 mat = projection * view * model;
-			world_block_shader->uniformmat4fv("transform", mat);
+		glm::mat4 mat = projection * view * model;
+		world_block_shader->uniformmat4fv("transform", mat);
 
-			Chunk* chunk = world->getChunk(global_chunk_position_x, global_chunk_position_z, true);
-			if (chunk != nullptr) {
-				chunk->draw();
-			}
+		Chunk* chunk = world->getChunk(x, z, true);
+		if (chunk != nullptr) {
+			chunk->draw();
 		}
 	}
 }

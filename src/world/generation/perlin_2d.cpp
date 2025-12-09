@@ -15,9 +15,16 @@ Perlin2D::Perlin2D(int seed) : m_seed(seed) {
 		m_perm[i] = p[i];
 		m_perm[i + 256] = p[i];
 	}
+
+	std::uniform_real_distribution<float> dist(-100000.0f, 100000.0f);
+	m_offset_x = dist(rng);
+	m_offset_z = dist(rng);
 }
 
 float Perlin2D::noise(float x, float y) const {
+	x += m_offset_x;
+	y += m_offset_z;
+
 	int X = static_cast<int>(std::floor(x)) & 255;
 	int Y = static_cast<int>(std::floor(y)) & 255;
 
