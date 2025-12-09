@@ -28,7 +28,6 @@ public:
 private:
 	void initGLFW();
 	void startMainLoop();
-	void updateGameContext();
 	void worldGenerationThread();
 	void worldUpdaterThread();
 	void movementUpdaterThread();

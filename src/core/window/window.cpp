@@ -10,9 +10,7 @@ Window::Window(const char* title, int width, int height, Input* input) {
     m_glfw_window = glfwCreateWindow(width, height, title, nullptr, nullptr);
 
     if(!m_glfw_window) {
-        LOG_ERROR("Failed to create GLFW window");
-        glfwTerminate();
-        return;
+        throw std::runtime_error("Failed to create GLFW window");
     }
 
     glfwMakeContextCurrent(m_glfw_window);

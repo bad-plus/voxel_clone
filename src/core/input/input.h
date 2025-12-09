@@ -24,6 +24,8 @@ public:
     bool clicked(const int key) const;
     bool jclicked(const int key) const;
 
+    void scroll(double x_offset, double y_offset);
+
     double m_mouse_pos_x;
     double m_mouse_pos_y;
 

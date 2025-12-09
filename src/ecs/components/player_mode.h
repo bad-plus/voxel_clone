@@ -7,5 +7,5 @@ enum class PlayerMode {
 };
 
 struct PlayerState {
-	PlayerMode mode = PlayerMode::CREATIVE;
+	PlayerMode mode = PlayerMode::SURVIVAL;
 };

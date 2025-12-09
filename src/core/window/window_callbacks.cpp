@@ -24,8 +24,9 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mode)
     if(action == GLFW_RELEASE) input->mouse_release_button(button);
 }
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-    //p_camera->processMouseScroll(yoffset);
+void scroll_callback(GLFWwindow* window, double offset_x, double offset_y) {
+    Input* input = (Input*)glfwGetWindowUserPointer(window);
+    input->scroll(offset_x, offset_y);
 }
 
 void Window::bindCallbacks() {

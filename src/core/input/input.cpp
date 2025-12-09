@@ -107,3 +107,7 @@ bool Input::jclicked(const int key) const {
     if(m_jkeys[KEYS_COUNT + key] && !m_keys[KEYS_COUNT + key]) return true;
     else return false;
 }
+
+void Input::scroll(double x_offset, double y_offset) {
+
+}
