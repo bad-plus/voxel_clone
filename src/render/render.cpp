@@ -121,8 +121,8 @@ void Render::renderWorld(World* world, int render_dist) {
 	glm::mat4 projection(1.0f);
 	projection = glm::perspective(player_camera.zoom, (float)m_render_width / (float)m_render_height, 0.1f, 1000.0f);
 
-	int chunk_offset_x = player_transform.position.x / CHUNK_SIZE_X;
-	int chunk_offset_z = player_transform.position.z / CHUNK_SIZE_Z;
+	int chunk_offset_x = static_cast<int>(std::floor(player_transform.position.x / CHUNK_SIZE_X));
+	int chunk_offset_z = static_cast<int>(std::floor(player_transform.position.z / CHUNK_SIZE_Z));
 
 	auto spiral = genSpiralArr(chunk_offset_x, chunk_offset_z, render_dist);
 
