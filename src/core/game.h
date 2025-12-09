@@ -25,9 +25,9 @@ public:
 	GameSystemInfo getSystemInfo();
 	GameSystemInfo m_game_system_info;
 
+	void run();
 private:
 	void initGLFW();
-	void startMainLoop();
 	void worldGenerationThread();
 	void worldUpdaterThread();
 	void movementUpdaterThread();

@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <deque>
 #include <mutex>
+#include <memory>
 #include "../world/block.h"
 #include "../ecs/core/entity.h"
 
@@ -63,10 +64,10 @@ private:
     std::mutex m_update_mesh_queue_mutex;
 
     struct {
-        ECS* ecs;
-		PlayerMovementSystem* player_movement_system;
-		WorldCollisionSystem* world_collision_system;
-		GravitySystem* gravity_system;
+        std::unique_ptr<ECS> ecs;
+        std::unique_ptr<PlayerMovementSystem> player_movement_system;
+        std::unique_ptr<WorldCollisionSystem> world_collision_system;
+        std::unique_ptr<GravitySystem> gravity_system;
     } m_ecs;
 
     double last_tick_time;

@@ -65,15 +65,15 @@ void InputHandler::processing() {
 	}
 	else player_input.sneak = false;
 
-    if (m_input->jpressed(GLFW_KEY_O)) {
-        player_input.fly_speedup *= 2.0f;
+    if (m_input->pressed(GLFW_KEY_O)) {
+        player_input.fly_speedup += (player_input.fly_speedup * 0.01f);
     }
 
-    if (m_input->jpressed(GLFW_KEY_P)) {
-		player_input.fly_speedup *= 0.5f;
+    if (m_input->pressed(GLFW_KEY_P)) {
+		player_input.fly_speedup -= (player_input.fly_speedup * 0.01f);
 	}
 
-    m_player_camera_system.update(*m_ecs, system_tick_time);
+    m_player_camera_system.update(*m_ecs, (float)system_tick_time);
 }
 
 /*void InputHandler::processing() {

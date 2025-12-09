@@ -146,6 +146,9 @@ public:
 			trans.position.x = new_x;
 			trans.position.y = new_y;
 			trans.position.z = new_z;
+
+			// TODO
+			if (trans.position.y < -50.0f) trans.position.y = 500.0f;
 		}
 	}
 };

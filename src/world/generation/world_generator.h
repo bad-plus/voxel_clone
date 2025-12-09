@@ -1,8 +1,10 @@
 ﻿#pragma once
 #include "biome.hpp"
+#include "perlin_2d.h"
+
+#include <memory>
 
 struct Chunk;
-struct Perlin2D;
 
 class WorldGenerator {
 public:
@@ -17,10 +19,10 @@ private:
     void generateBedrock(Chunk* chunk, int x, int z);
 
     int m_seed;
-    Perlin2D* m_perlin;
+    std::unique_ptr<Perlin2D> m_perlin;
 
-    std::map<Biome::BiomeID, Perlin2D*> m_biome_perlins;
+    std::map<Biome::BiomeID, std::unique_ptr<Perlin2D>> m_biome_perlins;
 
-    Perlin2D* m_perlin_river;
-    Perlin2D* m_perlin_canyon;
+    std::unique_ptr<Perlin2D> m_perlin_river;
+    std::unique_ptr<Perlin2D> m_perlin_canyon;
 };

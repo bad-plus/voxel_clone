@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <cmath>
+#include <memory>
 
 namespace Biome {
     enum class BiomeID {
@@ -213,49 +214,54 @@ namespace Biome {
         return weights;
     }
 
-    inline int getHeight(std::map<Biome::BiomeID, Perlin2D*>& perlins, int world_x, int world_z, std::map<BiomeID, float>& weights) {
-        float result_height = 0.0f;
+	inline int getHeight(const std::map<BiomeID, std::unique_ptr<Perlin2D>>& perlins,
+		int world_x, int world_z, std::map<BiomeID, float>& weights) {
+		float result_height = 0.0f;
 
-        for (const auto& w : weights) {
-            BiomeID id = w.first;
-            float weight = w.second;
+		for (const auto& w : weights) {
+			BiomeID id = w.first;
+			float weight = w.second;
 
-            if (weight < 0.001f) continue;
+			if (weight < 0.001f) continue;
 
-            const BiomeInfo& info = BiomesInfo[id];
+			const BiomeInfo& info = BiomesInfo[id];
 
-            float height = 0.0f;
+			auto it = perlins.find(id);
+			if (it == perlins.end()) continue;
+			Perlin2D* perlin = it->second.get();
 
-            float noise_continent = (perlins[id]->noise(
-                (float)world_x * info.frequency_continent,
-                (float)world_z * info.frequency_continent) + 1.0f) * 0.5f * info.amplitude_continent;
+			float height = 0.0f;
 
-            height += noise_continent;
+			float noise_continent = (perlin->noise(
+				(float)world_x * info.frequency_continent,
+				(float)world_z * info.frequency_continent) + 1.0f) * 0.5f * info.amplitude_continent;
 
-            float noise_terrain = (perlins[id]->noise(
-                (float)world_x * info.frequency_terrain,
-                (float)world_z * info.frequency_terrain) + 1.0f) * 0.5f * info.amplitude_terrain;
+			height += noise_continent;
 
-            height += noise_terrain;
+			float noise_terrain = (perlin->noise(
+				(float)world_x * info.frequency_terrain,
+				(float)world_z * info.frequency_terrain) + 1.0f) * 0.5f * info.amplitude_terrain;
 
-            float noise_details = (perlins[id]->noise(
-                (float)world_x * info.frequency_details,
-                (float)world_z * info.frequency_details) + 1.0f) * 0.5f * info.amplitude_details;
+			height += noise_terrain;
 
-            height += noise_details;
+			float noise_details = (perlin->noise(
+				(float)world_x * info.frequency_details,
+				(float)world_z * info.frequency_details) + 1.0f) * 0.5f * info.amplitude_details;
 
-            float noise_ridge_raw = perlins[id]->noise(
-                (float)world_x * info.frequency_ridge,
-                (float)world_z * info.frequency_ridge);
+			height += noise_details;
 
-            float noise_ridge = (1.0f - std::fabs(noise_ridge_raw)) * info.amplitude_ridge;
-            height += noise_ridge;
+			float noise_ridge_raw = perlin->noise(
+				(float)world_x * info.frequency_ridge,
+				(float)world_z * info.frequency_ridge);
 
-            float smooth_weight = smoother(smoother(smoother(weight)));
+			float noise_ridge = (1.0f - std::fabs(noise_ridge_raw)) * info.amplitude_ridge;
+			height += noise_ridge;
 
-            result_height += (info.base_height + height) * smooth_weight;
-        }
+			float smooth_weight = smoother(smoother(smoother(weight)));
 
-        return (int)result_height;
-    }
+			result_height += (info.base_height + height) * smooth_weight;
+		}
+            
+		return (int)result_height;
+	}
 }

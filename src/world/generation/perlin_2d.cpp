@@ -8,7 +8,7 @@ Perlin2D::Perlin2D(int seed) : m_seed(seed) {
 	std::array<uint8_t, 256> p;
 	std::iota(p.begin(), p.end(), 0);
 
-	std::mt19937 rng(seed);
+	std::mt19937 rng(m_seed);
 	std::shuffle(p.begin(), p.end(), rng);
 
 	for (int i = 0; i < 256; i++) {

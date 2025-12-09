@@ -27,13 +27,13 @@ static constexpr int unpack_chunk_z(long long key) {
 World::World(WorldGenerator* generator) {
     m_generator = generator;
     m_chunk_creation_time = 0.0;
-
-    m_ecs.ecs = new ECS();
     last_tick_time = 0;
 
-	m_ecs.world_collision_system = new WorldCollisionSystem;
-	m_ecs.gravity_system = new GravitySystem;
-    m_ecs.player_movement_system = new PlayerMovementSystem;
+    m_ecs.ecs = std::make_unique<ECS>();
+
+    m_ecs.world_collision_system = std::make_unique<WorldCollisionSystem>();
+    m_ecs.gravity_system = std::make_unique<GravitySystem>();
+    m_ecs.player_movement_system = std::make_unique<PlayerMovementSystem>();
 }
 
 World::~World() {
@@ -43,12 +43,6 @@ World::~World() {
             delete chunk_info;
         }
     }
-
-    delete m_ecs.ecs;
-
-    delete m_ecs.world_collision_system;
-    delete m_ecs.gravity_system;
-    delete m_ecs.player_movement_system;
 }
 
 ChunkInfo* World::createChunk(int x, int z) {
@@ -290,14 +284,14 @@ Entity World::CreatePlayer() {
 }
 
 ECS* World::getECS() {
-    return m_ecs.ecs;
+    return m_ecs.ecs.get();
 }
 
 void World::tick() {
     if (last_tick_time == 0) last_tick_time = glfwGetTime();
 
     float tick_delta = (float)(glfwGetTime() - last_tick_time);
-    ECS* ecs = m_ecs.ecs;
+    ECS* ecs = m_ecs.ecs.get();
 
 	
 
@@ -308,7 +302,7 @@ void World::tick_movement() {
 	if (last_tick_time == 0) last_tick_time = glfwGetTime();
 
 	float tick_delta = (float)(glfwGetTime() - last_tick_time);
-	ECS* ecs = m_ecs.ecs;
+	ECS* ecs = m_ecs.ecs.get();
 
     m_ecs.player_movement_system->update(*ecs, tick_delta, this);
 	m_ecs.world_collision_system->update(*ecs, tick_delta, this);

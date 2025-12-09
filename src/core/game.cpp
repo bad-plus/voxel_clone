@@ -12,9 +12,9 @@
 
 Game::Game() {
 	m_quit.store(false);
+	initLogger();
 
 	initGLFW();
-	initLogger();
 
 	m_input = std::make_unique<Input>();
 
@@ -50,7 +50,6 @@ Game::Game() {
 	m_threads.emplace_back(&Game::movementUpdaterThread, this);
 
 	m_window->setCursorEnabled(false);
-	startMainLoop();
 }
 
 void Game::movementUpdaterThread() {
@@ -91,8 +90,8 @@ void Game::movementUpdaterThread() {
 
 void Game::worldGenerationThread() {
     while (!m_quit) {
-        m_world->processUpdateMeshQueue();
         m_world->processGenerationQueue();
+		m_world->processUpdateMeshQueue();
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 }
@@ -151,7 +150,7 @@ Game::~Game() {
     glfwTerminate();
 }
 
-void Game::startMainLoop() {
+void Game::run() {
     while (!m_quit) {
         double start_game_tick_time = glfwGetTime();
 
