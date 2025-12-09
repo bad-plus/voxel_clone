@@ -3,17 +3,22 @@
 #include "../../ecs/systems/player_camera_system.h"
 #include "../../ecs/systems/player_movement_system.h"
 
-struct GameContext;
+struct ECS;
+struct Input;
+struct Game;
+struct World;
 
 class InputHandler {
 public:
-    InputHandler(GameContext* context);
+    InputHandler(Game* game, Input* input, ECS* ecs);
     ~InputHandler();
 
     void processing();
     void setPlayerEntity(Entity entity);
 private:
-    GameContext* m_game_context;
+    Game* m_game;
+    ECS* m_ecs;
+    Input* m_input;
     Entity m_player_entity;
 
     CameraSystem m_player_camera_system;

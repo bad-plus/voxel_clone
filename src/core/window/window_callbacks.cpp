@@ -7,21 +7,21 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
-    GameContext* context = (GameContext*)glfwGetWindowUserPointer(window);
-    if(action == GLFW_PRESS) context->input->press_button(key);
-    if(action == GLFW_RELEASE) context->input->release_button(key);
+void key_callback(GLFWwindow* window, int key, int scan_code, int action, int mode) {
+    Input* input = (Input*)glfwGetWindowUserPointer(window);
+    if(action == GLFW_PRESS) input->press_button(key);
+    if(action == GLFW_RELEASE) input->release_button(key);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-    GameContext* context = (GameContext*)glfwGetWindowUserPointer(window);
-    context->input->mouse_move(xpos, ypos);
+    Input* input = (Input*)glfwGetWindowUserPointer(window);
+    input->mouse_move(xpos, ypos);
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mode) {
-    GameContext* context = (GameContext*)glfwGetWindowUserPointer(window);
-    if(action == GLFW_PRESS) context->input->mouse_press_button(button);
-    if(action == GLFW_RELEASE) context->input->mouse_release_button(button);
+    Input* input = (Input*)glfwGetWindowUserPointer(window);
+    if(action == GLFW_PRESS) input->mouse_press_button(button);
+    if(action == GLFW_RELEASE) input->mouse_release_button(button);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
@@ -33,7 +33,6 @@ void Window::bindCallbacks() {
     glfwSetScrollCallback(m_glfw_window, scroll_callback);
     glfwSetCursorPosCallback(m_glfw_window, mouse_callback);
     glfwSetMouseButtonCallback(m_glfw_window, mouse_button_callback);
-
 
     LOG_INFO("Callbacks installed");
 }

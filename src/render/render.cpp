@@ -10,8 +10,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-Render::Render(GameContext* game_context) {
-    m_game_context = game_context;
+Render::Render(Window* window, ECS* ecs, Resources* resources) {
+	m_window = window;
+	m_ecs = ecs;
+	m_resources = resources;
+
     initRender();
 
     m_debug_render_mode = false;
@@ -31,7 +34,7 @@ void Render::initRender() {
 }
 
 void Render::render() {
-    GLFWwindow* window = m_game_context->window->getGLFWwindow();
+    GLFWwindow* window = m_window->getGLFWwindow();
 
     glfwGetFramebufferSize(window, &m_render_width, &m_render_height);
     glViewport(0, 0, m_render_width, m_render_height);
@@ -57,16 +60,16 @@ void Render::setDebugRenderMode(bool mode) {
 
 void Render::renderWorld(World* world, int render_dist) {
 	if (world == nullptr) return;
-	ECS* ecs = m_game_context->world->getECS();
+	ECS* ecs = m_world->getECS();
 
 
-	Shader* world_block_shader = m_game_context->resources->getShader("block_shader");
+	Shader* world_block_shader = m_resources->getShader("block_shader");
 	if (world_block_shader == nullptr) {
 		LOG_WARN("BLOCK SHADER NOT LOADED! {0}", (void*)world_block_shader);
 		return;
 	}
 
-	TextureAtlas* atlas = m_game_context->resources->getTextureAtlas();
+	TextureAtlas* atlas = m_resources->getTextureAtlas();
 
 	world_block_shader->use();
 

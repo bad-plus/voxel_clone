@@ -2,19 +2,17 @@
 
 struct GLFWwindow;
 struct Camera;
-struct GameContext;
+struct Input;
 
 class Window {
 public:
-    Window(const char* title, int width, int height, GameContext* context);
+    Window(const char* title, int width, int height, Input* input);
     ~Window();
 
     bool isClose();
     void eventProcessing();
     void bindCallbacks();
     void setCursorEnabled(bool status);
-
-    void setContext(GameContext* context);
 
     void quit();
 

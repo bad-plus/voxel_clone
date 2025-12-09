@@ -6,9 +6,12 @@
 
 #include <GLFW/glfw3.h>
 
-InputHandler::InputHandler(GameContext* context) {
-    m_game_context = context;
+InputHandler::InputHandler(Game* game, Input* input, ECS* ecs) {
     m_player_entity = INVALID_ENTITY;
+
+    m_input = input;
+    m_ecs = ecs;
+    m_game = game;
 }
 InputHandler::~InputHandler() {
 
@@ -21,59 +24,56 @@ BlockID selected_block = BlockID::STONE;
 void InputHandler::processing() {
     const float mouse_sensivty = 0.3f;
 
-	Input* input = m_game_context->input;
-	double system_tick_time = m_game_context->game->getSystemInfo().update_tick_time;
-	ECS* ecs = m_game_context->world->getECS();
+	double system_tick_time = m_game->getSystemInfo().update_tick_time;
 
-	if (input->jpressed(GLFW_KEY_ESCAPE)) m_game_context->game->quit();
+	if (m_input->jpressed(GLFW_KEY_ESCAPE)) m_game->quit();
 
-	auto& player_input = ecs->storage<PlayerInput>().get(m_player_entity);
+	auto& player_input = m_ecs->storage<PlayerInput>().get(m_player_entity);
 
-	if (input->pressed(GLFW_KEY_W)) player_input.move_forward = 1.0f;
-	else if (input->pressed(GLFW_KEY_S)) player_input.move_forward = -1.0f;
+	if (m_input->pressed(GLFW_KEY_W)) player_input.move_forward = 1.0f;
+	else if (m_input->pressed(GLFW_KEY_S)) player_input.move_forward = -1.0f;
 	else player_input.move_forward = 0.0f;
 
-	if (input->pressed(GLFW_KEY_D)) player_input.move_right = 1.0f;
-	else if (input->pressed(GLFW_KEY_A)) player_input.move_right = -1.0f;
+	if (m_input->pressed(GLFW_KEY_D)) player_input.move_right = 1.0f;
+	else if (m_input->pressed(GLFW_KEY_A)) player_input.move_right = -1.0f;
 	else player_input.move_right = 0.0f;
 
-	if (input->pressed(GLFW_KEY_SPACE)) player_input.fly_up = true;
+	if (m_input->pressed(GLFW_KEY_SPACE)) player_input.fly_up = true;
 	else player_input.fly_up = false;
 
-	if (input->pressed(GLFW_KEY_LEFT_SHIFT)) player_input.fly_down = true;
+	if (m_input->pressed(GLFW_KEY_LEFT_SHIFT)) player_input.fly_down = true;
 	else player_input.fly_down = false;
 
-	player_input.mouse_delta_x = input->m_mouse_delta_x * mouse_sensivty;
-	player_input.mouse_delta_y = input->m_mouse_delta_y * mouse_sensivty;
+	player_input.mouse_delta_x = m_input->m_mouse_delta_x * mouse_sensivty;
+	player_input.mouse_delta_y = m_input->m_mouse_delta_y * mouse_sensivty;
 
-	if (input->jpressed(GLFW_KEY_M)) {
-		auto& player_state = ecs->storage<PlayerState>().get(m_player_entity);
+	if (m_input->jpressed(GLFW_KEY_M)) {
+		auto& player_state = m_ecs->storage<PlayerState>().get(m_player_entity);
 
         if (player_state.mode == PlayerMode::CREATIVE) player_state.mode = PlayerMode::SURVIVAL;
         else if (player_state.mode == PlayerMode::SURVIVAL) player_state.mode = PlayerMode::SPECTATOR;
         else player_state.mode = PlayerMode::CREATIVE;
 	}
 
-	if (input->pressed(GLFW_KEY_SPACE)) {
+	if (m_input->pressed(GLFW_KEY_SPACE)) {
 		player_input.jump = true;
 	}
 	else player_input.jump = false;
 
-	if (input->pressed(GLFW_KEY_LEFT_SHIFT)) {
+	if (m_input->pressed(GLFW_KEY_LEFT_SHIFT)) {
 		player_input.sneak = true;
 	}
 	else player_input.sneak = false;
 
-    if (input->jpressed(GLFW_KEY_O)) {
+    if (m_input->jpressed(GLFW_KEY_O)) {
         player_input.fly_speedup *= 2.0f;
     }
 
-    if (input->jpressed(GLFW_KEY_P)) {
+    if (m_input->jpressed(GLFW_KEY_P)) {
 		player_input.fly_speedup *= 0.5f;
 	}
 
-    m_player_camera_system.update(*ecs, system_tick_time);
-    m_player_movement_system.update(*ecs, system_tick_time, m_game_context->world);
+    m_player_camera_system.update(*m_ecs, system_tick_time);
 }
 
 /*void InputHandler::processing() {

@@ -17,21 +17,12 @@ Game::Game() {
 	initLogger();
 
 	m_input = std::make_unique<Input>();
-	updateGameContext();
 
-	m_window = std::make_unique<Window>("Game test", 1280, 720, &m_game_context);
-	updateGameContext();
+	m_window = std::make_unique<Window>("Game test", 1280, 720, m_input.get());
 
 	m_resources = std::make_unique<Resources>();
-	updateGameContext();
 
 	m_loader = std::make_unique<Loader>(m_resources.get());
-	updateGameContext();
-
-	m_render = std::make_unique<Render>(&m_game_context);
-	updateGameContext();
-
-	m_loader->loadResources();
 
 	std::random_device rd;
 	std::mt19937 gen(rd());
@@ -41,21 +32,22 @@ Game::Game() {
 	m_world_generator = std::make_unique<WorldGenerator>(seed);
 	LOG_INFO("World seed: {0}", seed);
 
-	m_world = std::make_unique<World>(&m_game_context, m_world_generator.get());
+	m_world = std::make_unique<World>(m_world_generator.get());
+
+	m_render = std::make_unique<Render>(m_window.get(), m_world->getECS(), m_resources.get());
 	m_render->setWorld(m_world.get());
+
+	m_loader->loadResources();
 
 	Entity player_entity = m_world->CreatePlayer();
 	m_render->setPlayerEntity(player_entity);
-	updateGameContext();
 
-	m_input_handler = std::make_unique<InputHandler>(&m_game_context);
+	m_input_handler = std::make_unique<InputHandler>(this, m_input.get(), m_world->getECS());
 	m_input_handler->setPlayerEntity(player_entity);
 
 	m_threads.emplace_back(&Game::worldGenerationThread, this);
 	m_threads.emplace_back(&Game::worldUpdaterThread, this);
 	m_threads.emplace_back(&Game::movementUpdaterThread, this);
-
-	updateGameContext();
 
 	m_window->setCursorEnabled(false);
 	startMainLoop();
@@ -139,16 +131,6 @@ void Game::worldUpdaterThread() {
 			std::this_thread::yield();
 		}
 	}
-}
-
-void Game::updateGameContext() {
-    m_game_context.game = this;
-    m_game_context.input = m_input.get();
-    m_game_context.window = m_window.get();
-    m_game_context.render = m_render.get();
-    m_game_context.resources = m_resources.get();
-    m_game_context.loader = m_loader.get();
-    m_game_context.world = m_world.get();
 }
 
 void Game::quit() {

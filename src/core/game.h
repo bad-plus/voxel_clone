@@ -11,17 +11,6 @@
 
 class Game;
 
-
-struct GameContext {
-	Game* game;
-	Window* window;
-	Input* input;
-	Render* render;
-	Resources* resources;
-	Loader* loader;
-	World* world;
-};
-
 struct GameSystemInfo {
 	double update_tick_time;
 	double render_time;
@@ -55,6 +44,4 @@ private:
 	std::unique_ptr<Loader> m_loader;
 	std::unique_ptr<World> m_world;
 	std::unique_ptr<WorldGenerator> m_world_generator;
-
-	GameContext m_game_context;
 };

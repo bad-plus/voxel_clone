@@ -6,7 +6,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-Window::Window(const char* title, int width, int height, GameContext* context) {
+Window::Window(const char* title, int width, int height, Input* input) {
     m_glfw_window = glfwCreateWindow(width, height, title, nullptr, nullptr);
 
     if(!m_glfw_window) {
@@ -19,13 +19,9 @@ Window::Window(const char* title, int width, int height, GameContext* context) {
 
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-    setContext(context);
+    glfwSetWindowUserPointer(m_glfw_window, input);
     
     bindCallbacks();
-}
-
-void Window::setContext(GameContext* context) {
-    glfwSetWindowUserPointer(m_glfw_window, context);
 }
 
 Window::~Window() {

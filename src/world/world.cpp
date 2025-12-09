@@ -9,6 +9,7 @@
 
 #include "../ecs/systems/player_camera_system.h"
 #include "../ecs/systems/world_collision_system.h"
+#include "../ecs/systems/player_movement_system.h"
 #include "../ecs/systems/gravity_system.h"
 
 static constexpr long long pack_chunk_coords(int x, int z) {
@@ -23,8 +24,7 @@ static constexpr int unpack_chunk_z(long long key) {
     return (int)((key >> 32) & 0xFFFFFFFF);
 }
 
-World::World(GameContext* context, WorldGenerator* generator) {
-    m_game_context = context;
+World::World(WorldGenerator* generator) {
     m_generator = generator;
     m_chunk_creation_time = 0.0;
 
@@ -33,6 +33,7 @@ World::World(GameContext* context, WorldGenerator* generator) {
 
 	m_ecs.world_collision_system = new WorldCollisionSystem;
 	m_ecs.gravity_system = new GravitySystem;
+    m_ecs.player_movement_system = new PlayerMovementSystem;
 }
 
 World::~World() {
@@ -47,6 +48,7 @@ World::~World() {
 
     delete m_ecs.world_collision_system;
     delete m_ecs.gravity_system;
+    delete m_ecs.player_movement_system;
 }
 
 ChunkInfo* World::createChunk(int x, int z) {
@@ -308,6 +310,7 @@ void World::tick_movement() {
 	float tick_delta = (float)(glfwGetTime() - last_tick_time);
 	ECS* ecs = m_ecs.ecs;
 
+    m_ecs.player_movement_system->update(*ecs, tick_delta, this);
 	m_ecs.world_collision_system->update(*ecs, tick_delta, this);
 	m_ecs.gravity_system->update(*ecs, tick_delta);
 

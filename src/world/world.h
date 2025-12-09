@@ -22,7 +22,7 @@ struct ChunkInfo {
 
 class World {
 public:
-    World(GameContext* context, WorldGenerator* generator);
+    World(WorldGenerator* generator);
     ~World();
 
     Chunk* getChunk(int x, int z, bool create = false);
@@ -55,7 +55,6 @@ private:
     std::mutex m_chunks_mutex;
 
     WorldGenerator* m_generator;
-    GameContext* m_game_context;
 
     std::deque<ChunkInfo*> m_generation_queue;
     std::mutex m_generation_queue_mtx;
