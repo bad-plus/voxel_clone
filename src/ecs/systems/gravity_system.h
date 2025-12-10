@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 #include <cmath>
 
-constexpr float GRAVITY = 13.0f;
+constexpr float GRAVITY = 16.0f;
 
 class GravitySystem {
 public:

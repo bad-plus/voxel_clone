@@ -6,6 +6,7 @@
 #include "../components/player_input.h"
 #include "../components/player_mode.h"
 #include "../components/player_camera.h"
+#include "../components/collider.h"
 #include "../../world/world.h"
 #include <glm/glm.hpp>
 #include <cmath>
@@ -21,6 +22,7 @@ public:
 			auto& inp = ecs.storage<PlayerInput>().get(e);
 			auto& cam = ecs.storage<PlayerCamera>().get(e);
 			auto& st = ecs.storage<PlayerState>().get(e);
+			auto& col = ecs.storage<Collider>().get(e);
 
 			glm::vec3 front;
 			front.x = cos(glm::radians(cam.yaw)) * cos(glm::radians(cam.pitch));
@@ -32,7 +34,12 @@ public:
 			glm::vec3 world_up = glm::vec3(0.0f, 1.0f, 0.0f);
 			glm::vec3 right = glm::normalize(glm::cross(forward_flat, world_up));
 
-			float speed = (st.mode == PlayerMode::SURVIVAL) ? 10.0f : (15.0f * inp.fly_speedup);
+			if (inp.sneak) {
+				col.half_y = 1.6f;
+			}
+			else col.half_y = 1.9;
+
+			float speed = (st.mode == PlayerMode::SURVIVAL) ? 8.0f : (15.0f * inp.fly_speedup);
 
 			if (st.mode == PlayerMode::SPECTATOR) {
 				vel.x = forward.x * inp.move_forward * speed + right.x * inp.move_right * speed;
