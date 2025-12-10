@@ -19,6 +19,9 @@ public:
 
 			if (cam.pitch > 89.f) cam.pitch = 89.f;
 			if (cam.pitch < -89.f) cam.pitch = -89.f;
+
+			if (cam.yaw > 360.f) cam.yaw -= 360.f;
+			if (cam.yaw < -360.f) cam.yaw += 360.f;
 		}
 	}
 };

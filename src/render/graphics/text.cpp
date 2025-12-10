@@ -1,4 +1,4 @@
-#include "text.h"
+﻿#include "text.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -22,6 +22,7 @@ Text::Text(Font* font, const std::string& str, float x, float y, float scale, co
 	setScale(scale);
 	setColor(color);
 	setProjection(screen_width, screen_height);
+	setLineSpacing(1.2f);
 
 	m_shader = nullptr;
 }
@@ -59,6 +60,10 @@ void Text::setFont(Font* font) {
 	m_font = font;
 }
 
+void Text::setLineSpacing(float spacing) {
+	m_lineSpacing = spacing;
+}
+
 void Text::draw() {
 	if (m_shader == nullptr || m_font == nullptr) return;
 
@@ -71,8 +76,23 @@ void Text::draw() {
 
 	float x = m_position.x;
 	float y = m_position.y;
+	float startX = m_position.x;
+
+	float lineHeight = 0.0f;
+	for (const auto& pair : m_font->m_glyphs) {
+		if (pair.second.size.y > lineHeight) {
+			lineHeight = pair.second.size.y;
+		}
+	}
+	lineHeight *= m_scale * m_lineSpacing;
 
 	for (char c : m_string) {
+		if (c == '\n') {
+			x = startX;
+			y -= lineHeight;
+			continue;
+		}
+
 		if (m_font->m_glyphs.find(c) == m_font->m_glyphs.end()) {
 			continue;
 		}

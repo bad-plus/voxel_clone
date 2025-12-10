@@ -14,6 +14,8 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+#include "../ecs/components/transform.h"
+#include "../ecs/components/player_camera.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -56,12 +58,8 @@ void Render::render() {
 
 	glDisable(GL_BLEND);
     renderWorld(m_world, m_render_dist);
-	// ui
-	glEnable(GL_BLEND);
-
-	Text test_t(m_resources->getFont("arial_22"), "test_str", 10, 5, 1.0f, {1.0f, 1.0f, 1.0f}, m_render_width, m_render_height);
-	test_t.setShader(m_resources->getShader("text_shader"));
-	test_t.draw();
+	
+	renderDebug();
 	glfwSwapBuffers(window);
 }
 
@@ -95,7 +93,7 @@ std::vector<std::pair<int, int>> genCircleReady(int cx, int cz, int radius) {
 
 void Render::renderWorld(World* world, int render_dist) {
 	if (world == nullptr) return;
-	ECS* ecs = m_world->getECS();
+	ECS* ecs = world->getECS();
 
 
 	Shader* world_block_shader = m_resources->getShader("block_shader");
@@ -147,4 +145,31 @@ void Render::renderWorld(World* world, int render_dist) {
 
 void Render::setPlayerEntity(Entity entity) {
     m_player_entity = entity;
+}
+
+void Render::renderDebug() {
+	glEnable(GL_BLEND);
+	Text debug_text(m_resources->getFont("arial_22"), "", 10, 690, 1.0f, { 1.0f, 1.0f, 1.0f }, m_render_width, m_render_height);
+	debug_text.setShader(m_resources->getShader("text_shader"));
+
+	ECS* ecs = m_world->getECS();
+
+	auto& player_camera = ecs->storage<PlayerCamera>().get(m_player_entity);
+	auto& player_transform = ecs->storage<Transform>().get(m_player_entity);
+
+	std::string debug_str = "";
+	debug_str += "Camera position: ";
+	debug_str += std::to_string(player_transform.position.x) + " ";
+	debug_str += std::to_string(player_transform.position.y) + " ";
+	debug_str += std::to_string(player_transform.position.z);
+	debug_str += "\n";
+	debug_str += "Camera rotation: ";
+	debug_str += "yaw: " + std::to_string(player_camera.yaw) + " ";
+	debug_str += " | pitch: " + std::to_string(player_camera.pitch) + " ";
+	debug_str += "\n";
+
+
+	
+	debug_text.setString(debug_str);
+	debug_text.draw();
 }

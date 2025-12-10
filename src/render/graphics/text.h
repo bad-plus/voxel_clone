@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <string>
 #include <glm/glm.hpp>
 #include "../../utils/resource/font.h"
@@ -16,6 +16,7 @@ public:
 	void setShader(Shader* shader);
 	void setColor(const glm::vec3& color);
 	void setFont(Font* font);
+	void setLineSpacing(float spacing);
 
 	void draw();
 private:
@@ -24,6 +25,7 @@ private:
 	Shader* m_shader;
 	Font* m_font;
 	float m_scale;
+	float m_lineSpacing;
 	glm::mat4 m_projection;
 	glm::vec3 m_color;
 	glm::vec2 m_position;
