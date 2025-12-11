@@ -17,11 +17,10 @@ WorldGenerator::WorldGenerator(int seed) {
     m_biome_perlins[Biome::BiomeID::WINTER] = std::make_unique<Perlin2D>(m_seed + 13);
     m_biome_perlins[Biome::BiomeID::DESERT] = std::make_unique<Perlin2D>(m_seed + 14);
 }
-WorldGenerator::~WorldGenerator() {
-    
-}
+WorldGenerator::~WorldGenerator() = default;
 
 Chunk* WorldGenerator::generateChunk(Chunk* chunk, int x, int z) {
+    generateTerrain(chunk, x, z);
     generateTerrain(chunk, x, z);
     generateRivers(chunk, x, z);
     generateCanyon(chunk, x, z);

@@ -163,8 +163,10 @@ void Chunk::calculateMesh() {
     std::vector<GLfloat> temp_vertices;
     std::vector<GLuint> temp_indices;
 
-    temp_vertices.reserve(2048);
-    temp_indices.reserve(2048);
+    constexpr int VERTICES_BUFFER_SIZE = CHUNK_SIZE_X * CHUNK_SIZE_Z * 64 * 4;
+
+    temp_vertices.reserve(VERTICES_BUFFER_SIZE);
+    temp_indices.reserve(VERTICES_BUFFER_SIZE);
 
     for (unsigned int x = 0; x < CHUNK_SIZE_X; x++) {
         for (unsigned int y = 0; y < CHUNK_SIZE_Y; y++) {

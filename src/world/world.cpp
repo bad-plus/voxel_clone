@@ -189,8 +189,7 @@ ChunkInfo* World::pullUpdateMeshQueue() {
 void World::processUpdateMeshQueue() {
     ChunkInfo* chunk_info = pullUpdateMeshQueue();
     if (chunk_info == nullptr) return;
-
-    chunk_info->chunk->calculateMesh();
+	chunk_info->chunk->calculateMesh();
 }
 
 static inline int floorDiv(int a, int b) {
