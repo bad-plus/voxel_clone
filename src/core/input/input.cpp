@@ -15,9 +15,7 @@ Input::Input() {
 
     m_first_move = true;
 }
-Input::~Input() {
-
-}
+Input::~Input() = default;
 
 void Input::press_button(const int key) {
     if (key < 0 || key > KEYS_COUNT) {

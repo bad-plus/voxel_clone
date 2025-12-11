@@ -32,11 +32,10 @@ Render::Render(Window* window, ECS* ecs, Resources* resources) {
 
     m_world = nullptr;
 }
-Render::~Render() {
 
-}
+Render::~Render() = default;
 
-void Render::initRender() {
+void Render::initRender() const {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
@@ -113,25 +112,24 @@ void Render::renderWorld(World* world, int render_dist) {
 	glm::mat4 view(1.0f);
 	view = getCameraViewMatrix(ecs, m_player_entity);
 
-	auto& player_input = ecs->storage<PlayerInput>().get(m_player_entity);
-	auto& player_transform = ecs->storage<Transform>().get(m_player_entity);
-	auto& player_camera = ecs->storage<PlayerCamera>().get(m_player_entity);
+	const auto& player_transform = ecs->storage<Transform>().get(m_player_entity);
+	const auto& player_camera = ecs->storage<PlayerCamera>().get(m_player_entity);
 
 	glm::mat4 projection(1.0f);
 	projection = glm::perspective(player_camera.zoom, (float)m_render_width / (float)m_render_height, 0.1f, 1000.0f);
 
 
-	int chunk_offset_x = player_transform.position.x / CHUNK_SIZE_X;
-	int chunk_offset_z = player_transform.position.z / CHUNK_SIZE_Z;
+	int chunk_offset_x = (player_transform.position.x / CHUNK_SIZE_X);
+	int chunk_offset_z = (player_transform.position.z / CHUNK_SIZE_Z);
 
 	auto go_draw = genCircleReady(chunk_offset_x, chunk_offset_z, render_dist);
 
-	for (auto& [x, z] : go_draw) {
+	for (const auto& [x, z] : go_draw) {
 		glm::mat4 model = glm::translate(
 			glm::mat4(1.0f),
-			glm::vec3((float)(x * (float)CHUNK_SIZE_X),
+			glm::vec3((x * (float)CHUNK_SIZE_X),
 				0.0f,
-				(float)(z * (float)CHUNK_SIZE_Z)));
+				(z * (float)CHUNK_SIZE_Z)));
 
 		glm::mat4 mat = projection * view * model;
 		world_block_shader->uniformmat4fv("transform", mat);

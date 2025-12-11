@@ -13,10 +13,6 @@ private:
 		return t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f);
 	}
 
-	inline float lerp(float a, float b, float t) const {
-		return a + t * (b - a);
-	}
-
 	inline float grad(int hash, float x, float y) const {
 		int h = hash & 7;
 		float u = h < 4 ? x : y;

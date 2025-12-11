@@ -38,12 +38,12 @@ Shader::Shader(const char* vertex_path, const char* fragment_path) {
     if(vertex_code.length() > 0) {
         GLuint vertex_shader;
         vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex_shader, 1, &vertex_source, NULL);
+        glShaderSource(vertex_shader, 1, &vertex_source, nullptr);
         glCompileShader(vertex_shader);
 
         glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
         if(!success) {
-            glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
+            glGetShaderInfoLog(vertex_shader, 512, nullptr, info_log);
             LOG_ERROR("Shader {0} not compiled:\n\t{1}", vertex_path, info_log);
         } else glAttachShader(m_shader_program, vertex_shader);
 
@@ -53,12 +53,12 @@ Shader::Shader(const char* vertex_path, const char* fragment_path) {
     if(fragment_code.length() > 0) {
         GLuint fragment_shader;
         fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragment_shader, 1, &fragment_source, NULL);
+        glShaderSource(fragment_shader, 1, &fragment_source, nullptr);
         glCompileShader(fragment_shader);
 
         glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
         if(!success) {
-            glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
+            glGetShaderInfoLog(fragment_shader, 512, nullptr, info_log);
             LOG_ERROR("Shader {0} not compiled:\n\t{1}", fragment_path, info_log);
         } else glAttachShader(m_shader_program, fragment_shader);
 
@@ -69,7 +69,7 @@ Shader::Shader(const char* vertex_path, const char* fragment_path) {
     glGetProgramiv(m_shader_program, GL_LINK_STATUS, &success);
 
     if(!success) {
-        glGetProgramInfoLog(m_shader_program, 512, NULL, info_log);
+        glGetProgramInfoLog(m_shader_program, 512, nullptr, info_log);
         LOG_ERROR("Shader program not compiled\n\t{0}", info_log);
     }
 }
@@ -78,11 +78,11 @@ Shader::~Shader() {
     glDeleteProgram(m_shader_program);
 }
 
-void Shader::use() {
+void Shader::use() const {
     glUseProgram(m_shader_program);
 }
 
-void Shader::uniformVec4(const char* form_name, float rx, float gy, float bz, float aw) {
+void Shader::uniformVec4(const char* form_name, float rx, float gy, float bz, float aw) const {
     GLint form_location = glGetUniformLocation(m_shader_program, form_name);
     if(form_location == -1) {
         LOG_WARN("bad request to update shader uniform ({0})", form_name);
@@ -91,7 +91,7 @@ void Shader::uniformVec4(const char* form_name, float rx, float gy, float bz, fl
     glUniform4f(form_location, rx, gy, bz, aw);
 }
 
-void Shader::uniformi1(const char* form_name, int data) {
+void Shader::uniformi1(const char* form_name, int data) const {
     GLint form_location = glGetUniformLocation(m_shader_program, form_name);
     if(form_location == -1) {
         LOG_WARN("bad request to update shader uniform ({0})", form_name);
@@ -100,7 +100,7 @@ void Shader::uniformi1(const char* form_name, int data) {
     glUniform1i(form_location, data);
 }
 
-void Shader::uniformmat4fv(const char* form_name, const glm::mat4& mat) {
+void Shader::uniformmat4fv(const char* form_name, const glm::mat4& mat) const {
     GLint form_location = glGetUniformLocation(m_shader_program, form_name);
     if(form_location == -1) {
         LOG_WARN("bad request to update shader uniform ({0})", form_name);

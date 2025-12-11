@@ -25,12 +25,12 @@ public:
 	Game();
 	~Game();
 	void quit();
-	GameSystemInfo getSystemInfo();
+	GameSystemInfo getSystemInfo() const;
 	GameSystemInfo m_game_system_info;
 
 	void run();
 private:
-	void initGLFW();
+	void initGLFW() const;
 	void worldGenerationThread();
 	void worldUpdaterThread();
 	void movementUpdaterThread();

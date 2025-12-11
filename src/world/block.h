@@ -18,7 +18,7 @@ enum class BlockID {
 };
 
 struct SideUV {
-    glm::vec2 uv[4]; // 4 vertecs per cube face
+    glm::vec2 uv[4]; // 4 vertices per cube face
 };
 
 enum class BlockSide {

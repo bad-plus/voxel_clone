@@ -27,7 +27,7 @@ private:
     ECS* m_ecs;
     Resources* m_resources;
 
-    void initRender();
+    void initRender() const;
 
     bool m_debug_render_mode;
 

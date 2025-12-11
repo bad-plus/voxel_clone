@@ -290,7 +290,7 @@ ECS* World::getECS() {
 void World::tick() {
     if (last_tick_time == 0) last_tick_time = glfwGetTime();
 
-    float tick_delta = (float)(glfwGetTime() - last_tick_time);
+    const float tick_delta = (float)(glfwGetTime() - last_tick_time);
     ECS* ecs = m_ecs.ecs.get();
 
 	
@@ -304,7 +304,7 @@ void World::tick_movement() {
 	float tick_delta = (float)(glfwGetTime() - last_tick_time);
 	ECS* ecs = m_ecs.ecs.get();
 
-    m_ecs.player_movement_system->update(*ecs, tick_delta, this);
+    m_ecs.player_movement_system->update(*ecs, this);
 	m_ecs.world_collision_system->update(*ecs, tick_delta, this);
 	m_ecs.gravity_system->update(*ecs, tick_delta);
 

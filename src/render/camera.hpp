@@ -17,13 +17,12 @@ inline glm::mat4 getCameraViewMatrix(ECS* ecs, Entity entity) {
 		return glm::mat4(1.0f);
 	}
 
-	auto& player_input = ecs->storage<PlayerInput>().get(entity);
-	auto& player_camera = ecs->storage<PlayerCamera>().get(entity);
-	auto& player_transform = ecs->storage<Transform>().get(entity);
+	const auto& player_camera = ecs->storage<PlayerCamera>().get(entity);
+	const auto& player_transform = ecs->storage<Transform>().get(entity);
 
 	glm::vec3 m_world_up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	glm::vec3 front;
+	glm::vec3 front = {};
 	front.x = cos(glm::radians(player_camera.yaw)) * cos(glm::radians(player_camera.pitch));
 	front.y = sin(glm::radians(player_camera.pitch));
 	front.z = sin(glm::radians(player_camera.yaw)) * cos(glm::radians(player_camera.pitch));

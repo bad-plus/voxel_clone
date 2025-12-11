@@ -21,7 +21,7 @@ public:
 		for (Entity e : view.each()) {
 			auto& trans = ecs.storage<Transform>().get(e);
 			auto& vel = ecs.storage<Velocity>().get(e);
-			auto& col = ecs.storage<Collider>().get(e);
+			const auto& col = ecs.storage<Collider>().get(e);
 
 			bool has_player_state = ecs.storage<PlayerState>().has(e);
 			bool skip_collision = false;
@@ -29,7 +29,7 @@ public:
 			bool wants_jump = false;
 
 			if (has_player_state) {
-				auto& st = ecs.storage<PlayerState>().get(e);
+				const auto& st = ecs.storage<PlayerState>().get(e);
 
 				if (st.mode == PlayerMode::SPECTATOR) {
 					skip_collision = true;
@@ -38,7 +38,7 @@ public:
 				is_survival = (st.mode == PlayerMode::SURVIVAL);
 
 				if (ecs.storage<PlayerInput>().has(e)) {
-					auto& inp = ecs.storage<PlayerInput>().get(e);
+					const auto& inp = ecs.storage<PlayerInput>().get(e);
 					wants_jump = inp.jump;
 				}
 			}

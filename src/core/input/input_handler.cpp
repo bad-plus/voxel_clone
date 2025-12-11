@@ -13,9 +13,7 @@ InputHandler::InputHandler(Game* game, Input* input, ECS* ecs) {
     m_ecs = ecs;
     m_game = game;
 }
-InputHandler::~InputHandler() {
-
-}
+InputHandler::~InputHandler() = default;
 
 bool current_render_debug_mode = false;
 
@@ -45,7 +43,7 @@ void InputHandler::processing() {
 	else player_input.fly_down = false;
 
 	player_input.mouse_delta_x = m_input->m_mouse_delta_x * mouse_sensivty;
-	player_input.mouse_delta_y = m_input->m_mouse_delta_y * mouse_sensivty;
+	player_input.mouse_delta_y = -m_input->m_mouse_delta_y * mouse_sensivty;
 
 	if (m_input->jpressed(GLFW_KEY_M)) {
 		auto& player_state = m_ecs->storage<PlayerState>().get(m_player_entity);
@@ -73,7 +71,7 @@ void InputHandler::processing() {
 		player_input.fly_speedup -= (player_input.fly_speedup * 0.01f);
 	}
 
-    m_player_camera_system.update(*m_ecs, (float)system_tick_time);
+    m_player_camera_system.update(*m_ecs);
 }
 
 /*void InputHandler::processing() {

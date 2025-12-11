@@ -8,10 +8,10 @@ Text::Text(Font* font, const std::string& str, float x, float y, float scale, co
 
 	glBindVertexArray(m_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, nullptr, GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -102,8 +102,8 @@ void Text::draw() {
 		float xpos = x + glyph.bearing.x * m_scale;
 		float ypos = y - (glyph.size.y - glyph.bearing.y) * m_scale;
 
-		float w = glyph.size.x * m_scale;
-		float h = glyph.size.y * m_scale;
+		float w = (glyph.size.x * m_scale);
+		float h = (glyph.size.y * m_scale);
 
 		float vertices[6][4] = {
 			{ xpos,     ypos + h,   0.0f, 0.0f },

@@ -8,9 +8,7 @@
 Loader::Loader(Resources* resources) {
     m_resources = resources;
 }
-Loader::~Loader() {
-
-}
+Loader::~Loader() = default;
 
 void Loader::loadResources() {
     loadAtlas();

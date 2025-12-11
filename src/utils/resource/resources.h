@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <string>
+#include <memory>
 
 struct Shader;
 struct TextureAtlas;
@@ -20,7 +21,7 @@ public:
     Font* loadFont(const char* font_name, const char* font_path, int font_size);
     Font* getFont(const char* font_name);
 private:
-    std::unordered_map<std::string, Shader*> m_shaders;
-    std::unordered_map<std::string, Font*> m_fonts;
-    TextureAtlas* m_texture_atlas;
+    std::unordered_map<std::string, std::unique_ptr<Shader>> m_shaders;
+    std::unordered_map<std::string, std::unique_ptr<Font>> m_fonts;
+    std::unique_ptr<TextureAtlas> m_texture_atlas;
 };

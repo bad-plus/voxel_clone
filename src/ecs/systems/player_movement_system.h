@@ -13,11 +13,10 @@
 
 class PlayerMovementSystem {
 public:
-	void update(ECS& ecs, float delta_time, World* world) {
+	void update(ECS& ecs, World* world) const {
 		View <Transform, Velocity, PlayerCamera, PlayerInput, PlayerState> view(ecs);
 
 		for (Entity e : view.each()) {
-			auto& trans = ecs.storage<Transform>().get(e);
 			auto& vel = ecs.storage<Velocity>().get(e);
 			auto& inp = ecs.storage<PlayerInput>().get(e);
 			auto& cam = ecs.storage<PlayerCamera>().get(e);
@@ -37,7 +36,7 @@ public:
 			if (inp.sneak) {
 				col.half_y = 1.6f;
 			}
-			else col.half_y = 1.9;
+			else col.half_y = 1.9f;
 
 			float speed = (st.mode == PlayerMode::SURVIVAL) ? 8.0f : (15.0f * inp.fly_speedup);
 

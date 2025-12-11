@@ -15,9 +15,8 @@ public:
 		View <Transform, Velocity, Mass> view(ecs);
 
 		for (Entity e : view.each()) {
-			auto& trans = ecs.storage<Transform>().get(e);
 			auto& vel = ecs.storage<Velocity>().get(e);
-			auto& mass = ecs.storage<Mass>().get(e);
+			const auto& mass = ecs.storage<Mass>().get(e);
 
 			if (vel.y <= 40 && vel.y < 0) {
 				vel.y -= mass.value * GRAVITY * delta_time * 2.0f;

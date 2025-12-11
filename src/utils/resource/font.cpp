@@ -36,7 +36,7 @@ Font::Font(const std::string& path, int pixel_size) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		Glyph g;
+		Glyph g = {};
 		g.texture = tex;
 		g.size = { m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows };
 		g.bearing = { m_face->glyph->bitmap_left, m_face->glyph->bitmap_top };
@@ -47,7 +47,7 @@ Font::Font(const std::string& path, int pixel_size) {
 }
 
 Font::~Font() {
-	for (auto& [c, g] : m_glyphs) {
+	for (const auto& [c, g] : m_glyphs) {
 		glDeleteTextures(1, &g.texture);
 	}
 

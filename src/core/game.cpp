@@ -17,6 +17,9 @@
 #include <random>
 #include <memory>
 
+constexpr int WORLD_MOVEMENT_TICKRATE = 60;
+constexpr int WORLD_UPDATER_TICKRATE = 24;
+
 Game::Game() {
 	m_quit.store(false);
 	initLogger();
@@ -60,8 +63,7 @@ Game::Game() {
 }
 
 void Game::movementUpdaterThread() {
-	const int tickrate = 60;
-	const double dt = 1.0 / tickrate;
+	const double dt = 1.0 / WORLD_MOVEMENT_TICKRATE;
 
 	double accumulator = 0.0;
 	double last_time = glfwGetTime();
@@ -104,8 +106,7 @@ void Game::worldGenerationThread() {
 }
 
 void Game::worldUpdaterThread() {
-	const int tickrate = 24;
-	const double dt = 1.0 / tickrate;
+	const double dt = 1.0 / WORLD_UPDATER_TICKRATE;
 
 	double accumulator = 0.0;
 	double last_time = glfwGetTime();
@@ -185,11 +186,11 @@ void Game::run() {
     }
 }
 
-GameSystemInfo Game::getSystemInfo() {
+GameSystemInfo Game::getSystemInfo() const {
     return m_game_system_info;
 }
 
-void Game::initGLFW() {
+void Game::initGLFW() const {
     LOG_INFO("Starting application...");
 	if (!glfwInit()) {
 		throw std::runtime_error("Failed to initialize GLFW");

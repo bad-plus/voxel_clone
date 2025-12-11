@@ -5,7 +5,7 @@
 #include <numeric>
 
 Perlin2D::Perlin2D(int seed) : m_seed(seed) {
-	std::array<uint8_t, 256> p;
+	std::array<uint8_t, 256> p = {};
 	std::iota(p.begin(), p.end(), 0);
 
 	std::mt19937 rng(m_seed);
@@ -39,10 +39,10 @@ float Perlin2D::noise(float x, float y) const {
 	int ba = m_perm[m_perm[X + 1] + Y];
 	int bb = m_perm[m_perm[X + 1] + Y + 1];
 
-	float x1 = lerp(grad(aa, xf, yf),
+	float x1 = std::lerp(grad(aa, xf, yf),
 		grad(ba, xf - 1.0f, yf), u);
-	float x2 = lerp(grad(ab, xf, yf - 1.0f),
+	float x2 = std::lerp(grad(ab, xf, yf - 1.0f),
 		grad(bb, xf - 1.0f, yf - 1.0f), u);
 
-	return lerp(x1, x2, v);
+	return std::lerp(x1, x2, v);
 }
