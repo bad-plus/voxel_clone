@@ -21,7 +21,6 @@ WorldGenerator::~WorldGenerator() = default;
 
 Chunk* WorldGenerator::generateChunk(Chunk* chunk, int x, int z) {
     generateTerrain(chunk, x, z);
-    generateTerrain(chunk, x, z);
     generateRivers(chunk, x, z);
     generateCanyon(chunk, x, z);
     generateBedrock(chunk, x, z);
