@@ -13,6 +13,7 @@ public:
     void eventProcessing();
     void bindCallbacks();
     void setCursorEnabled(bool status);
+    void setWindowSize(const int width, const int height);
 
     void quit();
 

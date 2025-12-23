@@ -11,6 +11,8 @@ struct Resources;
 struct Loader;
 struct World;
 struct WorldGenerator;
+struct UI;
+struct DebugOverlay;
 
 #include "input/input.h"
 
@@ -46,4 +48,6 @@ private:
 	std::unique_ptr<Loader> m_loader;
 	std::unique_ptr<World> m_world;
 	std::unique_ptr<WorldGenerator> m_world_generator;
+	std::unique_ptr<UI> m_ui;
+	std::unique_ptr<DebugOverlay> m_debug_overlay;
 };

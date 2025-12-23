@@ -3,15 +3,20 @@
 #include "input.h"
 #include "../../world/chunk.h"
 #include "../../world/block.h"
+#include "../../ui/ui.h"
 
 #include <GLFW/glfw3.h>
 
-InputHandler::InputHandler(Game* game, Input* input, ECS* ecs) {
+InputHandler::InputHandler(Game* game, Input* input, ECS* ecs, UI* ui) {
     m_player_entity = INVALID_ENTITY;
 
     m_input = input;
     m_ecs = ecs;
     m_game = game;
+    m_ui = ui;
+
+    m_window_width = 0;
+    m_window_height = 0;
 }
 InputHandler::~InputHandler() = default;
 
@@ -25,6 +30,16 @@ void InputHandler::processing() {
 	double system_tick_time = m_game->getSystemInfo().update_tick_time;
 
 	if (m_input->jpressed(GLFW_KEY_ESCAPE)) m_game->quit();
+
+    int new_window_width;
+    int new_window_height;
+    m_input->getWindowSize(&new_window_width, &new_window_height);
+
+    if (m_window_width != new_window_width || m_window_height != new_window_height) {
+        m_window_width = new_window_width;
+        m_window_height = new_window_height;
+        m_ui->updateScreenSize(m_window_width, m_window_height);
+    }
 
 	auto& player_input = m_ecs->storage<PlayerInput>().get(m_player_entity);
 

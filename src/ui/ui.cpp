@@ -1,0 +1,103 @@
+#include "ui.h"
+#include "../ecs/core/ecs.h"
+#include "../utils/resource/resources.h"
+#include "../core/logger.h"
+
+#include "elements/base_element.h"
+#include "elements/text.h"
+
+#include <glm/glm.hpp>
+
+#include <memory>
+#include <algorithm>
+
+UI::UI(ECS* ecs, Resources* resources) {
+	m_ecs = ecs;
+	m_resources = resources;
+}
+
+UI::~UI() {
+
+}
+
+void UI::draw() {
+	for (auto& element : m_elements) {
+		if (element && element->isVisible()) {
+			element->draw();
+		}
+	}
+
+	m_frame_counter.frame();
+}
+
+void UI::update(int mouse_x, int mouse_y) {
+	for (auto& element : m_elements) {
+		if (element && element->isVisible()) {
+			element->update(mouse_x, mouse_y);
+		}
+	}
+}
+
+void UI::updateScreenSize(const int width, const int height) {
+	m_screen_width = width;
+	m_screen_height = height;
+
+	for (auto& element : m_elements) {
+		if (element) {
+			element->setProjection(width, height);
+		}
+	}
+}
+
+void UI::addElement(std::unique_ptr<UIElement> element) {
+	if (!element) {
+		LOG_WARN("Attempted to add null element to UI");
+		return;
+	}
+
+	if (!element->getId().empty()) {
+		if (getElementById(element->getId()) != nullptr) {
+			LOG_WARN("UI element with ID '{}' already exists", element->getId());
+		}
+	}
+
+	element->setProjection(m_screen_width, m_screen_height);
+	m_elements.push_back(std::move(element));
+}
+
+UIElement* UI::getElementById(const std::string& id) {
+	if (id.empty()) {
+		return nullptr;
+	}
+
+	for (auto& element : m_elements) {
+		if (element && element->getId() == id) {
+			return element.get();
+		}
+	}
+	return nullptr;
+}
+
+bool UI::removeElement(const std::string& id) {
+	if (id.empty()) {
+		return false;
+	}
+
+	auto it = std::remove_if(m_elements.begin(), m_elements.end(),
+		[&id](const std::unique_ptr<UIElement>& element) {
+			return element && element->getId() == id;
+		});
+
+	if (it != m_elements.end()) {
+		m_elements.erase(it, m_elements.end());
+		return true;
+	}
+	return false;
+}
+
+UIElement* UI::getElement(size_t index) {
+	if (index < m_elements.size()) {
+		return m_elements[index].get();
+	}
+	return nullptr;
+}

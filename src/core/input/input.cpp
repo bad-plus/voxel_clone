@@ -14,6 +14,9 @@ Input::Input() {
     }
 
     m_first_move = true;
+
+    m_window_width = 0;
+    m_window_height = 0;
 }
 Input::~Input() = default;
 
@@ -108,4 +111,14 @@ bool Input::jclicked(const int key) const {
 
 void Input::scroll(double x_offset, double y_offset) {
 
+}
+
+void Input::update_window_size(const int width, const int height) {
+    m_window_width = width;
+    m_window_height = height;
+}
+
+void Input::getWindowSize(int* width, int* height) {
+    *width = m_window_width;
+    *height = m_window_height;
 }

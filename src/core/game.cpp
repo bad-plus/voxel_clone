@@ -9,6 +9,8 @@
 #include "../world/generation/world_generator.h"
 #include "../render/render.h"
 #include "input/input_handler.h"
+#include "../ui/ui.h"
+#include "../ui/debug_overlay.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -28,11 +30,12 @@ Game::Game() {
 
 	m_input = std::make_unique<Input>();
 
-	m_window = std::make_unique<Window>("Game test", 1280, 720, m_input.get());
+	m_window = std::make_unique<Window>("Game test", 800, 600, m_input.get());
 
 	m_resources = std::make_unique<Resources>();
 
 	m_loader = std::make_unique<Loader>(m_resources.get());
+	m_loader->loadResources();
 
 	std::random_device rd;
 	std::mt19937 gen(rd());
@@ -44,22 +47,27 @@ Game::Game() {
 
 	m_world = std::make_unique<World>(m_world_generator.get());
 
-	m_render = std::make_unique<Render>(m_window.get(), m_world->getECS(), m_resources.get());
-	m_render->setWorld(m_world.get());
+	m_ui = std::make_unique<UI>(m_world->getECS(), m_resources.get());
 
-	m_loader->loadResources();
+	m_render = std::make_unique<Render>(m_window.get(), m_world->getECS(), m_resources.get(), m_ui.get());
+	m_render->setWorld(m_world.get());
 
 	Entity player_entity = m_world->CreatePlayer();
 	m_render->setPlayerEntity(player_entity);
 
-	m_input_handler = std::make_unique<InputHandler>(this, m_input.get(), m_world->getECS());
+	m_input_handler = std::make_unique<InputHandler>(this, m_input.get(), m_world->getECS(), m_ui.get());
 	m_input_handler->setPlayerEntity(player_entity);
+
+	m_debug_overlay = std::make_unique<DebugOverlay>(m_ui.get(), m_resources.get(), m_world.get());
+	m_debug_overlay->setEntity(player_entity);
 
 	m_threads.emplace_back(&Game::worldGenerationThread, this);
 	m_threads.emplace_back(&Game::worldUpdaterThread, this);
 	m_threads.emplace_back(&Game::movementUpdaterThread, this);
 
+	m_window->setWindowSize(1280, 720);
 	m_window->setCursorEnabled(false);
+	m_debug_overlay->show();
 }
 
 void Game::movementUpdaterThread() {
@@ -173,16 +181,10 @@ void Game::run() {
 
         double end_game_tick_time = glfwGetTime();
 
+		m_debug_overlay->update(end_game_tick_time);
+
         m_game_system_info.update_tick_time = end_game_tick_time - start_game_tick_time;
         m_game_system_info.render_time = end_render_time - start_render_time;
-        std::string title_str;
-        title_str += "Update time: ";
-        title_str += std::to_string(m_game_system_info.update_tick_time * 1000.0f);
-        title_str += " ms | ";
-        title_str += "Render time: ";
-        title_str += std::to_string(m_game_system_info.render_time * 1000.0f);
-        title_str += " ms";
-        glfwSetWindowTitle(m_window->getGLFWwindow(), title_str.c_str());
     }
 }
 

@@ -6,10 +6,11 @@ struct World;
 struct Window;
 struct ECS;
 struct Resources;
+struct UI;
 
 class Render {
 public:
-    Render(Window* window, ECS* ecs, Resources* recources);
+    Render(Window* window, ECS* ecs, Resources* recources, UI* ui);
     ~Render();
 
     void render();
@@ -26,6 +27,7 @@ private:
     Window* m_window;
     ECS* m_ecs;
     Resources* m_resources;
+    UI* m_ui;
 
     void initRender() const;
 

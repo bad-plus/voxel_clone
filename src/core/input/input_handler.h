@@ -7,10 +7,11 @@ struct ECS;
 struct Input;
 struct Game;
 struct World;
+struct UI;
 
 class InputHandler {
 public:
-    InputHandler(Game* game, Input* input, ECS* ecs);
+    InputHandler(Game* game, Input* input, ECS* ecs, UI* ui);
     ~InputHandler();
 
     void processing();
@@ -19,8 +20,12 @@ private:
     Game* m_game;
     ECS* m_ecs;
     Input* m_input;
+    UI* m_ui;
     Entity m_player_entity;
 
     CameraSystem m_player_camera_system;
     PlayerMovementSystem m_player_movement_system;
+
+    int m_window_width;
+    int m_window_height;
 };

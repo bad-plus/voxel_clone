@@ -59,7 +59,7 @@ namespace Biome {
             .top_block = BlockID::GRASS,
             .under_block = BlockID::DIRT,
 
-            .rarity = 3.0f
+            .rarity = 1.0f
         }},
         {BiomeID::HILLS, {
             .base_height = 80.0f,

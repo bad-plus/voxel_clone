@@ -18,6 +18,7 @@ Window::Window(const char* title, int width, int height, Input* input) {
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
     glfwSetWindowUserPointer(m_glfw_window, input);
+    glfwSetWindowAttrib(m_glfw_window, GLFW_RESIZABLE, GLFW_TRUE);
     
     bindCallbacks();
 }
@@ -41,4 +42,8 @@ void Window::quit() {
 
 GLFWwindow* Window::getGLFWwindow() {
     return m_glfw_window;
+}
+
+void Window::setWindowSize(const int width, const int height) {
+    glfwSetWindowSize(m_glfw_window, width, height);
 }

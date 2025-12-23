@@ -17,7 +17,7 @@ void WorldGenerator::generateBedrock(Chunk* chunk, int x, int z) {
                     (float)world_pos_x * base_frequency + (py * 1000.f),
                     (float)world_pos_z * base_frequency - (py * 1000.f)) + 1.0f) * 0.5f;
 
-                if (noise > (0.50f) || py == 0) {
+                if (py == 0 || noise > (0.6f)) {
                     chunk->setBlock({ px, py, pz }, BlockID::BEDROCK);
                 }
             }

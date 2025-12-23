@@ -16,19 +16,21 @@
 #include <algorithm>
 #include "../ecs/components/transform.h"
 #include "../ecs/components/player_camera.h"
+#include "../ui/ui.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-Render::Render(Window* window, ECS* ecs, Resources* resources) {
+Render::Render(Window* window, ECS* ecs, Resources* resources, UI* ui) {
 	m_window = window;
 	m_ecs = ecs;
 	m_resources = resources;
+	m_ui = ui;
 
     initRender();
 
     m_debug_render_mode = false;
-    m_render_dist = 20;
+    m_render_dist = 12;
 
     m_world = nullptr;
 }
@@ -56,9 +58,12 @@ void Render::render() {
     else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	glDisable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
     renderWorld(m_world, m_render_dist);
-	
-	renderDebug();
+
+	glEnable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	m_ui->draw();
 	glfwSwapBuffers(window);
 }
 
@@ -143,31 +148,4 @@ void Render::renderWorld(World* world, int render_dist) {
 
 void Render::setPlayerEntity(Entity entity) {
     m_player_entity = entity;
-}
-
-void Render::renderDebug() {
-	glEnable(GL_BLEND);
-	Text debug_text(m_resources->getFont("arial_22"), "", 10, 690, 1.0f, { 1.0f, 1.0f, 1.0f }, m_render_width, m_render_height);
-	debug_text.setShader(m_resources->getShader("text_shader"));
-
-	ECS* ecs = m_world->getECS();
-
-	auto& player_camera = ecs->storage<PlayerCamera>().get(m_player_entity);
-	auto& player_transform = ecs->storage<Transform>().get(m_player_entity);
-
-	std::string debug_str = "";
-	debug_str += "Camera position: ";
-	debug_str += std::to_string(player_transform.position.x) + " ";
-	debug_str += std::to_string(player_transform.position.y) + " ";
-	debug_str += std::to_string(player_transform.position.z);
-	debug_str += "\n";
-	debug_str += "Camera rotation: ";
-	debug_str += "yaw: " + std::to_string(player_camera.yaw) + " ";
-	debug_str += " | pitch: " + std::to_string(player_camera.pitch) + " ";
-	debug_str += "\n";
-
-
-	
-	debug_text.setString(debug_str);
-	debug_text.draw();
 }

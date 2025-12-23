@@ -29,11 +29,17 @@ void scroll_callback(GLFWwindow* window, double offset_x, double offset_y) {
     input->scroll(offset_x, offset_y);
 }
 
+void window_size_callback(GLFWwindow* window, int width, int height) {
+	Input* input = (Input*)glfwGetWindowUserPointer(window);
+    input->update_window_size(width, height);
+}
+
 void Window::bindCallbacks() {
     glfwSetKeyCallback(m_glfw_window, key_callback);
     glfwSetScrollCallback(m_glfw_window, scroll_callback);
     glfwSetCursorPosCallback(m_glfw_window, mouse_callback);
     glfwSetMouseButtonCallback(m_glfw_window, mouse_button_callback);
+    glfwSetWindowSizeCallback(m_glfw_window, window_size_callback);
 
     LOG_INFO("Callbacks installed");
 }

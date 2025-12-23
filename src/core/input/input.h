@@ -8,6 +8,8 @@ public:
     Input();
     ~Input();
 
+    void update_window_size(const int width, const int height);
+
     void press_button(const int key);
     void release_button(const int key);
 
@@ -31,9 +33,14 @@ public:
 
     double m_mouse_delta_x;
     double m_mouse_delta_y;
+
+    void getWindowSize(int* width, int* height);
 private:
     bool m_first_move;
 
     bool m_jkeys[KEYS_COUNT + MOUSE_BUTTONS];
     bool m_keys[KEYS_COUNT + MOUSE_BUTTONS]; // KEYBOARD KEYS .. , MOUSE KEYS ..
+
+    int m_window_width;
+    int m_window_height;
 };
