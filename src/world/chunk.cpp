@@ -11,7 +11,9 @@ Chunk::Chunk() {
 	m_dirty = true;
 
 	m_storage = std::make_unique<ChunkStorage>();
-	m_mesh_renderer = std::make_unique<MeshRenderer>();
+	m_mesh_renderer_opaque = std::make_unique<MeshRenderer>();
+	m_mesh_renderer_cutout = std::make_unique<MeshRenderer>();
+	m_mesh_renderer_transparent = std::make_unique<MeshRenderer>();
 
 	m_ready_gpu.ready = false;
 }
@@ -74,7 +76,7 @@ void Chunk::calculateMesh() {
 	if (m_neighbors.x_m.load() != nullptr) neighbor_x_m = m_neighbors.x_m.load()->getStorage();
 	if (m_neighbors.z_m.load() != nullptr) neighbor_z_m = m_neighbors.z_m.load()->getStorage();
 
-	Mesh generated_mesh = m_mesh_generator.generateMesh(
+	ChunkMesh generated_mesh = m_mesh_generator.generateMesh(
 		m_storage.get(),
 		neighbor_x_p,
 		neighbor_z_p,
@@ -92,17 +94,34 @@ void Chunk::calculateMesh() {
 
 void Chunk::uploadMeshToGPU() {
 	if (!m_ready_gpu.ready) return;
-	if (m_ready_gpu.mesh.isEmpty()) return;
 
-	m_mesh_renderer->uploadMesh(m_ready_gpu.mesh);
+	if (!m_ready_gpu.mesh.opaque.isEmpty()) {
+		m_mesh_renderer_opaque->uploadMesh(m_ready_gpu.mesh.opaque);
+	}
+	if (!m_ready_gpu.mesh.cutout.isEmpty()) {
+		m_mesh_renderer_cutout->uploadMesh(m_ready_gpu.mesh.cutout);
+	}
+	if (!m_ready_gpu.mesh.transparent.isEmpty()) {
+		m_mesh_renderer_transparent->uploadMesh(m_ready_gpu.mesh.transparent);
+	}
 
-	m_ready_gpu.mesh.clear();
+	m_ready_gpu.mesh.opaque.clear();
+	m_ready_gpu.mesh.cutout.clear();
+	m_ready_gpu.mesh.transparent.clear();
 	m_ready_gpu.ready = false;
 }
 
-void Chunk::draw() {
+void Chunk::drawOpaque() {
 	if (m_ready_gpu.ready) uploadMeshToGPU();
-	m_mesh_renderer->draw();
+	m_mesh_renderer_opaque->draw();
+}
+
+void Chunk::drawCutout() {
+	m_mesh_renderer_cutout->draw();
+}
+
+void Chunk::drawTransparent() {
+	m_mesh_renderer_transparent->draw();
 }
 
 void Chunk::updateNeighbors(Chunk* x_p, Chunk* z_p, Chunk* x_m, Chunk* z_m) {

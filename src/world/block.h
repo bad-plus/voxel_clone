@@ -17,6 +17,12 @@ enum class BlockID {
     BEDROCK
 };
 
+enum class BlockType {
+    OPAQUE = 0,
+    CUTOUT,
+    TRANSPARENT
+};
+
 struct SideUV {
     glm::vec2 uv[4]; // 4 vertices per cube face
 };
@@ -36,22 +42,22 @@ struct BlockTexture {
 
 struct BlockInfo {
     std::string name = "";
-    bool isTransparent = false;
+    BlockType block_type;
     bool is_solid_surface = true;
     BlockTexture texture = {};
 };
 
 inline std::unordered_map<BlockID, BlockInfo> BlocksInfo = {
-    {BlockID::EMPTY, {"", true}},
-    {BlockID::ERROR, {"error", false}},
-    {BlockID::STONE, {"stone", false}},
-    {BlockID::DIRT, {"dirt", false}},
-    {BlockID::GRASS, {"grass", false}},
-    {BlockID::SNOW_GRASS, {"snow_grass", false}},
-    {BlockID::SAND, {"sand", false}},
-    {BlockID::WATER, {"water", true}},
-    {BlockID::BEDROCK, {"bedrock", false}},
-    {BlockID::MY_LOVE, {"love", false}},
+    {BlockID::EMPTY, {"", BlockType::TRANSPARENT}},
+    {BlockID::ERROR, {"error", BlockType::OPAQUE}},
+    {BlockID::STONE, {"stone", BlockType::OPAQUE}},
+    {BlockID::DIRT, {"dirt", BlockType::OPAQUE}},
+    {BlockID::GRASS, {"grass", BlockType::OPAQUE}},
+    {BlockID::SNOW_GRASS, {"snow_grass", BlockType::OPAQUE}},
+    {BlockID::SAND, {"sand", BlockType::OPAQUE}},
+    {BlockID::WATER, {"water", BlockType::TRANSPARENT}},
+    {BlockID::BEDROCK, {"bedrock", BlockType::OPAQUE}},
+    {BlockID::MY_LOVE, {"love", BlockType::OPAQUE}},
 };
 
 

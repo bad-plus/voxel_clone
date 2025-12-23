@@ -34,6 +34,9 @@ public:
 
 	int getFPS() const { return m_frame_counter.getFPS(); }
 
+	int getScreenWidth() const { return m_screen_width; }
+	int getScreenHeight() const { return m_screen_height; }
+
 private:
 	std::vector<std::unique_ptr<UIElement>> m_elements;
 

@@ -4,6 +4,8 @@
 #include "../../core/logger.h"
 #include "biome.hpp"
 
+#include <glfw/glfw3.h>
+
 WorldGenerator::WorldGenerator(int seed) {
     m_seed = seed;
     m_perlin = std::make_unique<Perlin2D>(m_seed);
@@ -16,13 +18,17 @@ WorldGenerator::WorldGenerator(int seed) {
     m_biome_perlins[Biome::BiomeID::SHARP_PEAKS] = std::make_unique<Perlin2D>(m_seed + 12);
     m_biome_perlins[Biome::BiomeID::WINTER] = std::make_unique<Perlin2D>(m_seed + 13);
     m_biome_perlins[Biome::BiomeID::DESERT] = std::make_unique<Perlin2D>(m_seed + 14);
+
+    m_chunk_generation_time = 0;
 }
 WorldGenerator::~WorldGenerator() = default;
 
 Chunk* WorldGenerator::generateChunk(Chunk* chunk, int x, int z) {
+    double start_generation_time = glfwGetTime();
     generateTerrain(chunk, x, z);
-    //generateRivers(chunk, x, z);
-    //generateCanyon(chunk, x, z);
+    generateRivers(chunk, x, z);
+    generateCanyon(chunk, x, z);
     generateBedrock(chunk, x, z);
+    m_chunk_generation_time = glfwGetTime() - start_generation_time;
     return chunk;
 }

@@ -1,14 +1,12 @@
 ﻿#include "mesh_generator.h"
 #include "../render/graphics/mesh.h"
 
-Mesh MeshGenerator::generateMesh(
+ChunkMesh MeshGenerator::generateMesh(
 	ChunkStorage* storage,
 	ChunkStorage* neighbor_x_plus,
 	ChunkStorage* neighbor_z_plus,
 	ChunkStorage* neighbor_x_minus,
-	ChunkStorage* neighbor_z_minus)
-{
-	if (!storage) return Mesh();
+	ChunkStorage* neighbor_z_minus) {
 
 	m_storage = storage;
 	m_neighbor_x_plus = neighbor_x_plus;
@@ -16,12 +14,9 @@ Mesh MeshGenerator::generateMesh(
 	m_neighbor_x_minus = neighbor_x_minus;
 	m_neighbor_z_minus = neighbor_z_minus;
 
-	Mesh result_mesh;
+	ChunkMesh result;
 
-	const size_t estimated_vertices = ChunkStorage::getSizeX() *
-		ChunkStorage::getSizeY() *
-		ChunkStorage::getSizeZ() * 6 * 4;
-
+	if (m_storage == nullptr) return result;
 
 	for (int x = 0; x < ChunkStorage::getSizeX(); x++) {
 		for (int y = 0; y < ChunkStorage::getSizeY(); y++) {
@@ -32,72 +27,122 @@ Mesh MeshGenerator::generateMesh(
 				if (block_id == BlockID::EMPTY) continue;
 
 				const BlockTexture& block_texture = BlocksInfo[block_id].texture;
+				const BlockType block_type = BlocksInfo[block_id].block_type;
+
+				Mesh* selected_mesh = nullptr;
+
+				if (block_type == BlockType::OPAQUE) {
+					selected_mesh = &result.opaque;
+				}
+				else if (block_type == BlockType::CUTOUT) {
+					selected_mesh = &result.cutout;
+				}
+				else {
+					selected_mesh = &result.transparent;
+				}
 
 				// TOP Y+
-				if (isBlockTransparent({ block_pos.x, block_pos.y + 1, block_pos.z })) {
-					addBlockFace(&result_mesh, block_pos, BlockSide::TOP, block_texture);
+				if (shouldRenderFace(block_id, block_type, { block_pos.x, block_pos.y + 1, block_pos.z })) {
+					addBlockFace(selected_mesh, block_pos, BlockSide::TOP, block_texture);
 				}
 
 				// BOTTOM Y-
-				if (isBlockTransparent({ block_pos.x, block_pos.y - 1, block_pos.z })) {
-					addBlockFace(&result_mesh, block_pos, BlockSide::BOTTOM, block_texture);
+				if (shouldRenderFace(block_id, block_type, { block_pos.x, block_pos.y - 1, block_pos.z })) {
+					addBlockFace(selected_mesh, block_pos, BlockSide::BOTTOM, block_texture);
 				}
 
 				// FRONT Z+
-				if (isBlockTransparent({ block_pos.x, block_pos.y, block_pos.z + 1 })) {
-					addBlockFace(&result_mesh, block_pos, BlockSide::FRONT, block_texture);
+				if (shouldRenderFace(block_id, block_type, { block_pos.x, block_pos.y, block_pos.z + 1 })) {
+					addBlockFace(selected_mesh, block_pos, BlockSide::FRONT, block_texture);
 				}
 
 				// BACK Z-
-				if (isBlockTransparent({ block_pos.x, block_pos.y, block_pos.z - 1 })) {
-					addBlockFace(&result_mesh, block_pos, BlockSide::BACK, block_texture);
+				if (shouldRenderFace(block_id, block_type, { block_pos.x, block_pos.y, block_pos.z - 1 })) {
+					addBlockFace(selected_mesh, block_pos, BlockSide::BACK, block_texture);
 				}
 
 				// RIGHT X+
-				if (isBlockTransparent({ block_pos.x + 1, block_pos.y, block_pos.z })) {
-					addBlockFace(&result_mesh, block_pos, BlockSide::RIGHT, block_texture);
+				if (shouldRenderFace(block_id, block_type, { block_pos.x + 1, block_pos.y, block_pos.z })) {
+					addBlockFace(selected_mesh, block_pos, BlockSide::RIGHT, block_texture);
 				}
 
 				// LEFT X-
-				if (isBlockTransparent({ block_pos.x - 1, block_pos.y, block_pos.z })) {
-					addBlockFace(&result_mesh, block_pos, BlockSide::LEFT, block_texture);
+				if (shouldRenderFace(block_id, block_type, { block_pos.x - 1, block_pos.y, block_pos.z })) {
+					addBlockFace(selected_mesh, block_pos, BlockSide::LEFT, block_texture);
 				}
 			}
 		}
 	}
 
-	return result_mesh;
+	return result;
 }
 
-bool MeshGenerator::isBlockTransparent(
-	glm::ivec3 block_position
-) const {
-	BlockID selected_block = BlockID::EMPTY;
-	if (block_position.y < 0 || block_position.y >= ChunkStorage::getSizeY()) return true;
+bool MeshGenerator::shouldRenderFace(BlockID current_block_id, BlockType current_block_type, glm::ivec3 neighbor_position) const {
+	if (neighbor_position.y < 0 || neighbor_position.y >= ChunkStorage::getSizeY()) {
+		return true;
+	}
 
-	if (block_position.x < 0) {
+	BlockID neighbor_block = BlockID::EMPTY;
+
+	if (neighbor_position.x < 0) {
 		if (m_neighbor_x_minus != nullptr) {
-			selected_block = m_neighbor_x_minus->getBlockUnsafe({ ChunkStorage::getSizeX() + block_position.x, block_position.y, block_position.z })->getBlockID();
+			neighbor_block = m_neighbor_x_minus->getBlockUnsafe({
+				ChunkStorage::getSizeX() + neighbor_position.x,
+				neighbor_position.y,
+				neighbor_position.z
+				})->getBlockID();
 		}
 	}
-	else if (block_position.z < 0) {
+	else if (neighbor_position.z < 0) {
 		if (m_neighbor_z_minus != nullptr) {
-			selected_block = m_neighbor_z_minus->getBlockUnsafe({ block_position.x, block_position.y, ChunkStorage::getSizeZ() + block_position.z })->getBlockID();
+			neighbor_block = m_neighbor_z_minus->getBlockUnsafe({
+				neighbor_position.x,
+				neighbor_position.y,
+				ChunkStorage::getSizeZ() + neighbor_position.z
+				})->getBlockID();
 		}
 	}
-	else if (block_position.x >= ChunkStorage::getSizeX()) {
+	else if (neighbor_position.x >= ChunkStorage::getSizeX()) {
 		if (m_neighbor_x_plus != nullptr) {
-			selected_block = m_neighbor_x_plus->getBlockUnsafe({ block_position.x - ChunkStorage::getSizeX(), block_position.y, block_position.z })->getBlockID();
+			neighbor_block = m_neighbor_x_plus->getBlockUnsafe({
+				neighbor_position.x - ChunkStorage::getSizeX(),
+				neighbor_position.y,
+				neighbor_position.z
+				})->getBlockID();
 		}
 	}
-	else if (block_position.z >= ChunkStorage::getSizeZ()) {
+	else if (neighbor_position.z >= ChunkStorage::getSizeZ()) {
 		if (m_neighbor_z_plus != nullptr) {
-			selected_block = m_neighbor_z_plus->getBlockUnsafe({ block_position.x, block_position.y, block_position.z - ChunkStorage::getSizeZ() })->getBlockID();
+			neighbor_block = m_neighbor_z_plus->getBlockUnsafe({
+				neighbor_position.x,
+				neighbor_position.y,
+				neighbor_position.z - ChunkStorage::getSizeZ()
+				})->getBlockID();
 		}
 	}
-	else selected_block = m_storage->getBlockUnsafe(block_position)->getBlockID();
+	else {
+		neighbor_block = m_storage->getBlockUnsafe(neighbor_position)->getBlockID();
+	}
 
-	return BlocksInfo[selected_block].isTransparent;
+	BlockType neighbor_type = BlocksInfo[neighbor_block].block_type;
+
+	if (current_block_type == BlockType::OPAQUE) {
+		return neighbor_type != BlockType::OPAQUE;
+	}
+
+	if (current_block_type == BlockType::CUTOUT) {
+		return neighbor_type != BlockType::OPAQUE;
+	}
+
+	if (current_block_type == BlockType::TRANSPARENT) {
+		return current_block_id != neighbor_block;
+	}
+
+	return true;
+}
+
+bool MeshGenerator::isBlockTransparent(glm::ivec3 block_position) const {
+	return shouldRenderFace(BlockID::STONE, BlockType::OPAQUE, block_position);
 }
 
 void MeshGenerator::addBlockFace(

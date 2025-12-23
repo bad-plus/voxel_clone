@@ -3,12 +3,18 @@
 #include "chunk_storage.h"
 #include <unordered_map>
 
+struct ChunkMesh {
+	Mesh opaque;
+	Mesh cutout;
+	Mesh transparent;
+};
+
 class MeshGenerator {
 public:
 	MeshGenerator() = default;
 	~MeshGenerator() = default;
 
-	Mesh generateMesh(
+	ChunkMesh generateMesh(
 		ChunkStorage* storage,
 		ChunkStorage* neighbor_x_plus = nullptr,
 		ChunkStorage* neighbor_z_plus = nullptr,
@@ -16,13 +22,18 @@ public:
 		ChunkStorage* neighbor_z_minus = nullptr
 	);
 
-
 private:
 	ChunkStorage* m_storage = nullptr;
 	ChunkStorage* m_neighbor_x_plus = nullptr;
 	ChunkStorage* m_neighbor_z_plus = nullptr;
 	ChunkStorage* m_neighbor_x_minus = nullptr;
 	ChunkStorage* m_neighbor_z_minus = nullptr;
+
+	bool shouldRenderFace(
+		BlockID current_block_id,
+		BlockType current_block_type,
+		glm::ivec3 neighbor_position
+	) const;
 
 	bool isBlockTransparent(
 		glm::ivec3 block_position

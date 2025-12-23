@@ -25,7 +25,10 @@ public:
 	Block* getBlock(glm::ivec3 position);
 	Block* setBlock(glm::ivec3 position, BlockID block, bool mark = false);
 
-	void draw();
+	void drawOpaque();
+	void drawCutout();
+	void drawTransparent();
+
 	void markDirty();
 	bool isDirty();
 
@@ -40,12 +43,16 @@ private:
 	Block* getBlockLocal(glm::ivec3 position);
 
 	struct {
-		Mesh mesh;
+		ChunkMesh mesh;
 		std::atomic<bool> ready;
 	} m_ready_gpu;
 
 	std::unique_ptr<ChunkStorage> m_storage;
-	std::unique_ptr<MeshRenderer> m_mesh_renderer;
+
+	std::unique_ptr<MeshRenderer> m_mesh_renderer_opaque;
+	std::unique_ptr<MeshRenderer> m_mesh_renderer_cutout;
+	std::unique_ptr<MeshRenderer> m_mesh_renderer_transparent;
+
 	MeshGenerator m_mesh_generator;
 
 	bool m_dirty;

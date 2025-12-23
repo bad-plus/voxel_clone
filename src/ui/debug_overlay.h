@@ -30,11 +30,12 @@ private:
 	void createElements();
 	void updateFPS();
 	void updatePlayerInfo();
+	void updateWorldGeneratorInfo();
 
 	UI* m_ui;
 	Resources* m_resources;
-	ECS* m_ecs;
 	World* m_world;
+	ECS* m_ecs;
 	Entity m_player_entity;
 
 	bool m_visible = true;

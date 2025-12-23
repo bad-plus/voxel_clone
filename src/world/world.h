@@ -44,6 +44,8 @@ public:
 
     void tick();
     void tick_movement();
+
+    const WorldGenerator* getGenerator() const { return m_generator; }
 private:
     ChunkInfo* getChunkProtected(int x, int z);
 

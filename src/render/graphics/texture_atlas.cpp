@@ -45,7 +45,7 @@ std::unique_ptr<unsigned char[]> convertToRGBA(
                 rgba_data[i * 4 + 2] = data[i * 3 + 2];
                 rgba_data[i * 4 + 3] = 255;
                 break;
-            case 4: // RGBA -> RGBA (просто копируем)
+            case 4: // RGBA -> RGBA (copy)
                 memcpy(&rgba_data[i * 4], &data[i * 4], 4);
                 break;
             default:
