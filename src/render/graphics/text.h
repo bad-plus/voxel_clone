@@ -17,6 +17,7 @@ public:
 	void setColor(const glm::vec3& color);
 	void setFont(Font* font);
 	void setLineSpacing(float spacing);
+	Font* getFont() const { return m_font; }
 
 	void draw();
 private:

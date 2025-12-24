@@ -19,6 +19,8 @@ public:
 
 	Font(const std::string& path, int pixel_size);
 	~Font();
+
+	float max_bearing_y = 0.0f;
 private:
 	FT_Library m_ft;
 	FT_Face m_face;

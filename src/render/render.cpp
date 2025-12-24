@@ -99,13 +99,13 @@ void Render::renderWorld(World* world, int render_dist) {
 	if (world == nullptr) return;
 	ECS* ecs = world->getECS();
 
-	Shader* world_block_shader_opaque = m_resources->getShader("block_shader");
-	if (world_block_shader_opaque == nullptr) {
-		LOG_WARN("BLOCK SHADER NOT LOADED! {0}", (void*)world_block_shader_opaque);
+	Shader* world_block_shader_normal = m_resources->getShader("block_shader_normal");
+	if (world_block_shader_normal == nullptr) {
+		LOG_WARN("BLOCK SHADER NOT LOADED! {0}", (void*)world_block_shader_normal);
 		return;
 	}
 
-	Shader* world_block_shader_cutout = m_resources->getShader("block_shader");
+	Shader* world_block_shader_cutout = m_resources->getShader("block_shader_cutout");
 	if (world_block_shader_cutout == nullptr) {
 		LOG_WARN("BLOCK SHADER NOT LOADED! {0}", (void*)world_block_shader_cutout);
 		return;
@@ -113,11 +113,11 @@ void Render::renderWorld(World* world, int render_dist) {
 
 	TextureAtlas* atlas = m_resources->getTextureAtlas();
 
-	world_block_shader_opaque->use();
-
+	world_block_shader_normal->use();
+	
 	glActiveTexture(GL_TEXTURE0);
 	atlas->bind();
-	world_block_shader_opaque->uniformi1("ourTexture1", 0);
+	world_block_shader_normal->uniformi1("ourTexture1", 0);
 
 	glm::mat4 view(1.0f);
 	view = getCameraViewMatrix(ecs, m_player_entity);
@@ -144,7 +144,7 @@ void Render::renderWorld(World* world, int render_dist) {
 			glm::vec3((x * (float)CHUNK_SIZE_X), 0.0f, (z * (float)CHUNK_SIZE_Z)));
 
 		glm::mat4 mat = projection * view * model;
-		world_block_shader_opaque->uniformmat4fv("transform", mat);
+		world_block_shader_normal->uniformmat4fv("transform", mat);
 
 		Chunk* chunk = world->getChunk(x, z, true);
 		if (chunk != nullptr) {
@@ -153,6 +153,8 @@ void Render::renderWorld(World* world, int render_dist) {
 	}
 
 	// Draw cutout
+
+	world_block_shader_cutout->use();
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
@@ -164,7 +166,7 @@ void Render::renderWorld(World* world, int render_dist) {
 			glm::vec3((x * (float)CHUNK_SIZE_X), 0.0f, (z * (float)CHUNK_SIZE_Z)));
 
 		glm::mat4 mat = projection * view * model;
-		world_block_shader_opaque->uniformmat4fv("transform", mat);
+		world_block_shader_cutout->uniformmat4fv("transform", mat);
 
 		Chunk* chunk = world->getChunk(x, z, true);
 		if (chunk != nullptr) {
@@ -173,6 +175,8 @@ void Render::renderWorld(World* world, int render_dist) {
 	}
 
 	// Draw transparent
+	world_block_shader_normal->use();
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthMask(GL_FALSE);
@@ -185,7 +189,7 @@ void Render::renderWorld(World* world, int render_dist) {
 			glm::vec3((x * (float)CHUNK_SIZE_X), 0.0f, (z * (float)CHUNK_SIZE_Z)));
 
 		glm::mat4 mat = projection * view * model;
-		world_block_shader_opaque->uniformmat4fv("transform", mat);
+		world_block_shader_normal->uniformmat4fv("transform", mat);
 
 		Chunk* chunk = world->getChunk(x, z, true);
 		if (chunk != nullptr) {

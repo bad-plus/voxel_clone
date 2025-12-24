@@ -6,6 +6,7 @@
 #include "../ecs/core/ecs.h"
 #include "../world/world.h"
 #include "../world/generation/world_generator.h"
+#include "elements/vertical_layout.h"
 
 #include <sstream>
 #include <iomanip>
@@ -14,6 +15,8 @@ DebugOverlay::DebugOverlay(UI* ui, Resources* resources, World* world)
 	: m_ui(ui), m_resources(resources), m_world(world), m_ecs(m_world->getECS())
 {
 	createElements();
+
+	m_ui->updateScreenSize(m_ui->getScreenWidth(), m_ui->getScreenHeight());
 }
 
 DebugOverlay::~DebugOverlay() = default;
@@ -21,31 +24,26 @@ DebugOverlay::~DebugOverlay() = default;
 void DebugOverlay::createElements() {
 	Font* font = m_resources->getFont("arial_22");
 	Shader* shader = m_resources->getShader("text_shader");
-
-	if (!font || !shader) {
-		LOG_ERROR("Failed to load resources for debug overlay");
-		return;
-	}
-
 	const glm::vec3 base_color = glm::vec3(1.0f, 1.0f, 1.0f);
 
-	int base_height = m_ui->getScreenHeight() - 10;
-	const int line_space = 20;
+	auto panel = std::make_unique<UIVerticalLayout>();
+	panel->setPosition(5, 5, Anchor::TOP_LEFT);
+	panel->setId("debug_panel");
 
-	auto fps_text = std::make_unique<UIText>("", 10, base_height, base_color, font, shader);
+	auto fps_text = std::make_unique<UIText>("", 0, 0, base_color, font, shader);
 	fps_text->setId("debug_fps");
-	m_ui->addElement(std::move(fps_text));
-	base_height -= line_space;
 
-	auto pos_text = std::make_unique<UIText>("", 10, base_height, base_color, font, shader);
+	auto pos_text = std::make_unique<UIText>("", 0, 0, base_color, font, shader);
 	pos_text->setId("player_info");
-	m_ui->addElement(std::move(pos_text));
-	base_height -= line_space;
 
-	auto custom_text = std::make_unique<UIText>("", 10, base_height, base_color, font, shader);
-	custom_text->setId("world_generator_info");
-	m_ui->addElement(std::move(custom_text));
-	base_height -= line_space;
+	auto world_gen_text = std::make_unique<UIText>("", 0, 0, base_color, font, shader);
+	world_gen_text->setId("world_generator_info");
+
+	panel->addChild(std::move(fps_text));
+	panel->addChild(std::move(pos_text));
+	panel->addChild(std::move(world_gen_text));
+
+	m_ui->addElement(std::move(panel));
 }
 
 void DebugOverlay::show() {
@@ -81,6 +79,7 @@ void DebugOverlay::update(const float delta_time) {
 void DebugOverlay::updateFPS() {
 	int fps = m_ui->getFPS();
 	UIText* fps_text = m_ui->getElementById<UIText>("debug_fps");
+
 	fps_text->setString(std::format("FPS: {}", fps));
 	if (fps < 30) fps_text->setColor({ 1.0f, 0.0f, 0.0f });
 	else if (fps < 60) fps_text->setColor({ 1.0f, 1.0f, 0.0f });

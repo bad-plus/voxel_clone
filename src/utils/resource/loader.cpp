@@ -16,7 +16,8 @@ void Loader::loadResources() {
     loadFonts();
 }
 void Loader::loadShaders() {
-    m_resources->loadShader("block_shader", "world_block.vert", "world_block.frag");
+    m_resources->loadShader("block_shader_normal", "world_block_normal.vert", "world_block_normal.frag");
+    m_resources->loadShader("block_shader_cutout", "world_block_cutout.vert", "world_block_cutout.frag");
     m_resources->loadShader("text_shader", "text.vert", "text.frag");
 }
 void Loader::loadAtlas() {

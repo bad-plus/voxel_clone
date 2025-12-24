@@ -1,10 +1,11 @@
-#include "ui.h"
+﻿#include "ui.h"
 #include "../ecs/core/ecs.h"
 #include "../utils/resource/resources.h"
 #include "../core/logger.h"
 
 #include "elements/base_element.h"
 #include "elements/text.h"
+#include "elements/container.h"
 
 #include <glm/glm.hpp>
 
@@ -41,11 +42,8 @@ void UI::update(int mouse_x, int mouse_y) {
 void UI::updateScreenSize(const int width, const int height) {
 	m_screen_width = width;
 	m_screen_height = height;
-
 	for (auto& element : m_elements) {
-		if (element) {
-			element->setProjection(width, height);
-		}
+		element->setProjection(width, height); 
 	}
 }
 
@@ -61,18 +59,17 @@ void UI::addElement(std::unique_ptr<UIElement> element) {
 		}
 	}
 
-	element->setProjection(m_screen_width, m_screen_height);
 	m_elements.push_back(std::move(element));
 }
 
 UIElement* UI::getElementById(const std::string& id) {
-	if (id.empty()) {
-		return nullptr;
-	}
-
+	if (id.empty()) return nullptr;
 	for (auto& element : m_elements) {
-		if (element && element->getId() == id) {
-			return element.get();
+		if (element->getId() == id) return element.get();
+
+		if (auto container = dynamic_cast<UIContainer*>(element.get())) {
+			UIElement* found = container->findChildById(id);
+			if (found) return found;
 		}
 	}
 	return nullptr;

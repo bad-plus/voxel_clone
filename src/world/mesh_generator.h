@@ -29,6 +29,38 @@ private:
 	ChunkStorage* m_neighbor_x_minus = nullptr;
 	ChunkStorage* m_neighbor_z_minus = nullptr;
 
+	void generateCubeModel(
+		Mesh* mesh,
+		BlockID block_id,
+		BlockType block_type,
+		glm::ivec3 block_pos,
+		const BlockTexture& texture
+	);
+
+	void generateCrossModel(
+		Mesh* mesh,
+		glm::ivec3 block_pos,
+		const BlockTexture& texture
+	);
+
+	void generateSlabModel(
+		Mesh* mesh,
+		BlockID block_id,
+		BlockType block_type,
+		glm::ivec3 block_pos,
+		const BlockTexture& texture,
+		bool is_top
+	);
+
+	void generateLayerModel(
+		Mesh* mesh,
+		BlockID block_id,
+		BlockType block_type,
+		glm::ivec3 block_pos,
+		const BlockTexture& texture,
+		uint8_t layer_count
+	);
+
 	bool shouldRenderFace(
 		BlockID current_block_id,
 		BlockType current_block_type,

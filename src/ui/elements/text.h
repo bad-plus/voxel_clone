@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
@@ -13,6 +13,8 @@ public:
 
 	void draw() override;
 
+	void updatePosition(int sw, int sh) override;
+
 	void setString(const std::string& str);
 	const std::string& getString() const;
 
@@ -22,14 +24,14 @@ public:
 	void setScale(const float scale);
 	float getScale() const;
 
-	void setPosition(int x, int y);
+	void setPosition(int x, int y, Anchor anchor = Anchor::TOP_LEFT);
 
-	void setProjection(const int screen_width, const int screen_height) override;
 	void setShader(Shader* shader);
-
 	void setLineSpacing(float spacing);
 
 private:
+	void updateTextSize();
+
 	std::unique_ptr<Text> m_text;
 	std::string m_current_string;
 	glm::vec3 m_current_color;

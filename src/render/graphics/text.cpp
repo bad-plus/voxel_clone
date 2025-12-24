@@ -1,4 +1,5 @@
 ﻿#include "text.h"
+#include "../../core/logger.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -33,7 +34,7 @@ Text::~Text() {
 }
 
 void Text::setProjection(int screen_width, int screen_height) {
-	m_projection = glm::ortho(0.0f, (float)screen_width, 0.0f, (float)screen_height);
+	m_projection = glm::ortho(0.0f, (float)screen_width, (float)screen_height, 0.0f);
 }
 
 void Text::setString(const std::string& str) {
@@ -89,30 +90,28 @@ void Text::draw() {
 	for (char c : m_string) {
 		if (c == '\n') {
 			x = startX;
-			y -= lineHeight;
+			y += lineHeight;
 			continue;
 		}
 
-		if (m_font->m_glyphs.find(c) == m_font->m_glyphs.end()) {
-			continue;
-		}
+		if (m_font->m_glyphs.find(c) == m_font->m_glyphs.end()) continue;
 
 		Glyph glyph = m_font->m_glyphs[c];
 
 		float xpos = x + glyph.bearing.x * m_scale;
-		float ypos = y - (glyph.size.y - glyph.bearing.y) * m_scale;
 
 		float w = (glyph.size.x * m_scale);
 		float h = (glyph.size.y * m_scale);
+		float ypos = y + (glyph.size.y - glyph.bearing.y) * m_scale;
 
 		float vertices[6][4] = {
-			{ xpos,     ypos + h,   0.0f, 0.0f },
+			{ xpos,     ypos - h,   0.0f, 0.0f },
 			{ xpos,     ypos,       0.0f, 1.0f },
 			{ xpos + w, ypos,       1.0f, 1.0f },
 
-			{ xpos,     ypos + h,   0.0f, 0.0f },
+			{ xpos,     ypos - h,   0.0f, 0.0f },
 			{ xpos + w, ypos,       1.0f, 1.0f },
-			{ xpos + w, ypos + h,   1.0f, 0.0f }
+			{ xpos + w, ypos - h,   1.0f, 0.0f }
 		};
 
 		glBindTexture(GL_TEXTURE_2D, glyph.texture);

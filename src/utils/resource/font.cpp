@@ -44,6 +44,12 @@ Font::Font(const std::string& path, int pixel_size) {
 
 		m_glyphs[c] = g;
 	}
+
+	for (const auto& [ch, glyph] : m_glyphs) {
+		if (glyph.bearing.y > max_bearing_y) {
+			max_bearing_y = glyph.bearing.y;
+		}
+	}
 }
 
 Font::~Font() {
