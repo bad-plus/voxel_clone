@@ -36,7 +36,7 @@ enum class BlockModel {
 };
 
 struct SideUV {
-	glm::vec2 uv[4]; // 4 vertices per cube face
+	std::array<glm::vec2, 4> uv; // 4 vertices per cube face
 };
 
 enum class BlockSide {
@@ -49,7 +49,7 @@ enum class BlockSide {
 };
 
 struct BlockTexture {
-	SideUV sides[6]; // 6 cube faces
+	std::array<SideUV, 6> sides; // 6 cube faces
 };
 
 struct BlockInfo {

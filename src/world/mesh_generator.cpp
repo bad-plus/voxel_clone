@@ -113,7 +113,7 @@ void MeshGenerator::generateCrossModel(
 	const BlockTexture& texture) {
 
 	SideUV face_uv = texture.sides[0];
-	GLuint vertex_count = mesh->getVertexCount();
+	GLuint vertex_count = static_cast<GLuint>(mesh->getVertexCount());
 
 	glm::vec3 base_pos = glm::vec3(block_pos);
 
@@ -149,7 +149,7 @@ void MeshGenerator::generateCrossModel(
 	mesh->addTriangle(vertex_count + 2, vertex_count + 1, vertex_count + 0);
 	mesh->addTriangle(vertex_count + 0, vertex_count + 3, vertex_count + 2);
 
-	vertex_count = mesh->getVertexCount();
+	vertex_count = static_cast<GLuint>(mesh->getVertexCount());
 
 	for (int i = 0; i < 4; i++) {
 		mesh->addVertex(quad2_verts[i], normal2, { face_uv.uv[i].x, face_uv.uv[i].y });
@@ -175,7 +175,7 @@ void MeshGenerator::generateSlabModel(
 	SideUV bottom_uv = texture.sides[std::to_underlying(BlockSide::BOTTOM)];
 	SideUV side_uv = texture.sides[std::to_underlying(BlockSide::FRONT)];
 
-	GLuint vertex_count = mesh->getVertexCount();
+	GLuint vertex_count = static_cast<GLuint>(mesh->getVertexCount());
 	glm::vec3 base_pos = glm::vec3(block_pos);
 
 	// TOP
@@ -252,7 +252,7 @@ void MeshGenerator::generateLayerModel(
 	SideUV bottom_uv = texture.sides[std::to_underlying(BlockSide::BOTTOM)];
 	SideUV side_uv = texture.sides[std::to_underlying(BlockSide::FRONT)];
 
-	GLuint vertex_count = mesh->getVertexCount();
+	GLuint vertex_count = static_cast<GLuint>(mesh->getVertexCount());
 	glm::vec3 base_pos = glm::vec3(block_pos);
 
 	// TOP
