@@ -31,6 +31,7 @@ private:
 	void updateFPS();
 	void updatePlayerInfo();
 	void updateWorldGeneratorInfo();
+	void updateMeshGeneratorInfo();
 
 	UI* m_ui;
 	Resources* m_resources;

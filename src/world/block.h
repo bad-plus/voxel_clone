@@ -1,9 +1,10 @@
 ﻿#pragma once
 
 #include <string>
-#include <unordered_map>
+#include <array>
 #include <glm/glm.hpp>
 #include <cstdint>
+
 
 enum class BlockID {
 	EMPTY = 0,
@@ -15,7 +16,8 @@ enum class BlockID {
 	MY_LOVE,
 	SAND,
 	WATER,
-	BEDROCK
+	BEDROCK,
+	COUNT
 };
 
 enum class BlockType {
@@ -52,7 +54,7 @@ struct BlockTexture {
 
 struct BlockInfo {
 	std::string name = "";
-	BlockType block_type;
+	BlockType block_type = BlockType::OPAQUE;
 	BlockModel block_model = BlockModel::CUBE;
 	bool is_solid_surface = true;
 	bool block_movement = true;
@@ -60,29 +62,36 @@ struct BlockInfo {
 	BlockTexture texture = {};
 };
 
-inline std::unordered_map<BlockID, BlockInfo> BlocksInfo = {
-	{BlockID::EMPTY, {"", BlockType::TRANSPARENT, BlockModel::CUBE, false, false}},
-	{BlockID::ERROR, {"error", BlockType::OPAQUE}},
-	{BlockID::STONE, {"stone", BlockType::OPAQUE}},
-	{BlockID::DIRT, {"dirt", BlockType::OPAQUE}},
-	{BlockID::GRASS, {"grass", BlockType::OPAQUE}},
-	{BlockID::SNOW_GRASS, {"snow_grass", BlockType::OPAQUE}},
-	{BlockID::SAND, {"sand", BlockType::OPAQUE}},
-	{BlockID::WATER, {"water", BlockType::TRANSPARENT}},
-	{BlockID::BEDROCK, {"bedrock", BlockType::OPAQUE}},
-	{BlockID::MY_LOVE, {"love", BlockType::OPAQUE}},
+inline std::array<BlockInfo, (size_t)BlockID::COUNT> BlocksInfo = {
+	[] {
+		std::array<BlockInfo, (size_t)BlockID::COUNT> data;
+
+		data[std::to_underlying(BlockID::EMPTY)] = { "", BlockType::TRANSPARENT, BlockModel::CUBE, false, false };
+		data[std::to_underlying(BlockID::ERROR)] = { "error", BlockType::OPAQUE };
+		data[std::to_underlying(BlockID::STONE)] = { "stone", BlockType::OPAQUE };
+		data[std::to_underlying(BlockID::DIRT)] = { "dirt", BlockType::OPAQUE };
+		data[std::to_underlying(BlockID::GRASS)] = { "grass", BlockType::OPAQUE };
+		data[std::to_underlying(BlockID::SNOW_GRASS)] = { "snow_grass", BlockType::OPAQUE };
+		data[std::to_underlying(BlockID::SAND)] = { "sand", BlockType::OPAQUE };
+		data[std::to_underlying(BlockID::WATER)] = { "water", BlockType::TRANSPARENT };
+		data[std::to_underlying(BlockID::BEDROCK)] = { "bedrock", BlockType::OPAQUE };
+		data[std::to_underlying(BlockID::MY_LOVE)] = { "love", BlockType::OPAQUE };
+
+		return data;
+	}()
 };
+
+inline BlockInfo& GetBlockInfo(BlockID id) {
+	return BlocksInfo[std::to_underlying(id)];
+}
 
 class Block {
 public:
-	Block(BlockID block_id = BlockID::EMPTY, uint8_t metadata = 0);
+	Block(BlockID block_id = BlockID::EMPTY, uint8_t layers = 0);
 	~Block();
 
 	BlockID getBlockID() const;
 	void setBlockID(BlockID block);
-
-	uint8_t getMetadata() const;
-	void setMetadata(uint8_t metadata);
 
 	uint8_t getLayerCount() const;
 	void setLayerCount(uint8_t layers);
@@ -91,5 +100,5 @@ public:
 
 private:
 	BlockID m_block_id;
-	uint8_t m_metadata;
+	uint8_t m_layers_data;
 };

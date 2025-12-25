@@ -14,7 +14,7 @@
 class PlayerMovementSystem {
 public:
 	void update(ECS& ecs, World* world) const {
-		View <Transform, Velocity, PlayerCamera, PlayerInput, PlayerState> view(ecs);
+		View <Transform, Velocity, PlayerCamera, PlayerInput, PlayerState, PhysicsState> view(ecs);
 
 		for (Entity e : view.each()) {
 			auto& vel = ecs.storage<Velocity>().get(e);
@@ -22,6 +22,7 @@ public:
 			auto& cam = ecs.storage<PlayerCamera>().get(e);
 			auto& st = ecs.storage<PlayerState>().get(e);
 			auto& col = ecs.storage<Collider>().get(e);
+			auto& phys = ecs.storage<PhysicsState>().get(e);
 
 			glm::vec3 front;
 			front.x = cos(glm::radians(cam.yaw)) * cos(glm::radians(cam.pitch));
@@ -39,6 +40,13 @@ public:
 			else col.half_y = 1.9f;
 
 			float speed = (st.mode == PlayerMode::SURVIVAL) ? 8.0f : (15.0f * inp.fly_speedup);
+
+			if (st.mode == PlayerMode::SURVIVAL) {
+				if (inp.jump && phys.on_ground) {
+					vel.y = 7.0f;
+					phys.on_ground = false;
+				}
+			}
 
 			if (st.mode == PlayerMode::SPECTATOR) {
 				vel.x = forward.x * inp.move_forward * speed + right.x * inp.move_right * speed;

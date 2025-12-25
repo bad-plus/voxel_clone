@@ -21,12 +21,12 @@ public:
 	}
 
 	void draw() override {
-		if (!visible) return;
+		if (!m_visible) return;
 		for (auto& child : m_children) if (child->isVisible()) child->draw();
 	}
 
 	void update(int mx, int my) override {
-		if (!visible) return;
+		if (!m_visible) return;
 		for (auto& child : m_children) {
 			if (child->isVisible()) child->update(mx, my);
 		}

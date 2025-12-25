@@ -2,7 +2,7 @@
 
 Block::Block(BlockID block_id, uint8_t metadata) {
 	m_block_id = block_id;
-	m_metadata = metadata & 0x0F;
+	m_layers_data = metadata & 0x0F;
 }
 
 Block::~Block() {
@@ -16,26 +16,18 @@ BlockID Block::getBlockID() const {
 	return m_block_id;
 }
 
-uint8_t Block::getMetadata() const {
-	return m_metadata;
-}
-
-void Block::setMetadata(uint8_t metadata) {
-	m_metadata = metadata & 0x0F;
-}
-
 uint8_t Block::getLayerCount() const {
-	const BlockInfo& info = BlocksInfo[m_block_id];
+	const BlockInfo& info = GetBlockInfo(m_block_id);
 
 	if (info.block_model != BlockModel::LAYER) {
 		return 0;
 	}
 
-	return (m_metadata & 0x07) + 1; // 0-7 → 1-8 слоёв
+	return (m_layers_data & 0x07) + 1; // 0-7 → 1-8 слоёв
 }
 
 void Block::setLayerCount(uint8_t layers) {
-	const BlockInfo& info = BlocksInfo[m_block_id];
+	const BlockInfo& info = GetBlockInfo(m_block_id);
 
 	if (info.block_model != BlockModel::LAYER) {
 		return;
@@ -44,11 +36,11 @@ void Block::setLayerCount(uint8_t layers) {
 	if (layers < 1) layers = 1;
 	if (layers > 8) layers = 8;
 
-	m_metadata = (layers - 1) & 0x07;
+	m_layers_data = (layers - 1) & 0x07;
 }
 
 float Block::getHeight() const {
-	const BlockInfo& info = BlocksInfo[m_block_id];
+	const BlockInfo& info = GetBlockInfo(m_block_id);
 
 	switch (info.block_model) {
 	case BlockModel::CUBE:

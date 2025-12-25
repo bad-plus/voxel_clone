@@ -60,7 +60,7 @@ std::unique_ptr<unsigned char[]> convertToRGBA(
     return rgba_data;
 }
 
-LoadedTexture loadTexture(const std::string path) {
+LoadedTexture loadTexture(const std::string& path) {
     LoadedTexture tex;
     tex.file_path = path.c_str();
     tex.data = stbi_load(path.c_str(), &tex.width, &tex.height, &tex.channels, 0);
@@ -160,13 +160,16 @@ void TextureAtlas::update() {
     
     memset(m_atlas_data, 0, ATLAS_SIZE * ATLAS_SIZE * ATLAS_CHANNELS);
 
-    for(auto& block_info : BlocksInfo) {
+    for (size_t i = 0; i < static_cast<size_t>(BlockID::COUNT); ++i) {
         try {
-            if(block_info.first == BlockID::EMPTY) continue;
+			BlockID id = static_cast<BlockID>(i);
+			BlockInfo& info = BlocksInfo[i];
 
-            BlockTexture& block_texture = block_info.second.texture;
+            if(id == BlockID::EMPTY) continue;
 
-            BlockTextureFiles texture_files = getBlockTextureFiles(block_info.second.name);
+            BlockTexture& block_texture = info.texture;
+
+            BlockTextureFiles texture_files = getBlockTextureFiles(info.name);
 
             std::unordered_map<std::string, AtlasTexture*> loaded_map;
 
@@ -186,15 +189,15 @@ void TextureAtlas::update() {
             };
 
             AtlasTexture* side_tex = pushIfExists(texture_files.side);
-            for(int s : { (int)BlockSide::LEFT, (int)BlockSide::RIGHT, (int)BlockSide::FRONT, (int)BlockSide::BACK }) {
+            for (int s : { std::to_underlying(BlockSide::LEFT), std::to_underlying(BlockSide::RIGHT), std::to_underlying(BlockSide::FRONT), std::to_underlying(BlockSide::BACK) }) {
                 if(side_tex) atlasTextureToSideUV(*side_tex, &block_texture.sides[s]);
             }
 
             AtlasTexture* top_tex = pushIfExists(texture_files.top);
-            if(top_tex) atlasTextureToSideUV(*top_tex, &block_texture.sides[(int)BlockSide::TOP]);
+            if(top_tex) atlasTextureToSideUV(*top_tex, &block_texture.sides[std::to_underlying(BlockSide::TOP)]);
 
             AtlasTexture* bottom_tex = pushIfExists(texture_files.bottom);
-            if(bottom_tex) atlasTextureToSideUV(*bottom_tex, &block_texture.sides[(int)BlockSide::BOTTOM]);
+            if(bottom_tex) atlasTextureToSideUV(*bottom_tex, &block_texture.sides[std::to_underlying(BlockSide::BOTTOM)]);
 
             for(auto& pair : loaded_map) delete pair.second;
 
@@ -223,7 +226,8 @@ void TextureAtlas::update() {
     glDeleteTextures(1, &old_gpu_texture_id);
 
     LOG_INFO("Texture atlas generated! {0} textures", m_atlas_texture_count);
-}
+    }
+
 
 TextureAtlas::TextureAtlas() {
     m_atlas_data = new unsigned char[ATLAS_SIZE * ATLAS_SIZE * ATLAS_CHANNELS];
@@ -235,6 +239,6 @@ TextureAtlas::~TextureAtlas() {
     glDeleteTextures(1, &m_gpu_texture_id);
 }
 
-void TextureAtlas::bind() {
+void TextureAtlas::bind() const {
     glBindTexture(GL_TEXTURE_2D, m_gpu_texture_id);
 }

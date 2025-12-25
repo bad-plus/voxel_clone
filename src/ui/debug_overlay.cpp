@@ -7,6 +7,7 @@
 #include "../world/world.h"
 #include "../world/generation/world_generator.h"
 #include "elements/vertical_layout.h"
+#include "elements/crosshair.h"
 
 #include <sstream>
 #include <iomanip>
@@ -34,30 +35,40 @@ void DebugOverlay::createElements() {
 	fps_text->setId("debug_fps");
 
 	auto pos_text = std::make_unique<UIText>("", 0, 0, base_color, font, shader);
-	pos_text->setId("player_info");
+	pos_text->setId("debug_player_info");
 
-	auto world_gen_text = std::make_unique<UIText>("", 0, 0, base_color, font, shader);
-	world_gen_text->setId("world_generator_info");
+	auto world_gen_text_chunk = std::make_unique<UIText>("", 0, 0, base_color, font, shader);
+	world_gen_text_chunk->setId("world_generator_info_create_chunk");
+
+	auto world_gen_mesh_chunk = std::make_unique<UIText>("", 0, 0, base_color, font, shader);
+	world_gen_mesh_chunk->setId("world_generator_info_create_mesh");
 
 	panel->addChild(std::move(fps_text));
 	panel->addChild(std::move(pos_text));
-	panel->addChild(std::move(world_gen_text));
+	panel->addChild(std::move(world_gen_text_chunk));
+	panel->addChild(std::move(world_gen_mesh_chunk));
 
 	m_ui->addElement(std::move(panel));
+
+	// test
+	Shader* crosshair_shader = m_resources->getShader("crosshair");
+	auto crosshair = std::make_unique<UICrosshair>();
+	crosshair->setShader(crosshair_shader);
+	m_ui->addElement(std::move(crosshair));
 }
 
 void DebugOverlay::show() {
 	m_visible = true;
 	if (UIElement* fps = m_ui->getElementById("debug_fps")) fps->setVisible(true);
-	if (UIElement* pos = m_ui->getElementById("player_info")) pos->setVisible(true);
-	if (UIElement* custom = m_ui->getElementById("world_generator_info")) custom->setVisible(true);
+	if (UIElement* info = m_ui->getElementById("debug_player_info")) info->setVisible(true);
+	if (UIElement* create_chunk = m_ui->getElementById("world_generator_info_create_chunk")) create_chunk->setVisible(true);
 }
 
 void DebugOverlay::hide() {
 	m_visible = false;
 	if (UIElement* fps = m_ui->getElementById("debug_fps")) fps->setVisible(false);
-	if (UIElement* pos = m_ui->getElementById("player_info")) pos->setVisible(false);
-	if (UIElement* world_generator_info = m_ui->getElementById("world_generator_info")) world_generator_info->setVisible(false);
+	if (UIElement* info = m_ui->getElementById("debug_player_info")) info->setVisible(false);
+	if (UIElement* create_chunk = m_ui->getElementById("world_generator_info_create_chunk")) create_chunk->setVisible(false);
 }
 
 void DebugOverlay::toggle() {
@@ -74,6 +85,7 @@ void DebugOverlay::update(const float delta_time) {
 	updateFPS();
 	updatePlayerInfo();
 	updateWorldGeneratorInfo();
+	updateMeshGeneratorInfo();
 }
 
 void DebugOverlay::updateFPS() {
@@ -91,42 +103,53 @@ void DebugOverlay::setEntity(Entity entity) {
 }
 
 void DebugOverlay::updatePlayerInfo() {
-	UIText* player_info_text = m_ui->getElementById<UIText>("player_info");
+	UIText* player_info_text = m_ui->getElementById<UIText>("debug_player_info");
 
 	auto& player_camera = m_ecs->storage<PlayerCamera>().get(m_player_entity);
 	auto& player_transform = m_ecs->storage<Transform>().get(m_player_entity);
 	auto& player_collider = m_ecs->storage<Collider>().get(m_player_entity);
 
 	std::string output_str = std::format(
-		"Position: {:.2f} {:.2f} {:.2f} / Rotate {:.2f} {:.2f}",
+		"Position: {:.2f} {:.2f} {:.2f} / Rotate: {:.2f} {:.2f}",
 		player_transform.position.x,
 		player_transform.position.y - player_collider.half_y,
 		player_transform.position.z,
 		player_camera.yaw,
 		player_camera.pitch
-		);
+	);
 
 	player_info_text->setString(output_str);
 }
 
 void DebugOverlay::setColor(const glm::vec3& color) {
 	if (UIText* fps = m_ui->getElementById<UIText>("debug_fps")) fps->setColor(color);
-	if (UIText* pos = m_ui->getElementById<UIText>("player_info")) pos->setColor(color);
-	if (UIText* world_generator_info = m_ui->getElementById<UIText>("world_generator_info")) world_generator_info->setColor(color);
+	if (UIText* pos = m_ui->getElementById<UIText>("debug_player_info")) pos->setColor(color);
+	if (UIText* world_generator_info = m_ui->getElementById<UIText>("world_generator_info_create_chunk")) world_generator_info->setColor(color);
 }
 
 void DebugOverlay::setScale(float scale) {
 	if (UIText* fps = m_ui->getElementById<UIText>("debug_fps")) fps->setScale(scale);
-	if (UIText* pos = m_ui->getElementById<UIText>("player_info")) pos->setScale(scale);
-	if (UIText* world_generator_info = m_ui->getElementById<UIText>("world_generator_info")) world_generator_info->setScale(scale);
+	if (UIText* pos = m_ui->getElementById<UIText>("debug_player_info")) pos->setScale(scale);
+	if (UIText* world_generator_info = m_ui->getElementById<UIText>("world_generator_info_create_chunk")) world_generator_info->setScale(scale);
 }
 
 void DebugOverlay::updateWorldGeneratorInfo() {
-	UIText* world_info_text = m_ui->getElementById<UIText>("world_generator_info");
+	UIText* world_info_text = m_ui->getElementById<UIText>("world_generator_info_create_chunk");
 
 	std::string output_str = std::format(
 		"Chunk generation time: {:.2f} ms",
 		m_world->getGenerator()->getChunkGenerationTime() * 1000
+	);
+
+	world_info_text->setString(output_str);
+}
+
+void DebugOverlay::updateMeshGeneratorInfo() {
+	UIText* world_info_text = m_ui->getElementById<UIText>("world_generator_info_create_mesh");
+
+	std::string output_str = std::format(
+		"Chunk mesh generation time: {:.2f} ms",
+		m_world->getMeshGenerationTime() * 1000
 	);
 
 	world_info_text->setString(output_str);

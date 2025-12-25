@@ -39,6 +39,7 @@ public:
 
 	ChunkStorage* getStorage() { return m_storage.get(); }
 
+	double getChunkBuildTime();
 private:
 	Block* getBlockLocal(glm::ivec3 position);
 
@@ -64,4 +65,6 @@ private:
 		std::atomic<Chunk*> x_m;
 		std::atomic<Chunk*> z_m;
 	} m_neighbors;
+
+	double m_mesh_build_time;
 };

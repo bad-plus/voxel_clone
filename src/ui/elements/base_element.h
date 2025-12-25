@@ -15,27 +15,27 @@ class UIElement {
 public:
 	virtual ~UIElement() = default;
 
-	Rect getRect() const { return rect; }
+	Rect getRect() const { return m_rect; }
 
 	void setPosition(int x, int y, Anchor anchor = Anchor::TOP_LEFT) {
-		rect.x = x;
-		rect.y = y;
+		m_rect.x = x;
+		m_rect.y = y;
 		m_anchor = anchor;
 	}
 
-	void setSize(int w, int h) { rect.w = w; rect.h = h; }
+	void setSize(int w, int h) { m_rect.w = w; m_rect.h = h; }
 	void setId(const std::string& id) { m_id = id; }
 	const std::string& getId() const { return m_id; }
-	void setVisible(bool visible) { this->visible = visible; }
-	bool isVisible() const { return visible; }
+	void setVisible(bool visible) { m_visible = visible; }
+	bool isVisible() const { return m_visible; }
 
 	virtual void updatePosition(int sw, int sh) {
 		switch (m_anchor) {
-		case Anchor::TOP_LEFT:     rect.screen_x = rect.x; rect.screen_y = rect.y; break;
-		case Anchor::TOP_RIGHT:    rect.screen_x = sw - rect.w - rect.x; rect.screen_y = rect.y; break;
-		case Anchor::BOTTOM_LEFT:  rect.screen_x = rect.x; rect.screen_y = sh - rect.h - rect.y; break;
-		case Anchor::BOTTOM_RIGHT: rect.screen_x = sw - rect.w - rect.x; rect.screen_y = sh - rect.h - rect.y; break;
-		case Anchor::CENTER:       rect.screen_x = (sw - rect.w) / 2 + rect.x; rect.screen_y = (sh - rect.h) / 2 + rect.y; break;
+		case Anchor::TOP_LEFT:     m_rect.screen_x = m_rect.x; m_rect.screen_y = m_rect.y; break;
+		case Anchor::TOP_RIGHT:    m_rect.screen_x = sw - m_rect.w - m_rect.x; m_rect.screen_y = m_rect.y; break;
+		case Anchor::BOTTOM_LEFT:  m_rect.screen_x = m_rect.x; m_rect.screen_y = sh - m_rect.h - m_rect.y; break;
+		case Anchor::BOTTOM_RIGHT: m_rect.screen_x = sw - m_rect.w - m_rect.x; m_rect.screen_y = sh - m_rect.h - m_rect.y; break;
+		case Anchor::CENTER:       m_rect.screen_x = (sw - m_rect.w) / 2 + m_rect.x; m_rect.screen_y = (sh - m_rect.h) / 2 + m_rect.y; break;
 		}
 	}
 
@@ -45,7 +45,7 @@ public:
 
 protected:
 	std::string m_id;
-	Rect rect = { 0,0,0,0,0,0 };
+	Rect m_rect = { 0,0,0,0,0,0 };
 	Anchor m_anchor = Anchor::TOP_LEFT;
-	bool visible = true;
+	bool m_visible = true;
 };

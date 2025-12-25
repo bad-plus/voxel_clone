@@ -23,7 +23,7 @@ public:
     AtlasTexture pushTextureToAltas(LoadedTexture& texture);
 
     void update();
-    void bind();
+    void bind() const;
 private:
     unsigned char* m_atlas_data;
     unsigned int m_atlas_texture_count;

@@ -26,21 +26,26 @@ ChunkMesh MeshGenerator::generateMesh(
 
 				if (block_id == BlockID::EMPTY) continue;
 
-				const BlockInfo& block_info = BlocksInfo[block_id];
+				const BlockInfo& block_info = GetBlockInfo(block_id);
 				const BlockTexture& block_texture = block_info.texture;
 				const BlockType block_type = block_info.block_type;
 				const BlockModel block_model = block_info.block_model;
 
 				Mesh* selected_mesh = nullptr;
 
-				if (block_type == BlockType::OPAQUE) {
-					selected_mesh = &result.opaque;
-				}
-				else if (block_type == BlockType::CUTOUT) {
-					selected_mesh = &result.cutout;
-				}
-				else {
-					selected_mesh = &result.transparent;
+				switch (block_type) {
+					case BlockType::OPAQUE: {
+						selected_mesh = &result.opaque;
+						break;
+					}
+					case BlockType::CUTOUT: {
+						selected_mesh = &result.cutout;
+						break;
+					}
+					case BlockType::TRANSPARENT: {
+						selected_mesh = &result.transparent;
+						break;
+					}
 				}
 
 				switch (block_model) {
@@ -61,7 +66,7 @@ ChunkMesh MeshGenerator::generateMesh(
 					break;
 
 				case BlockModel::LAYER: {
-					Block* block = m_storage->getBlockUnsafe(block_pos);
+					const Block* block = m_storage->getBlockUnsafe(block_pos);
 					uint8_t layer_count = block->getLayerCount();
 					if (layer_count == 0) layer_count = 1;
 					generateLayerModel(selected_mesh, block_id, block_type, block_pos, block_texture, layer_count);
@@ -86,28 +91,19 @@ void MeshGenerator::generateCubeModel(
 	glm::ivec3 block_pos,
 	const BlockTexture& texture) {
 
-	if (shouldRenderFace(block_id, block_type, { block_pos.x, block_pos.y + 1, block_pos.z })) {
-		addBlockFace(mesh, block_pos, BlockSide::TOP, texture);
-	}
+	constexpr std::array < std::pair < BlockSide, glm::ivec3>, 6> offsets = { {
+		{BlockSide::TOP, {0, 1, 0}},
+		{BlockSide::BOTTOM, {0, -1, 0}},
+		{BlockSide::FRONT, {0, 0, 1}},
+		{BlockSide::BACK, {0, 0, -1}},
+		{BlockSide::RIGHT, {1, 0, 0}},
+		{BlockSide::LEFT, {-1, 0, 0}}
+	}};
 
-	if (shouldRenderFace(block_id, block_type, { block_pos.x, block_pos.y - 1, block_pos.z })) {
-		addBlockFace(mesh, block_pos, BlockSide::BOTTOM, texture);
-	}
-
-	if (shouldRenderFace(block_id, block_type, { block_pos.x, block_pos.y, block_pos.z + 1 })) {
-		addBlockFace(mesh, block_pos, BlockSide::FRONT, texture);
-	}
-
-	if (shouldRenderFace(block_id, block_type, { block_pos.x, block_pos.y, block_pos.z - 1 })) {
-		addBlockFace(mesh, block_pos, BlockSide::BACK, texture);
-	}
-
-	if (shouldRenderFace(block_id, block_type, { block_pos.x + 1, block_pos.y, block_pos.z })) {
-		addBlockFace(mesh, block_pos, BlockSide::RIGHT, texture);
-	}
-
-	if (shouldRenderFace(block_id, block_type, { block_pos.x - 1, block_pos.y, block_pos.z })) {
-		addBlockFace(mesh, block_pos, BlockSide::LEFT, texture);
+	for (const auto& [key, value] : offsets) {
+		if (shouldRenderFace(block_id, block_type, block_pos + value)) {
+			addBlockFace(mesh, block_pos, key, texture);
+		}
 	}
 }
 
@@ -175,9 +171,9 @@ void MeshGenerator::generateSlabModel(
 	float y_offset = is_top ? 0.5f : 0.0f;
 	float height = 0.5f;
 
-	SideUV top_uv = texture.sides[(int)BlockSide::TOP];
-	SideUV bottom_uv = texture.sides[(int)BlockSide::BOTTOM];
-	SideUV side_uv = texture.sides[(int)BlockSide::FRONT];
+	SideUV top_uv = texture.sides[std::to_underlying(BlockSide::TOP)];
+	SideUV bottom_uv = texture.sides[std::to_underlying(BlockSide::BOTTOM)];
+	SideUV side_uv = texture.sides[std::to_underlying(BlockSide::FRONT)];
 
 	GLuint vertex_count = mesh->getVertexCount();
 	glm::vec3 base_pos = glm::vec3(block_pos);
@@ -244,7 +240,7 @@ void MeshGenerator::generateLayerModel(
 	const BlockTexture& texture,
 	uint8_t layer_count) {
 
-	const BlockInfo& info = BlocksInfo[block_id];
+	const BlockInfo& info = GetBlockInfo(block_id);
 	float height = layer_count * info.layer_height;
 
 	if (height >= 1.0f) {
@@ -252,9 +248,9 @@ void MeshGenerator::generateLayerModel(
 		return;
 	}
 
-	SideUV top_uv = texture.sides[(int)BlockSide::TOP];
-	SideUV bottom_uv = texture.sides[(int)BlockSide::BOTTOM];
-	SideUV side_uv = texture.sides[(int)BlockSide::FRONT];
+	SideUV top_uv = texture.sides[std::to_underlying(BlockSide::TOP)];
+	SideUV bottom_uv = texture.sides[std::to_underlying(BlockSide::BOTTOM)];
+	SideUV side_uv = texture.sides[std::to_underlying(BlockSide::FRONT)];
 
 	GLuint vertex_count = mesh->getVertexCount();
 	glm::vec3 base_pos = glm::vec3(block_pos);
@@ -422,8 +418,10 @@ bool MeshGenerator::shouldRenderFace(BlockID current_block_id, BlockType current
 		neighbor_block = m_storage->getBlockUnsafe(neighbor_position)->getBlockID();
 	}
 
-	BlockType neighbor_type = BlocksInfo[neighbor_block].block_type;
-	BlockModel neighbor_model = BlocksInfo[neighbor_block].block_model;
+	BlockInfo block_info = GetBlockInfo(neighbor_block);
+
+	BlockType neighbor_type = block_info.block_type;
+	BlockModel neighbor_model = block_info.block_model;
 
 	if (neighbor_model == BlockModel::CROSS) {
 		return true;
@@ -454,10 +452,10 @@ void MeshGenerator::addBlockFace(
 	BlockSide block_side,
 	const BlockTexture& texture)
 {
-	SideUV face_uv = texture.sides[(unsigned int)block_side];
-	GLuint vertex_count = mesh->getVertexCount();
+	const SideUV face_uv = texture.sides[std::to_underlying(block_side)];
+	const GLuint vertex_count = static_cast<GLuint>(mesh->getVertexCount());
 
-	const int side_index = (int)block_side;
+	const int side_index = std::to_underlying(block_side);
 	const float* vertices = FACE_VERTICES[side_index];
 	const glm::vec3& normal = FACE_NORMALS[block_side];
 

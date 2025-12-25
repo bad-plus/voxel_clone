@@ -40,6 +40,9 @@ public:
 
 	bool isEmpty() const { return m_vertices.empty() || m_indices.empty(); }
 	void clear();
+
+	void reserveVertices(size_t size) { m_vertices.reserve(size); }
+	void reserveIndices(size_t size) { m_indices.reserve(size); }
 private:
 	std::vector<Vertex> m_vertices;
 	std::vector<GLuint> m_indices;

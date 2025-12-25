@@ -16,6 +16,8 @@ Chunk::Chunk() {
 	m_mesh_renderer_transparent = std::make_unique<MeshRenderer>();
 
 	m_ready_gpu.ready = false;
+	
+	m_mesh_build_time = 0.0f;
 }
 
 Chunk::~Chunk() {
@@ -66,6 +68,8 @@ Block* Chunk::setBlock(glm::ivec3 position, BlockID block, bool mark) {
 void Chunk::calculateMesh() {
 	if (!m_dirty) return;
 
+	double start_generation_time = glfwGetTime();
+
 	ChunkStorage* neighbor_x_p = nullptr;
 	ChunkStorage* neighbor_z_p = nullptr;
 	ChunkStorage* neighbor_x_m = nullptr;
@@ -90,6 +94,8 @@ void Chunk::calculateMesh() {
 		m_ready_gpu.ready = true;
 		m_dirty = false;
 	}
+
+	m_mesh_build_time = glfwGetTime() - start_generation_time;
 }
 
 void Chunk::uploadMeshToGPU() {
@@ -138,4 +144,10 @@ bool Chunk::isDirty() {
 
 int Chunk::getTopBlockPosition(int x, int z) {
 	return m_storage->getTopBlockY(x, z);
+}
+
+double Chunk::getChunkBuildTime() {
+	if (m_ready_gpu.ready) return 0.0f;
+	
+	return m_mesh_build_time;
 }

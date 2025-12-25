@@ -100,6 +100,15 @@ void Shader::uniformi1(const char* form_name, int data) const {
     glUniform1i(form_location, data);
 }
 
+void Shader::uniform1f(const char* form_name, float data) const {
+	GLint form_location = glGetUniformLocation(m_shader_program, form_name);
+	if (form_location == -1) {
+		LOG_WARN("bad request to update shader uniform ({0})", form_name);
+		return;
+	}
+	glUniform1f(form_location, data);
+}
+
 void Shader::uniformmat4fv(const char* form_name, const glm::mat4& mat) const {
     GLint form_location = glGetUniformLocation(m_shader_program, form_name);
     if(form_location == -1) {

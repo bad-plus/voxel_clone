@@ -19,7 +19,7 @@
 #include <random>
 #include <memory>
 
-constexpr int WORLD_MOVEMENT_TICKRATE = 60;
+constexpr int WORLD_MOVEMENT_TICKRATE = 120;
 constexpr int WORLD_UPDATER_TICKRATE = 24;
 
 Game::Game() {
@@ -41,6 +41,7 @@ Game::Game() {
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> dis(1, INT_MAX);
 	int seed = dis(gen);
+	seed = 666;
 
 	m_world_generator = std::make_unique<WorldGenerator>(seed);
 	LOG_INFO("World seed: {0}", seed);

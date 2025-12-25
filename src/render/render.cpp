@@ -63,7 +63,9 @@ void Render::render() {
 
 	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
+
 	m_ui->draw();
+
 	glfwSwapBuffers(window);
 }
 
@@ -128,8 +130,8 @@ void Render::renderWorld(World* world, int render_dist) {
 	glm::mat4 projection(1.0f);
 	projection = glm::perspective(player_camera.zoom, (float)m_render_width / (float)m_render_height, 0.1f, 1000.0f);
 
-	int chunk_offset_x = (player_transform.position.x / CHUNK_SIZE_X);
-	int chunk_offset_z = (player_transform.position.z / CHUNK_SIZE_Z);
+	int chunk_offset_x = ((player_transform.position.x) / CHUNK_SIZE_X);
+	int chunk_offset_z = ((player_transform.position.z) / CHUNK_SIZE_Z);
 
 	auto chunks_to_draw = genCircleReady(chunk_offset_x, chunk_offset_z, render_dist);
 

@@ -10,6 +10,7 @@
 #include "../components/player_mode.h"
 #include "../components/collider.h"
 #include "../components/mass.h"
+#include "../components/physics_state.h"
 
 #include <typeinfo>
 
@@ -24,6 +25,7 @@ public:
 		registerComponent<PlayerState>();
 		registerComponent<Collider>();
 		registerComponent<Mass>();
+		registerComponent<PhysicsState>();
 	}
 	~ECS() {
 		for (auto& pair : m_components) {

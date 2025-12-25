@@ -6,7 +6,6 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indic
 }
 
 Mesh::Mesh(const std::vector<GLfloat>& raw_vertices, const std::vector<GLuint>& indices) {
-	// Каждая вершина занимает 8 float: 3 (position) + 3 (normal) + 2 (tex_coord)
 	size_t vertex_count = raw_vertices.size() / 8;
 	m_vertices.reserve(vertex_count);
 

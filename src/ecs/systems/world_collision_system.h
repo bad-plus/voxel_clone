@@ -16,12 +16,13 @@ public:
 	void update(ECS& ecs, float dt, World* world) {
 		if (world == nullptr) return;
 
-		View<Transform, Velocity, Collider> view(ecs);
+		View<Transform, Velocity, Collider, PhysicsState> view(ecs);
 
 		for (Entity e : view.each()) {
 			auto& trans = ecs.storage<Transform>().get(e);
 			auto& vel = ecs.storage<Velocity>().get(e);
 			const auto& col = ecs.storage<Collider>().get(e);
+			auto& phys = ecs.storage<PhysicsState>().get(e);
 
 			bool has_player_state = ecs.storage<PlayerState>().has(e);
 			bool skip_collision = false;
@@ -64,7 +65,7 @@ public:
 			bool collision_x = false;
 			bool collision_y = false;
 			bool collision_z = false;
-			bool on_ground = false;
+			phys.on_ground = false;
 
 			for (int by = min_check_y; by <= max_check_y; by++) {
 				for (int bz = min_check_z; bz <= max_check_z; bz++) {
@@ -75,7 +76,7 @@ public:
 						BlockID block_id = block->getBlockID();
 						if (block_id == BlockID::EMPTY) continue;
 
-						BlockInfo block_info = BlocksInfo[block_id];
+						const BlockInfo& block_info = GetBlockInfo(block_id);
 						if (!block_info.is_solid_surface) continue;
 
 						if (Utils::AABBvsBlock(new_x, trans.position.y, trans.position.z, col, bx, by, bz)) {
@@ -96,14 +97,14 @@ public:
 						BlockID block_id = block->getBlockID();
 						if (block_id == BlockID::EMPTY) continue;
 
-						BlockInfo block_info = BlocksInfo[block_id];
+						const BlockInfo& block_info = GetBlockInfo(block_id);
 						if (!block_info.is_solid_surface) continue;
 
 						if (Utils::AABBvsBlock(new_x, new_y, trans.position.z, col, bx, by, bz)) {
 							collision_y = true;
 
 							if (vel.y < 0.0f) {
-								on_ground = true;
+								phys.on_ground = true;
 								trans.position.y = (float)(by + 1) + col.half_y;
 								new_y = trans.position.y;
 							}
@@ -118,10 +119,6 @@ public:
 				}
 			}
 
-			if (is_survival && wants_jump && on_ground) {
-				vel.y = 6.0f;
-			}
-
 			for (int by = min_check_y; by <= max_check_y; by++) {
 				for (int bx = min_check_x; bx <= max_check_x; bx++) {
 					for (int bz = min_check_z; bz <= max_check_z; bz++) {
@@ -131,7 +128,7 @@ public:
 						BlockID block_id = block->getBlockID();
 						if (block_id == BlockID::EMPTY) continue;
 
-						BlockInfo block_info = BlocksInfo[block_id];
+						const BlockInfo& block_info = GetBlockInfo(block_id);
 						if (!block_info.is_solid_surface) continue;
 
 						if (Utils::AABBvsBlock(new_x, new_y, new_z, col, bx, by, bz)) {
@@ -146,9 +143,6 @@ public:
 			trans.position.x = new_x;
 			trans.position.y = new_y;
 			trans.position.z = new_z;
-
-			// TODO
-			if (trans.position.y < -50.0f) trans.position.y = 500.0f;
 		}
 	}
 };

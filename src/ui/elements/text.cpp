@@ -7,10 +7,10 @@ UIText::UIText(const std::string& str, const int x, const int y, const glm::vec3
 	m_text = std::make_unique<Text>(font, str, 0.0f, 0.0f, 1.0f, color, 1, 1);
 
 	setShader(shader);
-	rect.x = x;
-	rect.y = y;
-	rect.w = 0;
-	rect.h = 0;
+	m_rect.x = x;
+	m_rect.y = y;
+	m_rect.w = 0;
+	m_rect.h = 0;
 
 	updateTextSize();
 }
@@ -31,20 +31,20 @@ void UIText::updatePosition(int sw, int sh) {
 			}
 		}
 
-		float opengl_y = static_cast<float>(rect.screen_y) + font_height;
+		float opengl_y = static_cast<float>(m_rect.screen_y) + font_height;
 
-		m_text->setPosition(static_cast<float>(rect.screen_x), opengl_y);
+		m_text->setPosition(static_cast<float>(m_rect.screen_x), opengl_y);
 	}
 }
 
 void UIText::setPosition(int x, int y, Anchor anchor) {
-	rect.x = x;
-	rect.y = y;
+	m_rect.x = x;
+	m_rect.y = y;
 	m_anchor = anchor;
 }
 
 void UIText::draw() {
-	if (!visible || !m_text) return;
+	if (!m_visible || !m_text) return;
 
 	m_text->draw();
 }
@@ -89,14 +89,10 @@ void UIText::setShader(Shader* shader) {
 	}
 }
 
-void UIText::setLineSpacing(float spacing) {
-	
-}
-
 void UIText::updateTextSize() {
 	if (!m_text || m_current_string.empty()) {
-		rect.w = 0;
-		rect.h = 20;
+		m_rect.w = 0;
+		m_rect.h = 20;
 		return;
 	}
 
@@ -120,6 +116,6 @@ void UIText::updateTextSize() {
 		}
 	}
 
-	rect.w = static_cast<int>(total_width) + 5;
-	rect.h = static_cast<int>(max_height) + 2;
+	m_rect.w = static_cast<int>(total_width) + 5;
+	m_rect.h = static_cast<int>(max_height) + 2;
 }

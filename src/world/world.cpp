@@ -278,6 +278,7 @@ Entity World::CreatePlayer() {
     ecs->storage<PlayerTag>().add(entity, PlayerTag());
     ecs->storage<Collider>().add(entity, {0.4f, 1.9f, 0.4f});
     ecs->storage<Mass>().add(entity, { 1.0f });
+    ecs->storage<PhysicsState>().add(entity, PhysicsState());
 
     return entity;
 }
@@ -308,4 +309,19 @@ void World::tick_movement() {
 	m_ecs.gravity_system->update(*ecs, tick_delta);
 
 	last_tick_time = glfwGetTime();
+}
+
+double World::getMeshGenerationTime() const {
+    double all_time = 0.0f;
+    int all_count = 0;
+
+    for (const auto& [key, value] : m_chunks) {
+        double time = value->chunk->getChunkBuildTime();
+        if (time != 0.0f) {
+            all_time += time;
+            all_count++;
+        }
+    }
+
+    return (all_time / all_count);
 }

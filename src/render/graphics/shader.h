@@ -10,6 +10,7 @@ public:
     
     void uniformVec4(const char* form_name, float rx, float gy, float bz, float aw) const;
     void uniformi1(const char* form_name, int data) const;
+    void uniform1f(const char* form_name, float data) const;
     void uniformmat4fv(const char* form_name, const glm::mat4& mat) const;
 private:
     GLuint m_shader_program;
