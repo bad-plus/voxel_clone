@@ -105,7 +105,7 @@ void DebugOverlay::setEntity(Entity entity) {
 void DebugOverlay::updatePlayerInfo() {
 	UIText* player_info_text = m_ui->getElementById<UIText>("debug_player_info");
 
-	auto& player_camera = m_ecs->storage<PlayerCamera>().get(m_player_entity);
+	auto& player_camera = m_ecs->storage<Camera>().get(m_player_entity);
 	auto& player_transform = m_ecs->storage<Transform>().get(m_player_entity);
 	auto& player_collider = m_ecs->storage<Collider>().get(m_player_entity);
 

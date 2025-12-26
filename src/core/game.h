@@ -37,6 +37,8 @@ private:
 	void worldUpdaterThread();
 	void movementUpdaterThread();
 
+	void InitSystems();
+
 	std::atomic<bool> m_quit{ false };
 	std::vector<std::thread> m_threads;
 

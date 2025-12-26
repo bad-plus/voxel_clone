@@ -14,30 +14,25 @@
 class PlayerMovementSystem {
 public:
 	void update(ECS& ecs, World* world) const {
-		View <Transform, Velocity, PlayerCamera, PlayerInput, PlayerState, PhysicsState> view(ecs);
+		View <Transform, Velocity, Camera, PlayerInput, PlayerState, PhysicsState> view(ecs);
 
 		for (Entity e : view.each()) {
 			auto& vel = ecs.storage<Velocity>().get(e);
 			auto& inp = ecs.storage<PlayerInput>().get(e);
-			auto& cam = ecs.storage<PlayerCamera>().get(e);
+			auto& cam = ecs.storage<Camera>().get(e);
 			auto& st = ecs.storage<PlayerState>().get(e);
 			auto& col = ecs.storage<Collider>().get(e);
 			auto& phys = ecs.storage<PhysicsState>().get(e);
+			auto& trans = ecs.storage<Transform>().get(e);
 
-			glm::vec3 front;
-			front.x = cos(glm::radians(cam.yaw)) * cos(glm::radians(cam.pitch));
-			front.y = sin(glm::radians(cam.pitch));
-			front.z = sin(glm::radians(cam.yaw)) * cos(glm::radians(cam.pitch));
-
-			glm::vec3 forward = glm::normalize(front);
+			glm::vec3 forward = cam.front;
 			glm::vec3 forward_flat = glm::normalize(glm::vec3(forward.x, 0.0f, forward.z));
-			glm::vec3 world_up = glm::vec3(0.0f, 1.0f, 0.0f);
-			glm::vec3 right = glm::normalize(glm::cross(forward_flat, world_up));
+			glm::vec3 right = cam.right;
 
 			if (inp.sneak) {
-				col.half_y = 1.6f;
+				col.half_y = 0.8f;
 			}
-			else col.half_y = 1.9f;
+			else col.half_y = 0.9f;
 
 			float speed = (st.mode == PlayerMode::SURVIVAL) ? 8.0f : (15.0f * inp.fly_speedup);
 

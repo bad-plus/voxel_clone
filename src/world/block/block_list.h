@@ -1,6 +1,6 @@
 #pragma once
 
-enum class BlockID {
+enum class BlockID : uint8_t {
 	EMPTY = 0,
 	ERROR,
 	STONE,

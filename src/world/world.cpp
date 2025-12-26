@@ -11,8 +11,10 @@
 #include "../ecs/systems/world_collision_system.h"
 #include "../ecs/systems/player_movement_system.h"
 #include "../ecs/systems/gravity_system.h"
+#include "../ecs/systems/camera_update_system.h"
 
 static constexpr long long pack_chunk_coords(int x, int z) {
+    return ((long long)(x & 0xFFFFFFFF)) | ((long long)(z & 0xFFFFFFFF) << 32);
     return ((long long)(x & 0xFFFFFFFF)) | ((long long)(z & 0xFFFFFFFF) << 32);
 }
 
@@ -31,6 +33,8 @@ World::World(WorldGenerator* generator) {
 
     m_ecs.ecs = std::make_unique<ECS>();
 
+    m_ecs.player_camera_system = std::make_unique<PlayerCameraSystem>();
+    m_ecs.camera_update_system = std::make_unique<CameraUpdateSystem>();
     m_ecs.world_collision_system = std::make_unique<WorldCollisionSystem>();
     m_ecs.gravity_system = std::make_unique<GravitySystem>();
     m_ecs.player_movement_system = std::make_unique<PlayerMovementSystem>();
@@ -272,11 +276,13 @@ Entity World::CreatePlayer() {
     Entity entity = ecs->create();
     ecs->storage<Transform>().add(entity, { {0.0f, 250.0f, 0.0f}, {0.0f, 0.0f, 0.0f} });
     ecs->storage<Velocity>().add(entity, { 0.0f, 0.0f, 0.0f });
-    ecs->storage<PlayerCamera>().add(entity, PlayerCamera());
+    ecs->storage<Camera>().add(entity, Camera());
+	ecs->storage<PlayerControlledCamera>().add(entity, {});
+	ecs->storage<ActiveCamera>().add(entity, {});
     ecs->storage<PlayerInput>().add(entity, PlayerInput());
     ecs->storage<PlayerState>().add(entity, PlayerState());
     ecs->storage<PlayerTag>().add(entity, PlayerTag());
-    ecs->storage<Collider>().add(entity, {0.4f, 1.5f, 0.4f});
+    ecs->storage<Collider>().add(entity, {0.4f, 0.9f, 0.4f});
     ecs->storage<Mass>().add(entity, { 1.0f });
     ecs->storage<PhysicsState>().add(entity, PhysicsState());
 
@@ -299,16 +305,24 @@ void World::tick() {
 }
 
 void World::tick_movement() {
-	if (last_tick_time == 0) last_tick_time = glfwGetTime();
+	// Считаем delta time В НАЧАЛЕ
+	double current_time = glfwGetTime();
+	if (last_tick_time == 0) last_tick_time = current_time;
 
-	float tick_delta = (float)(glfwGetTime() - last_tick_time);
+	float delta_time = (float)(current_time - last_tick_time);
+	last_tick_time = current_time;
+
 	ECS* ecs = m_ecs.ecs.get();
 
-    m_ecs.player_movement_system->update(*ecs, this);
-	m_ecs.world_collision_system->update(*ecs, tick_delta, this);
-	m_ecs.gravity_system->update(*ecs, tick_delta);
+	m_ecs.player_camera_system->update(*ecs);
 
-	last_tick_time = glfwGetTime();
+	m_ecs.player_movement_system->update(*ecs, this);
+
+	m_ecs.gravity_system->update(*ecs, delta_time);
+
+	m_ecs.world_collision_system->update(*ecs, delta_time, this);
+
+	m_ecs.camera_update_system->update(*ecs);
 }
 
 double World::getMeshGenerationTime() const {

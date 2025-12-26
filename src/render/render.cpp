@@ -125,7 +125,7 @@ void Render::renderWorld(World* world, int render_dist) {
 	view = getCameraViewMatrix(ecs, m_player_entity);
 
 	const auto& player_transform = ecs->storage<Transform>().get(m_player_entity);
-	const auto& player_camera = ecs->storage<PlayerCamera>().get(m_player_entity);
+	const auto& player_camera = ecs->storage<Camera>().get(m_player_entity);
 
 	glm::mat4 projection(1.0f);
 	projection = glm::perspective(player_camera.zoom, (float)m_render_width / (float)m_render_height, 0.1f, 1000.0f);

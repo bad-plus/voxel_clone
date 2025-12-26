@@ -24,7 +24,7 @@ InputHandler::~InputHandler() = default;
 
 bool current_render_debug_mode = false;
 
-BlockID selected_block = BlockID::TREE_LEAVES;
+BlockID selected_block = BlockID::BLUE;
 
 void InputHandler::processing() {
 	const float mouse_sensivty = 0.3f;
@@ -88,18 +88,17 @@ void InputHandler::processing() {
 		player_input.fly_speedup -= (player_input.fly_speedup * 0.01f);
 	}
 
-	auto& player_transform = m_ecs->storage<Transform>().get(m_player_entity);
-	auto& player_camera = m_ecs->storage<Transform>().get(m_player_entity);
+	auto& player_camera = m_ecs->storage<Camera>().get(m_player_entity);
 
 
 	if (m_input->jclicked(GLFW_MOUSE_BUTTON_1)) {
 
-		const float max_dist = 10.f;
+		const float max_dist = 100.f;
 		const float step = 0.01f;
 
 		float curr_dist = 0.0f;
 
-		glm::vec3 start_pos = player_transform.position;
+		glm::vec3 start_pos = player_camera.position;
 		glm::vec3 direction = getCameraFront(m_ecs, m_player_entity);
 
 		while (curr_dist < max_dist) {
@@ -121,12 +120,12 @@ void InputHandler::processing() {
 	}
 
 	if (m_input->jclicked(GLFW_MOUSE_BUTTON_2)) {
-		const float max_dist = 10.f;
+		const float max_dist = 100.f;
 		const float step = 0.01f;
 
 		float curr_dist = 0.0f;
 
-		glm::vec3 start_pos = player_transform.position;
+		glm::vec3 start_pos = player_camera.position;
 		glm::vec3 direction = getCameraFront(m_ecs, m_player_entity);
 
 		while (curr_dist < max_dist) {
@@ -154,12 +153,12 @@ void InputHandler::processing() {
 	}
 
 	if (m_input->jclicked(GLFW_MOUSE_BUTTON_3)) {
-		const float max_dist = 10.f;
+		const float max_dist = 100.f;
 		const float step = 0.01f;
 
 		float curr_dist = 0.0f;
 
-		glm::vec3 start_pos = player_transform.position;
+		glm::vec3 start_pos = player_camera.position;
 		glm::vec3 direction = getCameraFront(m_ecs, m_player_entity);
 
 		while (curr_dist < max_dist) {
@@ -180,7 +179,6 @@ void InputHandler::processing() {
 		}
 
 	}
-	m_player_camera_system.update(*m_ecs);
 }
 
 

@@ -19,7 +19,7 @@
 #include <random>
 #include <memory>
 
-constexpr int WORLD_MOVEMENT_TICKRATE = 120;
+constexpr int WORLD_MOVEMENT_TICKRATE = 60;
 constexpr int WORLD_UPDATER_TICKRATE = 24;
 
 Game::Game() {
@@ -27,7 +27,18 @@ Game::Game() {
 	initLogger();
 
 	initGLFW();
+	InitSystems();
 
+	m_threads.emplace_back(&Game::worldGenerationThread, this);
+	m_threads.emplace_back(&Game::worldUpdaterThread, this);
+	m_threads.emplace_back(&Game::movementUpdaterThread, this);
+
+	m_window->setWindowSize(1280, 720);
+	m_window->setCursorEnabled(false);
+	m_debug_overlay->show();
+}
+
+void Game::InitSystems() {
 	m_input = std::make_unique<Input>();
 
 	m_window = std::make_unique<Window>("Game test", 800, 600, m_input.get());
@@ -61,14 +72,6 @@ Game::Game() {
 
 	m_debug_overlay = std::make_unique<DebugOverlay>(m_ui.get(), m_resources.get(), m_world.get());
 	m_debug_overlay->setEntity(player_entity);
-
-	m_threads.emplace_back(&Game::worldGenerationThread, this);
-	m_threads.emplace_back(&Game::worldUpdaterThread, this);
-	m_threads.emplace_back(&Game::movementUpdaterThread, this);
-
-	m_window->setWindowSize(1280, 720);
-	m_window->setCursorEnabled(false);
-	m_debug_overlay->show();
 }
 
 void Game::movementUpdaterThread() {

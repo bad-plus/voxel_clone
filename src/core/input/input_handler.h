@@ -24,9 +24,6 @@ private:
     Entity m_player_entity;
     World* m_world;
 
-    CameraSystem m_player_camera_system;
-    PlayerMovementSystem m_player_movement_system;
-
     int m_window_width;
     int m_window_height;
 };

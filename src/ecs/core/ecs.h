@@ -19,13 +19,15 @@ public:
 	ECS() {
 		registerComponent<Transform>();
 		registerComponent<Velocity>();
-		registerComponent<PlayerCamera>();
+		registerComponent<Camera>();
 		registerComponent<PlayerTag>();
 		registerComponent<PlayerInput>();
 		registerComponent<PlayerState>();
 		registerComponent<Collider>();
 		registerComponent<Mass>();
 		registerComponent<PhysicsState>();
+		registerComponent<PlayerControlledCamera>();
+		registerComponent<ActiveCamera>();
 	}
 	~ECS() {
 		for (auto& pair : m_components) {
