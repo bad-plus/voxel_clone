@@ -2,7 +2,7 @@
 #include "../core/game.h"
 #include "graphics/texture_atlas.h"
 #include "graphics/shader.h"
-#include "../world/chunk.h"
+#include "../world/chunk/chunk.h"
 #include "../core/logger.h"
 #include "../world/world.h"
 #include "../ecs/core/ecs.h"

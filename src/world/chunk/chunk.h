@@ -1,6 +1,6 @@
 #pragma once
 
-#include "block.h"
+#include "../block/block.h"
 #include "chunk_storage.h"
 #include "mesh_generator.h"
 
@@ -10,8 +10,8 @@
 #include <atomic>
 #include <memory>
 
-#include "../render/graphics/mesh.h"
-#include "../render/graphics/mesh_renderer.h"
+#include "../../render/graphics/mesh.h"
+#include "../../render/graphics/mesh_renderer.h"
 
 struct Chunk;
 

@@ -1,5 +1,5 @@
 ﻿#include "mesh_generator.h"
-#include "../render/graphics/mesh.h"
+#include "../../render/graphics/mesh.h"
 
 ChunkMesh MeshGenerator::generateMesh(
 	ChunkStorage* storage,
@@ -456,7 +456,7 @@ void MeshGenerator::addBlockFace(
 	const GLuint vertex_count = static_cast<GLuint>(mesh->getVertexCount());
 
 	const int side_index = std::to_underlying(block_side);
-	const float* vertices = FACE_VERTICES[side_index];
+	const auto vertices = CUBE_VERTICES[side_index];
 	const glm::vec3& normal = FACE_NORMALS[block_side];
 
 	for (int i = 0; i < 4; i++) {

@@ -27,7 +27,6 @@ public:
 	void setPosition(int x, int y, Anchor anchor = Anchor::TOP_LEFT);
 
 	void setShader(Shader* shader);
-	void setLineSpacing(float spacing);
 
 private:
 	void updateTextSize();

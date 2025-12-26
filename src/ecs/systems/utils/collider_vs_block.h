@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "../../components/collider.h"
-#include "../../../world/block.h"
+#include "../../../world/block/block.h"
 #include "../../../world/world.h"
 
 namespace Utils {

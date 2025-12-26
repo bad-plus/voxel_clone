@@ -7,7 +7,7 @@
 #include "../components/player_input.h"
 #include "../components/player_mode.h"
 #include "utils/collider_vs_block.h"
-#include "../../world/block.h"
+#include "../../world/block/block.h"
 #include "../../world/world.h"
 #include <cmath>
 
@@ -66,6 +66,7 @@ public:
 			bool collision_y = false;
 			bool collision_z = false;
 			phys.on_ground = false;
+
 
 			for (int by = min_check_y; by <= max_check_y; by++) {
 				for (int bz = min_check_z; bz <= max_check_z; bz++) {

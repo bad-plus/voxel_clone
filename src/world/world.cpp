@@ -1,6 +1,6 @@
 ﻿#include "world.h"
-#include "chunk.h"
-#include "block.h"
+#include "chunk/chunk.h"
+#include "block/block.h"
 #include "../core/logger.h"
 #include <GLFW/glfw3.h>
 #include "generation/world_generator.h"
@@ -276,7 +276,7 @@ Entity World::CreatePlayer() {
     ecs->storage<PlayerInput>().add(entity, PlayerInput());
     ecs->storage<PlayerState>().add(entity, PlayerState());
     ecs->storage<PlayerTag>().add(entity, PlayerTag());
-    ecs->storage<Collider>().add(entity, {0.4f, 1.9f, 0.4f});
+    ecs->storage<Collider>().add(entity, {0.4f, 1.5f, 0.4f});
     ecs->storage<Mass>().add(entity, { 1.0f });
     ecs->storage<PhysicsState>().add(entity, PhysicsState());
 

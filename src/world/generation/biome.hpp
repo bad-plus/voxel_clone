@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../block.h"
+#include "../block/block.h"
 #include "perlin_2d.h"
 #include <map>
 #include <vector>

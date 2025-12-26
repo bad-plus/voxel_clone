@@ -11,7 +11,7 @@ struct UI;
 
 class InputHandler {
 public:
-    InputHandler(Game* game, Input* input, ECS* ecs, UI* ui);
+    InputHandler(Game* game, Input* input, ECS* ecs, UI* ui, World* world);
     ~InputHandler();
 
     void processing();
@@ -22,6 +22,7 @@ private:
     Input* m_input;
     UI* m_ui;
     Entity m_player_entity;
+    World* m_world;
 
     CameraSystem m_player_camera_system;
     PlayerMovementSystem m_player_movement_system;

@@ -56,7 +56,7 @@ Game::Game() {
 	Entity player_entity = m_world->CreatePlayer();
 	m_render->setPlayerEntity(player_entity);
 
-	m_input_handler = std::make_unique<InputHandler>(this, m_input.get(), m_world->getECS(), m_ui.get());
+	m_input_handler = std::make_unique<InputHandler>(this, m_input.get(), m_world->getECS(), m_ui.get(), m_world.get());
 	m_input_handler->setPlayerEntity(player_entity);
 
 	m_debug_overlay = std::make_unique<DebugOverlay>(m_ui.get(), m_resources.get(), m_world.get());

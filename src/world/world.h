@@ -3,7 +3,7 @@
 #include <deque>
 #include <mutex>
 #include <memory>
-#include "../world/block.h"
+#include "../world/block/block.h"
 #include "../ecs/core/entity.h"
 
 struct Chunk;

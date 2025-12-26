@@ -1,11 +1,12 @@
 #pragma once
-#include "block.h"
+#include "../block/block.h"
 
 #include <array>
 
 constexpr unsigned int CHUNK_SIZE_X = 16;
 constexpr unsigned int CHUNK_SIZE_Y = 512; // height
 constexpr unsigned int CHUNK_SIZE_Z = 16;
+constexpr unsigned int CHUNK_SIZE_VOLUME = CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z;
 
 class ChunkStorage {
 public:
@@ -21,6 +22,7 @@ public:
 	static constexpr int getSizeX() { return CHUNK_SIZE_X; }
 	static constexpr int getSizeY() { return CHUNK_SIZE_Y; }
 	static constexpr int getSizeZ() { return CHUNK_SIZE_Z; }
+	static constexpr int getVolume() { return CHUNK_SIZE_VOLUME; }
 
 	int getTopBlockY(int x, int z);
 	bool isValidPosition(glm::ivec3 position) const;
@@ -41,5 +43,5 @@ public:
 		};
 	}
 private:
-	std::array<Block, CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z> m_blocks;
+	std::array<Block, CHUNK_SIZE_VOLUME> m_blocks;
 };

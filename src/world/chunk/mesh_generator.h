@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../render/graphics/mesh.h"
+#include "../../render/graphics/mesh.h"
 #include "chunk_storage.h"
 #include <unordered_map>
 
@@ -87,7 +87,10 @@ private:
 		{ BlockSide::BACK, {0.0f, 0.0f, -1.0f} }
 	};
 
-	inline static const float FACE_VERTICES[6][12] = {
+	using FACE_VERTICES_TYPE = std::array<float, 12>;
+	using CUBE_VERTICES_TYPE = std::array<FACE_VERTICES_TYPE, 6>;
+
+	CUBE_VERTICES_TYPE CUBE_VERTICES = {{
 		// TOP (Y+)
 		{ 0.0f, 1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f, 0.0f },
 		// BOTTOM (Y-)
@@ -100,5 +103,5 @@ private:
 		{ 0.0f, 0.0f, 1.0f,  1.0f, 0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f, 1.0f },
 		// BACK (Z-)
 		{ 1.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f, 0.0f }
-	};
+	}};
 };
