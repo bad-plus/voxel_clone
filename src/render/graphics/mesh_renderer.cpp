@@ -43,20 +43,30 @@ void MeshRenderer::draw() const {
 }
 
 void MeshRenderer::setupVertexAttributes() const {
+	constexpr GLsizei VERTEX_SIZE = ((8 * sizeof(GLfloat)) + (2 * sizeof(GL_UNSIGNED_BYTE)));
+
 	glBindVertexArray(m_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 
 	// Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
 	// Normal attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (GLvoid*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
 
 	// Texture coordinate attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (GLvoid*)(6 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
+
+	// Light attribute
+	glVertexAttribPointer(3, 1, GL_UNSIGNED_BYTE, GL_FALSE, VERTEX_SIZE, (GLvoid*)(8 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(3);
+
+	// AO attribute
+	glVertexAttribPointer(4, 1, GL_UNSIGNED_BYTE, GL_FALSE, VERTEX_SIZE, (GLvoid*)(6 * sizeof(GLfloat) + sizeof(GL_UNSIGNED_BYTE)));
+	glEnableVertexAttribArray(4);
 
 	glBindVertexArray(0);
 }

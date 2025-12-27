@@ -6,12 +6,12 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indic
 }
 
 Mesh::Mesh(const std::vector<GLfloat>& raw_vertices, const std::vector<GLuint>& indices) {
-	size_t vertex_count = raw_vertices.size() / 8;
+	size_t vertex_count = raw_vertices.size() / 10;
 	m_vertices.reserve(vertex_count);
 
 	for (size_t i = 0; i < vertex_count; i++) {
 		Vertex vertex;
-		size_t offset = i * 8;
+		size_t offset = i * 10;
 
 		vertex.position.x = raw_vertices[offset + 0];
 		vertex.position.y = raw_vertices[offset + 1];
@@ -24,6 +24,9 @@ Mesh::Mesh(const std::vector<GLfloat>& raw_vertices, const std::vector<GLuint>& 
 		vertex.tex_coord.x = raw_vertices[offset + 6];
 		vertex.tex_coord.y = raw_vertices[offset + 7];
 
+		vertex.light.setData(raw_vertices[offset + 8]);
+		vertex.ao = raw_vertices[offset + 9];
+
 		m_vertices.push_back(vertex);
 	}
 
@@ -34,8 +37,8 @@ void Mesh::addVertex(const Vertex& vertex) {
 	m_vertices.push_back(vertex);
 }
 
-void Mesh::addVertex(glm::vec3 position, glm::vec3 normal, glm::vec2 tex_coord) {
-	addVertex({ position, normal, tex_coord });
+void Mesh::addVertex(glm::vec3 position, glm::vec3 normal, glm::vec2 tex_coord, Light light, uint8_t ao) {
+	addVertex({ position, normal, tex_coord, light, ao });
 }
 
 void Mesh::addTriangle(GLuint i0, GLuint i1, GLuint i2) {
@@ -57,6 +60,9 @@ std::vector<GLfloat> Mesh::getRawVertices() const {
 
 		vertices.push_back(vertex.tex_coord.x);
 		vertices.push_back(vertex.tex_coord.y);
+
+		vertices.push_back(vertex.light.getData());
+		vertices.push_back(vertex.ao);
 	}
 
 	return vertices;

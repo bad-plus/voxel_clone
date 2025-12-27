@@ -12,6 +12,7 @@ WorldGenerator::WorldGenerator(int seed) {
 
     m_perlin_river = std::make_unique<Perlin2D>(m_seed + 1);
     m_perlin_canyon = std::make_unique<Perlin2D>(m_seed + 2);
+    m_perlin_temperature = std::make_unique<Perlin2D>(m_seed + 3);
 
     m_biome_perlins[Biome::BiomeID::PLANKS] = std::make_unique<Perlin2D>(m_seed + 10);
     m_biome_perlins[Biome::BiomeID::HILLS] = std::make_unique<Perlin2D>(m_seed + 11);
@@ -26,8 +27,8 @@ WorldGenerator::~WorldGenerator() = default;
 Chunk* WorldGenerator::generateChunk(Chunk* chunk, int x, int z) {
     double start_generation_time = glfwGetTime();
     generateTerrain(chunk, x, z);
-    generateRivers(chunk, x, z);
-    generateCanyon(chunk, x, z);
+    //generateRivers(chunk, x, z);
+    //generateCanyon(chunk, x, z);
     generateBedrock(chunk, x, z);
     m_chunk_generation_time = glfwGetTime() - start_generation_time;
     return chunk;

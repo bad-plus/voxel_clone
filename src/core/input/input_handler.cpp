@@ -90,10 +90,9 @@ void InputHandler::processing() {
 
 	auto& player_camera = m_ecs->storage<Camera>().get(m_player_entity);
 
-
 	if (m_input->jclicked(GLFW_MOUSE_BUTTON_1)) {
 
-		const float max_dist = 100.f;
+		const float max_dist = 10.f;
 		const float step = 0.01f;
 
 		float curr_dist = 0.0f;
@@ -120,7 +119,7 @@ void InputHandler::processing() {
 	}
 
 	if (m_input->jclicked(GLFW_MOUSE_BUTTON_2)) {
-		const float max_dist = 100.f;
+		const float max_dist = 10.f;
 		const float step = 0.01f;
 
 		float curr_dist = 0.0f;
@@ -153,7 +152,7 @@ void InputHandler::processing() {
 	}
 
 	if (m_input->jclicked(GLFW_MOUSE_BUTTON_3)) {
-		const float max_dist = 100.f;
+		const float max_dist = 10.f;
 		const float step = 0.01f;
 
 		float curr_dist = 0.0f;

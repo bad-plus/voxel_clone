@@ -2,16 +2,20 @@
 #include <vector>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include "../../world/lighting/light.h"
 
 struct Vertex {
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec2 tex_coord;
+	Light light;
+	uint8_t ao;
+
 
 	Vertex() = default;
 	Vertex(
-		glm::vec3 pos, glm::vec3 norm, glm::vec2 uv
-	) : position(pos), normal(norm), tex_coord(uv) {
+		glm::vec3 pos, glm::vec3 norm, glm::vec2 uv, Light light_ = Light(), uint8_t ao_ = 0
+	) : position(pos), normal(norm), tex_coord(uv), light(light_), ao(ao_) {
 
 	}
 };
@@ -25,7 +29,7 @@ public:
 	~Mesh() = default;
 
 	void addVertex(const Vertex& vertex);
-	void addVertex(glm::vec3 position, glm::vec3 normal, glm::vec2 tex_coord);
+	void addVertex(glm::vec3 position, glm::vec3 normal, glm::vec2 tex_coord, Light light = Light(), uint8_t ao = 0);
 
 	void addTriangle(GLuint i0, GLuint i1, GLuint i2);
 

@@ -113,7 +113,7 @@ void Game::worldGenerationThread() {
     while (!m_quit) {
         m_world->processGenerationQueue();
 		m_world->processUpdateMeshQueue();
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 
