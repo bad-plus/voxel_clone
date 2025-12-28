@@ -47,7 +47,7 @@ void Mesh::addTriangle(GLuint i0, GLuint i1, GLuint i2) {
 
 std::vector<GLfloat> Mesh::getRawVertices() const {
 	std::vector<GLfloat> vertices;
-	vertices.reserve(m_vertices.size() * 8);
+	vertices.reserve(m_vertices.size() * 10);
 
 	for (const auto& vertex : m_vertices) {
 		vertices.push_back(vertex.position.x);

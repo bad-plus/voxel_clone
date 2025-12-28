@@ -23,21 +23,55 @@ inline std::array<BlockInfo, std::to_underlying(BlockID::COUNT)> BlocksInfo = {
 	[] {
 		std::array<BlockInfo, std::to_underlying(BlockID::COUNT)> data;
 
-		data[std::to_underlying(BlockID::EMPTY)] = { "", BlockType::TRANSPARENT, BlockModel::CUBE, false, false };
-		data[std::to_underlying(BlockID::ERROR)] = { "error", BlockType::OPAQUE };
-		data[std::to_underlying(BlockID::STONE)] = { "stone", BlockType::OPAQUE };
-		data[std::to_underlying(BlockID::DIRT)] = { "dirt", BlockType::OPAQUE };
-		data[std::to_underlying(BlockID::GRASS)] = { "grass", BlockType::OPAQUE };
-		data[std::to_underlying(BlockID::SNOW_GRASS)] = { "snow_grass", BlockType::OPAQUE };
-		data[std::to_underlying(BlockID::SAND)] = { "sand", BlockType::OPAQUE };
-		data[std::to_underlying(BlockID::WATER)] = { "water", BlockType::TRANSPARENT };
-		data[std::to_underlying(BlockID::BEDROCK)] = { "bedrock", BlockType::OPAQUE };
-		data[std::to_underlying(BlockID::MY_LOVE)] = { "love", BlockType::OPAQUE };
-		data[std::to_underlying(BlockID::TREE_LEAVES)] = { "tree_leaves", BlockType::CUTOUT };
-		data[std::to_underlying(BlockID::RED)] = { "red", BlockType::OPAQUE };
-		data[std::to_underlying(BlockID::GREEN)] = { "green", BlockType::OPAQUE };
-		data[std::to_underlying(BlockID::BLUE)] = { "blue", BlockType::OPAQUE };
-		data[std::to_underlying(BlockID::GRAY)] = { "gray", BlockType::OPAQUE };
+		data[std::to_underlying(BlockID::EMPTY)] = { 
+			.name = "", 
+			.block_type = BlockType::TRANSPARENT, 
+			.block_model = BlockModel::CUBE, 
+			.is_solid_surface = false, 
+			.block_movement = false 
+		};
+		data[std::to_underlying(BlockID::ERROR)] = { 
+			.name = "error"
+		};
+		data[std::to_underlying(BlockID::STONE)] = { 
+			.name = "stone"
+		};
+		data[std::to_underlying(BlockID::DIRT)] = { 
+			.name = "dirt"
+		};
+		data[std::to_underlying(BlockID::GRASS)] = { 
+			.name = "grass"
+		};
+		data[std::to_underlying(BlockID::SNOW_GRASS)] = { 
+			.name = "snow_grass"
+		};
+		data[std::to_underlying(BlockID::SAND)] = { 
+			.name = "sand"
+		};
+		data[std::to_underlying(BlockID::WATER)] = { 
+			.name = "water"
+		};
+		data[std::to_underlying(BlockID::BEDROCK)] = { 
+			.name = "bedrock"
+		};
+		data[std::to_underlying(BlockID::MY_LOVE)] = { 
+			.name = "love"
+		};
+		data[std::to_underlying(BlockID::TREE_LEAVES)] = { 
+			.name = "tree_leaves"
+		};
+		data[std::to_underlying(BlockID::RED)] = {
+			.name = "red",
+		};
+		data[std::to_underlying(BlockID::GREEN)] = { 
+			.name = "green",
+		};
+		data[std::to_underlying(BlockID::BLUE)] = { 
+			.name = "blue",
+		};
+		data[std::to_underlying(BlockID::GRAY)] = { 
+			.name = "gray",
+		};
 
 		return data;
 	}()

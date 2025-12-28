@@ -1,6 +1,8 @@
 ﻿#include "mesh_generator.h"
 #include "../../render/graphics/mesh.h"
 
+#include <glm/glm.hpp>
+
 ChunkMesh MeshGenerator::generateMesh(
 	ChunkStorage* storage,
 	ChunkStorage* neighbor_x_plus,
@@ -84,293 +86,6 @@ ChunkMesh MeshGenerator::generateMesh(
 	return result;
 }
 
-void MeshGenerator::generateCubeModel(
-	Mesh* mesh,
-	BlockID block_id,
-	BlockType block_type,
-	glm::ivec3 block_pos,
-	const BlockTexture& texture) {
-
-	constexpr std::array < std::pair < BlockSide, glm::ivec3>, 6> offsets = { {
-		{BlockSide::TOP, {0, 1, 0}},
-		{BlockSide::BOTTOM, {0, -1, 0}},
-		{BlockSide::FRONT, {0, 0, 1}},
-		{BlockSide::BACK, {0, 0, -1}},
-		{BlockSide::RIGHT, {1, 0, 0}},
-		{BlockSide::LEFT, {-1, 0, 0}}
-	}};
-
-	for (const auto& [key, value] : offsets) {
-		if (shouldRenderFace(block_id, block_type, block_pos + value)) {
-			addBlockFace(mesh, block_pos, key, texture);
-		}
-	}
-}
-
-void MeshGenerator::generateCrossModel(
-	Mesh* mesh,
-	glm::ivec3 block_pos,
-	const BlockTexture& texture) {
-
-	SideUV face_uv = texture.sides[0];
-	GLuint vertex_count = static_cast<GLuint>(mesh->getVertexCount());
-
-	glm::vec3 base_pos = glm::vec3(block_pos);
-
-	glm::vec3 quad1_verts[4] = {
-		base_pos + glm::vec3(0.0f, 0.0f, 0.0f),
-		base_pos + glm::vec3(1.0f, 0.0f, 1.0f),
-		base_pos + glm::vec3(1.0f, 1.0f, 1.0f),
-		base_pos + glm::vec3(0.0f, 1.0f, 0.0f)
-	};
-
-	glm::vec3 quad2_verts[4] = {
-		base_pos + glm::vec3(1.0f, 0.0f, 0.0f),
-		base_pos + glm::vec3(0.0f, 0.0f, 1.0f),
-		base_pos + glm::vec3(0.0f, 1.0f, 1.0f),
-		base_pos + glm::vec3(1.0f, 1.0f, 0.0f)
-	};
-
-	glm::vec3 normal1 = glm::normalize(glm::cross(
-		quad1_verts[1] - quad1_verts[0],
-		quad1_verts[2] - quad1_verts[0]
-	));
-
-	glm::vec3 normal2 = glm::normalize(glm::cross(
-		quad2_verts[1] - quad2_verts[0],
-		quad2_verts[2] - quad2_verts[0]
-	));
-
-	for (int i = 0; i < 4; i++) {
-		mesh->addVertex(quad1_verts[i], normal1, { face_uv.uv[i].x, face_uv.uv[i].y });
-	}
-	mesh->addTriangle(vertex_count + 0, vertex_count + 1, vertex_count + 2);
-	mesh->addTriangle(vertex_count + 2, vertex_count + 3, vertex_count + 0);
-	mesh->addTriangle(vertex_count + 2, vertex_count + 1, vertex_count + 0);
-	mesh->addTriangle(vertex_count + 0, vertex_count + 3, vertex_count + 2);
-
-	vertex_count = static_cast<GLuint>(mesh->getVertexCount());
-
-	for (int i = 0; i < 4; i++) {
-		mesh->addVertex(quad2_verts[i], normal2, { face_uv.uv[i].x, face_uv.uv[i].y });
-	}
-	mesh->addTriangle(vertex_count + 0, vertex_count + 1, vertex_count + 2);
-	mesh->addTriangle(vertex_count + 2, vertex_count + 3, vertex_count + 0);
-	mesh->addTriangle(vertex_count + 2, vertex_count + 1, vertex_count + 0);
-	mesh->addTriangle(vertex_count + 0, vertex_count + 3, vertex_count + 2);
-}
-
-void MeshGenerator::generateSlabModel(
-	Mesh* mesh,
-	BlockID block_id,
-	BlockType block_type,
-	glm::ivec3 block_pos,
-	const BlockTexture& texture,
-	bool is_top) {
-
-	float y_offset = is_top ? 0.5f : 0.0f;
-	float height = 0.5f;
-
-	SideUV top_uv = texture.sides[std::to_underlying(BlockSide::TOP)];
-	SideUV bottom_uv = texture.sides[std::to_underlying(BlockSide::BOTTOM)];
-	SideUV side_uv = texture.sides[std::to_underlying(BlockSide::FRONT)];
-
-	GLuint vertex_count = static_cast<GLuint>(mesh->getVertexCount());
-	glm::vec3 base_pos = glm::vec3(block_pos);
-
-	// TOP
-	if (is_top || shouldRenderFace(block_id, block_type, { block_pos.x, block_pos.y + 1, block_pos.z })) {
-		glm::vec3 verts[4] = {
-			base_pos + glm::vec3(0.0f, y_offset + height, 1.0f),
-			base_pos + glm::vec3(1.0f, y_offset + height, 1.0f),
-			base_pos + glm::vec3(1.0f, y_offset + height, 0.0f),
-			base_pos + glm::vec3(0.0f, y_offset + height, 0.0f)
-		};
-		for (int i = 0; i < 4; i++) {
-			mesh->addVertex(verts[i], { 0, 1, 0 }, { top_uv.uv[i].x, top_uv.uv[i].y });
-		}
-		mesh->addTriangle(vertex_count + 0, vertex_count + 1, vertex_count + 2);
-		mesh->addTriangle(vertex_count + 2, vertex_count + 3, vertex_count + 0);
-		vertex_count += 4;
-	}
-
-	// BOTTOM
-	if (!is_top || shouldRenderFace(block_id, block_type, { block_pos.x, block_pos.y - 1, block_pos.z })) {
-		glm::vec3 verts[4] = {
-			base_pos + glm::vec3(0.0f, y_offset, 0.0f),
-			base_pos + glm::vec3(1.0f, y_offset, 0.0f),
-			base_pos + glm::vec3(1.0f, y_offset, 1.0f),
-			base_pos + glm::vec3(0.0f, y_offset, 1.0f)
-		};
-		for (int i = 0; i < 4; i++) {
-			mesh->addVertex(verts[i], { 0, -1, 0 }, { bottom_uv.uv[i].x, bottom_uv.uv[i].y });
-		}
-		mesh->addTriangle(vertex_count + 0, vertex_count + 1, vertex_count + 2);
-		mesh->addTriangle(vertex_count + 2, vertex_count + 3, vertex_count + 0);
-		vertex_count += 4;
-	}
-
-	
-	if (shouldRenderFace(block_id, block_type, { block_pos.x, block_pos.y, block_pos.z + 1 })) {
-		glm::vec3 verts[4] = {
-			base_pos + glm::vec3(0.0f, y_offset, 1.0f),
-			base_pos + glm::vec3(1.0f, y_offset, 1.0f),
-			base_pos + glm::vec3(1.0f, y_offset + height, 1.0f),
-			base_pos + glm::vec3(0.0f, y_offset + height, 1.0f)
-		};
-		glm::vec2 uv_coords[4] = {
-			{side_uv.uv[0].x, side_uv.uv[0].y},
-			{side_uv.uv[1].x, side_uv.uv[1].y},
-			{side_uv.uv[2].x, side_uv.uv[0].y + (side_uv.uv[2].y - side_uv.uv[0].y) * 0.5f},
-			{side_uv.uv[3].x, side_uv.uv[0].y + (side_uv.uv[3].y - side_uv.uv[0].y) * 0.5f}
-		};
-		for (int i = 0; i < 4; i++) {
-			mesh->addVertex(verts[i], { 0, 0, 1 }, uv_coords[i]);
-		}
-		mesh->addTriangle(vertex_count + 0, vertex_count + 1, vertex_count + 2);
-		mesh->addTriangle(vertex_count + 2, vertex_count + 3, vertex_count + 0);
-	}
-}
-
-void MeshGenerator::generateLayerModel(
-	Mesh* mesh,
-	BlockID block_id,
-	BlockType block_type,
-	glm::ivec3 block_pos,
-	const BlockTexture& texture,
-	uint8_t layer_count) {
-
-	const BlockInfo& info = GetBlockInfo(block_id);
-	float height = layer_count * info.layer_height;
-
-	if (height >= 1.0f) {
-		generateCubeModel(mesh, block_id, block_type, block_pos, texture);
-		return;
-	}
-
-	SideUV top_uv = texture.sides[std::to_underlying(BlockSide::TOP)];
-	SideUV bottom_uv = texture.sides[std::to_underlying(BlockSide::BOTTOM)];
-	SideUV side_uv = texture.sides[std::to_underlying(BlockSide::FRONT)];
-
-	GLuint vertex_count = static_cast<GLuint>(mesh->getVertexCount());
-	glm::vec3 base_pos = glm::vec3(block_pos);
-
-	// TOP
-	{
-		glm::vec3 verts[4] = {
-			base_pos + glm::vec3(0.0f, height, 1.0f),
-			base_pos + glm::vec3(1.0f, height, 1.0f),
-			base_pos + glm::vec3(1.0f, height, 0.0f),
-			base_pos + glm::vec3(0.0f, height, 0.0f)
-		};
-		for (int i = 0; i < 4; i++) {
-			mesh->addVertex(verts[i], { 0, 1, 0 }, { top_uv.uv[i].x, top_uv.uv[i].y });
-		}
-		mesh->addTriangle(vertex_count + 0, vertex_count + 1, vertex_count + 2);
-		mesh->addTriangle(vertex_count + 2, vertex_count + 3, vertex_count + 0);
-		vertex_count += 4;
-	}
-
-	// BOTTOM
-	if (shouldRenderFace(block_id, block_type, { block_pos.x, block_pos.y - 1, block_pos.z })) {
-		glm::vec3 verts[4] = {
-			base_pos + glm::vec3(0.0f, 0.0f, 0.0f),
-			base_pos + glm::vec3(1.0f, 0.0f, 0.0f),
-			base_pos + glm::vec3(1.0f, 0.0f, 1.0f),
-			base_pos + glm::vec3(0.0f, 0.0f, 1.0f)
-		};
-		for (int i = 0; i < 4; i++) {
-			mesh->addVertex(verts[i], { 0, -1, 0 }, { bottom_uv.uv[i].x, bottom_uv.uv[i].y });
-		}
-		mesh->addTriangle(vertex_count + 0, vertex_count + 1, vertex_count + 2);
-		mesh->addTriangle(vertex_count + 2, vertex_count + 3, vertex_count + 0);
-		vertex_count += 4;
-	}
-
-	if (shouldRenderFace(block_id, block_type, { block_pos.x, block_pos.y, block_pos.z + 1 })) {
-		glm::vec3 verts[4] = {
-			base_pos + glm::vec3(0.0f, 0.0f, 1.0f),
-			base_pos + glm::vec3(1.0f, 0.0f, 1.0f),
-			base_pos + glm::vec3(1.0f, height, 1.0f),
-			base_pos + glm::vec3(0.0f, height, 1.0f)
-		};
-		glm::vec2 uv_coords[4] = {
-			{side_uv.uv[0].x, side_uv.uv[0].y},
-			{side_uv.uv[1].x, side_uv.uv[1].y},
-			{side_uv.uv[2].x, side_uv.uv[0].y + (side_uv.uv[2].y - side_uv.uv[0].y) * height},
-			{side_uv.uv[3].x, side_uv.uv[0].y + (side_uv.uv[3].y - side_uv.uv[0].y) * height}
-		};
-		for (int i = 0; i < 4; i++) {
-			mesh->addVertex(verts[i], { 0, 0, 1 }, uv_coords[i]);
-		}
-		mesh->addTriangle(vertex_count + 0, vertex_count + 1, vertex_count + 2);
-		mesh->addTriangle(vertex_count + 2, vertex_count + 3, vertex_count + 0);
-		vertex_count += 4;
-	}
-
-	if (shouldRenderFace(block_id, block_type, { block_pos.x, block_pos.y, block_pos.z - 1 })) {
-		glm::vec3 verts[4] = {
-			base_pos + glm::vec3(1.0f, 0.0f, 0.0f),
-			base_pos + glm::vec3(0.0f, 0.0f, 0.0f),
-			base_pos + glm::vec3(0.0f, height, 0.0f),
-			base_pos + glm::vec3(1.0f, height, 0.0f)
-		};
-		glm::vec2 uv_coords[4] = {
-			{side_uv.uv[0].x, side_uv.uv[0].y},
-			{side_uv.uv[1].x, side_uv.uv[1].y},
-			{side_uv.uv[2].x, side_uv.uv[0].y + (side_uv.uv[2].y - side_uv.uv[0].y) * height},
-			{side_uv.uv[3].x, side_uv.uv[0].y + (side_uv.uv[3].y - side_uv.uv[0].y) * height}
-		};
-		for (int i = 0; i < 4; i++) {
-			mesh->addVertex(verts[i], { 0, 0, -1 }, uv_coords[i]);
-		}
-		mesh->addTriangle(vertex_count + 0, vertex_count + 1, vertex_count + 2);
-		mesh->addTriangle(vertex_count + 2, vertex_count + 3, vertex_count + 0);
-		vertex_count += 4;
-	}
-
-	if (shouldRenderFace(block_id, block_type, { block_pos.x + 1, block_pos.y, block_pos.z })) {
-		glm::vec3 verts[4] = {
-			base_pos + glm::vec3(1.0f, 0.0f, 1.0f),
-			base_pos + glm::vec3(1.0f, 0.0f, 0.0f),
-			base_pos + glm::vec3(1.0f, height, 0.0f),
-			base_pos + glm::vec3(1.0f, height, 1.0f)
-		};
-		glm::vec2 uv_coords[4] = {
-			{side_uv.uv[0].x, side_uv.uv[0].y},
-			{side_uv.uv[1].x, side_uv.uv[1].y},
-			{side_uv.uv[2].x, side_uv.uv[0].y + (side_uv.uv[2].y - side_uv.uv[0].y) * height},
-			{side_uv.uv[3].x, side_uv.uv[0].y + (side_uv.uv[3].y - side_uv.uv[0].y) * height}
-		};
-		for (int i = 0; i < 4; i++) {
-			mesh->addVertex(verts[i], { 1, 0, 0 }, uv_coords[i]);
-		}
-		mesh->addTriangle(vertex_count + 0, vertex_count + 1, vertex_count + 2);
-		mesh->addTriangle(vertex_count + 2, vertex_count + 3, vertex_count + 0);
-		vertex_count += 4;
-	}
-
-	if (shouldRenderFace(block_id, block_type, { block_pos.x - 1, block_pos.y, block_pos.z })) {
-		glm::vec3 verts[4] = {
-			base_pos + glm::vec3(0.0f, 0.0f, 0.0f),
-			base_pos + glm::vec3(0.0f, 0.0f, 1.0f),
-			base_pos + glm::vec3(0.0f, height, 1.0f),
-			base_pos + glm::vec3(0.0f, height, 0.0f)
-		};
-		glm::vec2 uv_coords[4] = {
-			{side_uv.uv[0].x, side_uv.uv[0].y},
-			{side_uv.uv[1].x, side_uv.uv[1].y},
-			{side_uv.uv[2].x, side_uv.uv[0].y + (side_uv.uv[2].y - side_uv.uv[0].y) * height},
-			{side_uv.uv[3].x, side_uv.uv[0].y + (side_uv.uv[3].y - side_uv.uv[0].y) * height}
-		};
-		for (int i = 0; i < 4; i++) {
-			mesh->addVertex(verts[i], { -1, 0, 0 }, uv_coords[i]);
-		}
-		mesh->addTriangle(vertex_count + 0, vertex_count + 1, vertex_count + 2);
-		mesh->addTriangle(vertex_count + 2, vertex_count + 3, vertex_count + 0);
-	}
-}
-
 bool MeshGenerator::shouldRenderFace(BlockID current_block_id, BlockType current_block_type, glm::ivec3 neighbor_position) const {
 	if (neighbor_position.y < 0 || neighbor_position.y >= ChunkStorage::getSizeY()) {
 		return true;
@@ -443,8 +158,142 @@ bool MeshGenerator::shouldRenderFace(BlockID current_block_id, BlockType current
 }
 
 bool MeshGenerator::isBlockTransparent(glm::ivec3 block_position) const {
-	return shouldRenderFace(BlockID::STONE, BlockType::OPAQUE, block_position);
+	if (block_position.y < 0 || block_position.y >= ChunkStorage::getSizeY()) {
+		return true;
+	}
+
+	BlockID neighbor_block = BlockID::EMPTY;
+	ChunkStorage* target_chunk = nullptr;
+	glm::ivec3 local_pos = block_position;
+
+	if (block_position.x < 0) {
+		target_chunk = m_neighbor_x_minus;
+		local_pos.x = ChunkStorage::getSizeX() + block_position.x;
+	}
+	else if (block_position.x >= ChunkStorage::getSizeX()) {
+		target_chunk = m_neighbor_x_plus;
+		local_pos.x = block_position.x - ChunkStorage::getSizeX();
+	}
+	else if (block_position.z < 0) {
+		target_chunk = m_neighbor_z_minus;
+		local_pos.z = ChunkStorage::getSizeZ() + block_position.z;
+	}
+	else if (block_position.z >= ChunkStorage::getSizeZ()) {
+		target_chunk = m_neighbor_z_plus;
+		local_pos.z = block_position.z - ChunkStorage::getSizeZ();
+	}
+	else {
+		target_chunk = m_storage;
+	}
+
+	if (target_chunk == nullptr) {
+		return true;
+	}
+
+	if (local_pos.x < 0 || local_pos.x >= ChunkStorage::getSizeX() ||
+		local_pos.y < 0 || local_pos.y >= ChunkStorage::getSizeY() ||
+		local_pos.z < 0 || local_pos.z >= ChunkStorage::getSizeZ()) {
+		return true;
+	}
+
+	neighbor_block = target_chunk->getBlockUnsafe(local_pos)->getBlockID();
+
+	BlockInfo block_info = GetBlockInfo(neighbor_block);
+	BlockType neighbor_type = block_info.block_type;
+
+	return neighbor_type != BlockType::OPAQUE;
 }
+
+uint8_t MeshGenerator::calculateVertexAO(
+	glm::ivec3 block_pos,
+	glm::ivec3 side1,
+	glm::ivec3 side2,
+	glm::ivec3 corner) const {
+
+	glm::ivec3 pos1 = block_pos + side1;
+	glm::ivec3 pos2 = block_pos + side2;
+	glm::ivec3 pos_corner = block_pos + corner;
+
+	bool side1_opaque = !isBlockTransparent(pos1);
+	bool side2_opaque = !isBlockTransparent(pos2);
+	bool corner_opaque = !isBlockTransparent(pos_corner);
+
+	if (side1_opaque && side2_opaque) {
+		return 0;
+	}
+
+	int opaque_count = side1_opaque + side2_opaque + corner_opaque;
+
+	return 3 - opaque_count;
+}
+
+std::array<uint8_t, 4> MeshGenerator::calculateFaceAO(
+	glm::ivec3 block_pos,
+	BlockSide side) const {
+
+	using sides_and_corners_t = std::array<glm::ivec3, 3>;
+	using aos_param_per_block_side_t = std::array<sides_and_corners_t, 4>;
+
+	static const std::array<aos_param_per_block_side_t, 6> BLOCK_AO_PARAMS = { {
+		// TOP
+		{{
+			{ glm::ivec3(-1, 1, 0), glm::ivec3(0, 1, 1), glm::ivec3(-1, 1, 1) },
+			{ glm::ivec3(1, 1, 0), glm::ivec3(0, 1, 1), glm::ivec3(1, 1, 1) },
+			{ glm::ivec3(1, 1, 0), glm::ivec3(0, 1, -1), glm::ivec3(1, 1, -1) },
+			{ glm::ivec3(-1, 1, 0), glm::ivec3(0, 1, -1), glm::ivec3(-1, 1, -1) }
+		}},
+		// BOTTOM
+		{{
+			{ glm::ivec3(-1, -1, 0), glm::ivec3(0, -1, -1), glm::ivec3(-1, -1, -1) },
+			{ glm::ivec3(1, -1, 0), glm::ivec3(0, -1, -1), glm::ivec3(1, -1, -1) },
+			{ glm::ivec3(1, -1, 0), glm::ivec3(0, -1, 1), glm::ivec3(1, -1, 1) },
+			{ glm::ivec3(-1, -1, 0), glm::ivec3(0, -1, 1), glm::ivec3(-1, -1, 1) }
+		}},
+		// LEFT
+		{{
+			{ glm::ivec3(-1, -1, 0), glm::ivec3(-1, 0, -1), glm::ivec3(-1, -1, -1) },
+			{ glm::ivec3(-1, -1, 0), glm::ivec3(-1, 0, 1), glm::ivec3(-1, -1, 1) },
+			{ glm::ivec3(-1, 1, 0), glm::ivec3(-1, 0, 1), glm::ivec3(-1, 1, 1) },
+			{ glm::ivec3(-1, 1, 0), glm::ivec3(-1, 0, -1), glm::ivec3(-1, 1, -1) }
+		}},
+		// RIGHT
+		{{
+			{ glm::ivec3(1, -1, 0), glm::ivec3(1, 0, 1), glm::ivec3(1, -1, 1) },
+			{ glm::ivec3(1, -1, 0), glm::ivec3(1, 0, -1), glm::ivec3(1, -1, -1) },
+			{ glm::ivec3(1, 1, 0), glm::ivec3(1, 0, -1), glm::ivec3(1, 1, -1) },
+			{ glm::ivec3(1, 1, 0), glm::ivec3(1, 0, 1), glm::ivec3(1, 1, 1) }
+		}},
+		// FRONT
+		{{
+			{ glm::ivec3(-1, 0, 1), glm::ivec3(0, -1, 1), glm::ivec3(-1, -1, 1) },
+			{ glm::ivec3(1, 0, 1), glm::ivec3(0, -1, 1), glm::ivec3(1, -1, 1) },
+			{ glm::ivec3(1, 0, 1), glm::ivec3(0, 1, 1), glm::ivec3(1, 1, 1) },
+			{ glm::ivec3(-1, 0, 1), glm::ivec3(0, 1, 1), glm::ivec3(-1, 1, 1) }
+		}},
+		// BACK
+		{{
+			{ glm::ivec3(1, 0, -1), glm::ivec3(0, -1, -1), glm::ivec3(1, -1, -1) },
+			{ glm::ivec3(-1, 0, -1), glm::ivec3(0, -1, -1), glm::ivec3(-1, -1, -1) },
+			{ glm::ivec3(-1, 0, -1), glm::ivec3(0, 1, -1), glm::ivec3(-1, 1, -1) },
+			{ glm::ivec3(1, 0, -1), glm::ivec3(0, 1, -1), glm::ivec3(1, 1, -1) }
+		}}
+	} };
+
+	const aos_param_per_block_side_t& block_params = BLOCK_AO_PARAMS[std::to_underlying(side)];
+
+	std::array<uint8_t, 4> aos;
+	for (int i = 0; i < 4; i++) {
+		aos[i] = calculateVertexAO(
+			block_pos,
+			block_params[i][0],
+			block_params[i][1],
+			block_params[i][2]
+		);
+	}
+
+	return aos;
+}
+
 
 void MeshGenerator::addBlockFace(
 	Mesh* mesh,
@@ -459,6 +308,8 @@ void MeshGenerator::addBlockFace(
 	const auto vertices = CUBE_VERTICES[side_index];
 	const glm::vec3& normal = FACE_NORMALS[block_side];
 
+	std::array<uint8_t, 4> aos = calculateFaceAO(glm::ivec3(block_position), block_side);
+
 	for (int i = 0; i < 4; i++) {
 		glm::vec3 position = {
 			block_position.x + vertices[i * 3 + 0],
@@ -469,10 +320,20 @@ void MeshGenerator::addBlockFace(
 		mesh->addVertex(
 			position,
 			normal,
-			{ face_uv.uv[i].x, face_uv.uv[i].y }
+			{ face_uv.uv[i].x, face_uv.uv[i].y },
+			Light(),
+			aos[i]
 		);
 	}
 
-	mesh->addTriangle(vertex_count + 0, vertex_count + 1, vertex_count + 2);
-	mesh->addTriangle(vertex_count + 2, vertex_count + 3, vertex_count + 0);
+	bool flip = (aos[0] + aos[2]) > (aos[1] + aos[3]);
+
+	if (flip) {
+		mesh->addTriangle(vertex_count + 0, vertex_count + 1, vertex_count + 3);
+		mesh->addTriangle(vertex_count + 1, vertex_count + 2, vertex_count + 3);
+	}
+	else {
+		mesh->addTriangle(vertex_count + 0, vertex_count + 1, vertex_count + 2);
+		mesh->addTriangle(vertex_count + 2, vertex_count + 3, vertex_count + 0);
+	}
 }

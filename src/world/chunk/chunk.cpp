@@ -123,10 +123,12 @@ void Chunk::drawOpaque() {
 }
 
 void Chunk::drawCutout() {
+	if (m_ready_gpu.ready) uploadMeshToGPU();
 	m_mesh_renderer_cutout->draw();
 }
 
 void Chunk::drawTransparent() {
+	if (m_ready_gpu.ready) uploadMeshToGPU();
 	m_mesh_renderer_transparent->draw();
 }
 

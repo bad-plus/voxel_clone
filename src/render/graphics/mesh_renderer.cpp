@@ -43,7 +43,7 @@ void MeshRenderer::draw() const {
 }
 
 void MeshRenderer::setupVertexAttributes() const {
-	constexpr GLsizei VERTEX_SIZE = ((8 * sizeof(GLfloat)) + (2 * sizeof(GL_UNSIGNED_BYTE)));
+	constexpr GLsizei VERTEX_SIZE = 10 * sizeof(GLfloat);
 
 	glBindVertexArray(m_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
@@ -61,12 +61,12 @@ void MeshRenderer::setupVertexAttributes() const {
 	glEnableVertexAttribArray(2);
 
 	// Light attribute
-	glVertexAttribPointer(3, 1, GL_UNSIGNED_BYTE, GL_FALSE, VERTEX_SIZE, (GLvoid*)(8 * sizeof(GLfloat)));
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (GLvoid*)(8 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(3);
 
 	// AO attribute
-	glVertexAttribPointer(4, 1, GL_UNSIGNED_BYTE, GL_FALSE, VERTEX_SIZE, (GLvoid*)(6 * sizeof(GLfloat) + sizeof(GL_UNSIGNED_BYTE)));
+	glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, VERTEX_SIZE, (GLvoid*)(9 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(4);
-
+	 
 	glBindVertexArray(0);
 }

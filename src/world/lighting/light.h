@@ -26,6 +26,10 @@ public:
 
 	light_t getData() const { return m_data; }
 	void setData(light_t data) { m_data = data; }
+
+	static light_t const getLightData(int r, int g, int b, int s = 0) {
+		return (r & 0xF) | ((g & 0xF) << 4) | ((b & 0xF) << 8) | ((s & 0xF) << 12);
+	}
 private:
 	light_t m_data = 0;
 };

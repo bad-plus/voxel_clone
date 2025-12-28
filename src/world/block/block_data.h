@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <glm/glm.hpp>
+#include "../lighting/light.h"
 
 enum class BlockType {
 	OPAQUE = 0,
