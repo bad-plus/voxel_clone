@@ -1,19 +1,27 @@
 #version 330 core
-
 in vec2 TexCoord;
-in float vLight;
+flat in uint vLight;
 in float vAO;
-
 out vec4 color;
-
 uniform sampler2D ourTexture1;
+uniform vec3 sunColor;
 
 void main() {
-	float aoFactor = (vAO / 3.0);
-	aoFactor = 0.4 + 0.6 * aoFactor; 
+	uint r = (vLight      ) & 0xFu;
+	uint g = (vLight >> 4 ) & 0xFu;
+	uint b = (vLight >> 8 ) & 0xFu;
+	uint s = (vLight >> 12) & 0xFu;
+	
+	vec3 blockLight = vec3(float(r), float(g), float(b)) / 15.0;
+	float sunIntensity = float(s) / 15.0;
+	vec3 sunLight = sunColor * sunIntensity;
+	
+	float aoFactor = mix(0.6, 1.0, vAO / 3.0);
+	vec3 finalLight = blockLight + sunLight * aoFactor;
+	
 	vec4 tex = texture(ourTexture1, TexCoord);
 	if(tex.a < 0.5)
 		discard;
-    vec4 pre_color = tex;
-	color = pre_color * aoFactor;
+	
+	color = tex * vec4(finalLight, 1.0);
 }

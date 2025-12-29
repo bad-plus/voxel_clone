@@ -100,18 +100,24 @@ std::vector<std::pair<int, int>> genCircleReady(int cx, int cz, int radius) {
 void Render::renderWorld(World* world, int render_dist) {
 	if (world == nullptr) return;
 	ECS* ecs = world->getECS();
+	
+	glm::vec3 sun_color = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	Shader* world_block_shader_normal = m_resources->getShader("block_shader_normal");
 	if (world_block_shader_normal == nullptr) {
 		LOG_WARN("BLOCK SHADER NOT LOADED! {0}", (void*)world_block_shader_normal);
 		return;
 	}
+	world_block_shader_normal->use();
+	world_block_shader_normal->uniformVec3("sunColor", sun_color.r, sun_color.g, sun_color.b);
 
 	Shader* world_block_shader_cutout = m_resources->getShader("block_shader_cutout");
 	if (world_block_shader_cutout == nullptr) {
 		LOG_WARN("BLOCK SHADER NOT LOADED! {0}", (void*)world_block_shader_cutout);
 		return;
 	}
+	world_block_shader_cutout->use();
+	world_block_shader_cutout->uniformVec3("sunColor", sun_color.r, sun_color.g, sun_color.b);
 
 	TextureAtlas* atlas = m_resources->getTextureAtlas();
 

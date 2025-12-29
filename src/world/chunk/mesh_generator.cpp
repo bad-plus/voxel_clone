@@ -6,7 +6,7 @@
 ChunkMesh MeshGenerator::generateMesh(
 	ChunkStorage* storage,
 	ChunkStorage* neighbor_x_plus,
-	ChunkStorage* neighbor_z_plus,
+	ChunkStorage* neighbor_z_plus, 
 	ChunkStorage* neighbor_x_minus,
 	ChunkStorage* neighbor_z_minus) {
 
@@ -160,7 +160,7 @@ bool MeshGenerator::shouldRenderFace(BlockID current_block_id, BlockType current
 bool MeshGenerator::isBlockTransparent(glm::ivec3 block_position) const {
 	if (block_position.y < 0 || block_position.y >= ChunkStorage::getSizeY()) {
 		return true;
-	}
+	} 
 
 	BlockID neighbor_block = BlockID::EMPTY;
 	ChunkStorage* target_chunk = nullptr;
@@ -222,9 +222,9 @@ uint8_t MeshGenerator::calculateVertexAO(
 		return 0;
 	}
 
-	int opaque_count = side1_opaque + side2_opaque + corner_opaque;
+	int opaque_count = (side1_opaque + side2_opaque + corner_opaque);
 
-	return 3 - opaque_count;
+	return (3 - opaque_count);
 }
 
 std::array<uint8_t, 4> MeshGenerator::calculateFaceAO(
@@ -236,7 +236,7 @@ std::array<uint8_t, 4> MeshGenerator::calculateFaceAO(
 
 	static const std::array<aos_param_per_block_side_t, 6> BLOCK_AO_PARAMS = { {
 		// TOP
-		{{
+		{{ 
 			{ glm::ivec3(-1, 1, 0), glm::ivec3(0, 1, 1), glm::ivec3(-1, 1, 1) },
 			{ glm::ivec3(1, 1, 0), glm::ivec3(0, 1, 1), glm::ivec3(1, 1, 1) },
 			{ glm::ivec3(1, 1, 0), glm::ivec3(0, 1, -1), glm::ivec3(1, 1, -1) },
@@ -295,7 +295,7 @@ std::array<uint8_t, 4> MeshGenerator::calculateFaceAO(
 }
 
 
-void MeshGenerator::addBlockFace(
+void MeshGenerator::addBlockFace( 
 	Mesh* mesh,
 	glm::vec3 block_position,
 	BlockSide block_side,
@@ -317,12 +317,15 @@ void MeshGenerator::addBlockFace(
 			block_position.z + vertices[i * 3 + 2]
 		};
 
-		mesh->addVertex(
+		Light light;
+		light.set(0, 0, 0, 15);
+
+		mesh->addVertex( 
 			position,
 			normal,
 			{ face_uv.uv[i].x, face_uv.uv[i].y },
-			Light(),
-			aos[i]
+			light,
+			aos[i] 
 		);
 	}
 

@@ -42,5 +42,7 @@ struct BlockInfo {
 	bool is_solid_surface = true;
 	bool block_movement = true;
 	float layer_height = 0.125f;
+	bool lamp = false;
+	light_t lamp_color = 0;
 	BlockTexture texture = {};
 };

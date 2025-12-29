@@ -7,13 +7,13 @@ layout (location = 3) in float aLight;
 layout (location = 4) in float aAO;
 
 out vec2 TexCoord;
-out float vLight;
+flat out uint vLight;
 out float vAO;
 
 uniform mat4 transform;
 
 void main() {
-	vLight = aLight;
+	vLight = floatBitsToUint(aLight);
 	vAO = aAO;
 
     gl_Position = transform * vec4(aPosition, 1.0);

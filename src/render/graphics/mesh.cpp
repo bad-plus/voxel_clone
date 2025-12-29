@@ -59,9 +59,9 @@ std::vector<GLfloat> Mesh::getRawVertices() const {
 		vertices.push_back(vertex.normal.z);
 
 		vertices.push_back(vertex.tex_coord.x);
-		vertices.push_back(vertex.tex_coord.y);
+		vertices.push_back(vertex.tex_coord.y); 
 
-		vertices.push_back(vertex.light.getData());
+		vertices.push_back(vertex.light.getAsFloat());
 		vertices.push_back(vertex.ao);
 	}
 

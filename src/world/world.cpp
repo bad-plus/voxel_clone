@@ -274,7 +274,7 @@ void World::setBlock(int world_x, int world_y, int world_z, BlockID block_id) {
 Entity World::CreatePlayer() {
     ECS* ecs = getECS();
     Entity entity = ecs->create();
-    ecs->storage<Transform>().add(entity, { {0.0f, 250.0f, 0.0f}, {0.0f, 0.0f, 0.0f} });
+    ecs->storage<Transform>().add(entity, { {0.0f, 350.0f, 0.0f}, {0.0f, 0.0f, 0.0f} });
     ecs->storage<Velocity>().add(entity, { 0.0f, 0.0f, 0.0f });
     ecs->storage<Camera>().add(entity, Camera());
 	ecs->storage<PlayerControlledCamera>().add(entity, {});

@@ -91,6 +91,15 @@ void Shader::uniformVec4(const char* form_name, float rx, float gy, float bz, fl
     glUniform4f(form_location, rx, gy, bz, aw);
 }
 
+void Shader::uniformVec3(const char* form_name, float rx, float gy, float bz) const {
+	GLint form_location = glGetUniformLocation(m_shader_program, form_name);
+	if (form_location == -1) {
+		LOG_WARN("bad request to update shader uniform ({0})", form_name);
+		return;
+	}
+	glUniform3f(form_location, rx, gy, bz);
+}
+
 void Shader::uniformi1(const char* form_name, int data) const {
     GLint form_location = glGetUniformLocation(m_shader_program, form_name);
     if(form_location == -1) {

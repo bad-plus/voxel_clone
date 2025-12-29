@@ -62,12 +62,18 @@ inline std::array<BlockInfo, std::to_underlying(BlockID::COUNT)> BlocksInfo = {
 		};
 		data[std::to_underlying(BlockID::RED)] = {
 			.name = "red",
+			.lamp = true,
+			.lamp_color = Light::getColorData(15, 0, 0)
 		};
-		data[std::to_underlying(BlockID::GREEN)] = { 
+		data[std::to_underlying(BlockID::GREEN)] = {
 			.name = "green",
+			.lamp = true,
+			.lamp_color = Light::getColorData(0, 15, 0)
 		};
 		data[std::to_underlying(BlockID::BLUE)] = { 
 			.name = "blue",
+			.lamp = true,
+			.lamp_color = Light::getColorData(0, 0, 15)
 		};
 		data[std::to_underlying(BlockID::GRAY)] = { 
 			.name = "gray",
