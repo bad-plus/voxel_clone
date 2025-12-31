@@ -15,6 +15,13 @@
 
 struct Chunk;
 
+struct ChunkCoord {
+	int x;
+	int z;
+
+	ChunkCoord(int x_, int z_) : x(x_), z(z_) {}
+};
+
 class Chunk {
 public:
 	Chunk();

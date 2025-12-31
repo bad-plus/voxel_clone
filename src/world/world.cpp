@@ -5,6 +5,8 @@
 #include <GLFW/glfw3.h>
 #include "generation/world_generator.h"
 #include <thread>
+#include <algorithm>
+#include <vector>
 #include "../ecs/core/ecs.h"
 
 #include "../ecs/systems/player_camera_system.h"
@@ -12,6 +14,8 @@
 #include "../ecs/systems/player_movement_system.h"
 #include "../ecs/systems/gravity_system.h"
 #include "../ecs/systems/camera_update_system.h"
+#include "world/world_event_manager.h"
+#include "world/world_event_list.h"
 
 static constexpr long long pack_chunk_coords(int x, int z) {
     return ((long long)(x & 0xFFFFFFFF)) | ((long long)(z & 0xFFFFFFFF) << 32);
@@ -38,6 +42,7 @@ World::World(WorldGenerator* generator) {
     m_ecs.world_collision_system = std::make_unique<WorldCollisionSystem>();
     m_ecs.gravity_system = std::make_unique<GravitySystem>();
     m_ecs.player_movement_system = std::make_unique<PlayerMovementSystem>();
+    m_event_manager = std::make_unique<WorldEventManager>();
 }
 
 World::~World() {
@@ -65,8 +70,6 @@ ChunkInfo* World::createChunk(int x, int z) {
     chunk_info->chunk = new Chunk;
 
     m_chunks[chunk_index] = chunk_info;
-
-    pushGenerationQueue(chunk_info);
     return chunk_info;
 }
 ChunkInfo* World::getChunkProtected(int x, int z) {
@@ -89,111 +92,12 @@ Chunk* World::getChunk(int x, int z, bool create) {
     }
 
     chunk_info = createChunk(x, z);
+    ChunkCoord coord = { x, z };
+    addEvent(
+        std::make_unique<GenerateChunkEvent>(coord)
+	);
+
     return chunk_info->chunk;
-}
-
-void World::pushGenerationQueue(ChunkInfo* chunk_info) {
-    if (chunk_info == nullptr) return;
-
-    std::lock_guard<std::mutex> lock(m_generation_queue_mtx);
-
-    for (const auto& iter : m_generation_queue) {
-        if (iter->x == chunk_info->x && iter->z == chunk_info->z) return;
-    }
-
-    m_generation_queue.push_back(chunk_info);
-}
-
-ChunkInfo* World::pullGenerationQueue() {
-    std::lock_guard<std::mutex> lock(m_generation_queue_mtx);
-    if (m_generation_queue.empty()) return nullptr;
-
-    ChunkInfo* chunk_info = m_generation_queue.front();
-    m_generation_queue.pop_front();
-    return chunk_info;
-}
-
-void World::pushToChunks(ChunkInfo* chunk_info) {
-    if (chunk_info == nullptr) return;
-    pushUpdateMeshQueue(chunk_info);
-}
-
-void World::processGenerationQueue() {
-    ChunkInfo* chunk_info = pullGenerationQueue();
-    if (chunk_info == nullptr) return;
-
-    int x = chunk_info->x;
-    int z = chunk_info->z;
-
-
-    m_generator->generateChunk(chunk_info->chunk, x, z);
-    pushToChunks(chunk_info);
-
-    {
-        std::lock_guard<std::mutex> lock(m_chunks_mutex);
-
-        auto it_xm = m_chunks.find(pack_chunk_coords(x - 1, z));
-        auto it_zm = m_chunks.find(pack_chunk_coords(x, z - 1));
-        auto it_xp = m_chunks.find(pack_chunk_coords(x + 1, z));
-        auto it_zp = m_chunks.find(pack_chunk_coords(x, z + 1));
-
-        if (it_xm != m_chunks.end()) {
-            ChunkInfo* x_m = it_xm->second;
-            x_m->chunk->updateNeighbors(chunk_info->chunk, nullptr, nullptr, nullptr);
-            chunk_info->chunk->updateNeighbors(nullptr, nullptr, x_m->chunk, nullptr);
-            pushUpdateMeshQueue(x_m);
-        }
-
-        if (it_zm != m_chunks.end()) {
-            ChunkInfo* z_m = it_zm->second;
-            z_m->chunk->updateNeighbors(nullptr, chunk_info->chunk, nullptr, nullptr);
-            chunk_info->chunk->updateNeighbors(nullptr, nullptr, nullptr, z_m->chunk);
-            pushUpdateMeshQueue(z_m);
-        }
-
-        if (it_xp != m_chunks.end()) {
-            ChunkInfo* x_p = it_xp->second;
-            x_p->chunk->updateNeighbors(nullptr, nullptr, chunk_info->chunk, nullptr);
-            chunk_info->chunk->updateNeighbors(x_p->chunk, nullptr, nullptr, nullptr);
-            pushUpdateMeshQueue(x_p);
-        }
-
-        if (it_zp != m_chunks.end()) {
-            ChunkInfo* z_p = it_zp->second;
-            z_p->chunk->updateNeighbors(nullptr, nullptr, nullptr, chunk_info->chunk);
-            chunk_info->chunk->updateNeighbors(nullptr, z_p->chunk, nullptr, nullptr);
-            pushUpdateMeshQueue(z_p);
-        }
-    }
-}
-
-void World::pushUpdateMeshQueue(ChunkInfo* chunk_info, bool priority) {
-    if (chunk_info == nullptr) return;
-
-    std::lock_guard<std::mutex> lock(m_update_mesh_queue_mutex);
-
-    for (const auto& iter : m_update_mesh_queue) {
-        if (iter->x == chunk_info->x && iter->z == chunk_info->z) return;
-    }
-    
-    if(priority) m_update_mesh_queue.push_front(chunk_info);
-    else m_update_mesh_queue.push_back(chunk_info);
-    chunk_info->chunk->markDirty();
-}
-
-ChunkInfo* World::pullUpdateMeshQueue() {
-    std::lock_guard<std::mutex> lock(m_update_mesh_queue_mutex);
-    if (m_update_mesh_queue.empty()) return nullptr;
-
-    ChunkInfo* chunk_info = m_update_mesh_queue.front();
-    m_update_mesh_queue.pop_front();
-    return chunk_info;
-}
-
-void World::processUpdateMeshQueue() {
-    ChunkInfo* chunk_info = pullUpdateMeshQueue();
-    if (chunk_info == nullptr) return;
-	chunk_info->chunk->calculateMesh();
 }
 
 static inline int floorDiv(int a, int b) {
@@ -219,56 +123,70 @@ Block* World::getBlock(int world_x, int world_y, int world_z) {
 }
 
 void World::setBlock(int world_x, int world_y, int world_z, BlockID block_id) {
-    int chunk_x = floorDiv(world_x, CHUNK_SIZE_X);
-    int chunk_z = floorDiv(world_z, CHUNK_SIZE_Z);
+	int chunk_x = floorDiv(world_x, CHUNK_SIZE_X);
+	int chunk_z = floorDiv(world_z, CHUNK_SIZE_Z);
 
-    int in_chunk_x = world_x % CHUNK_SIZE_X;
-    if (in_chunk_x < 0) in_chunk_x += CHUNK_SIZE_X;
+	int in_chunk_x = world_x % CHUNK_SIZE_X;
+	if (in_chunk_x < 0) in_chunk_x += CHUNK_SIZE_X;
 
-    int in_chunk_y = world_y;
+	int in_chunk_y = world_y;
 
-    int in_chunk_z = world_z % CHUNK_SIZE_Z;
-    if (in_chunk_z < 0) in_chunk_z += CHUNK_SIZE_Z;
+	int in_chunk_z = world_z % CHUNK_SIZE_Z;
+	if (in_chunk_z < 0) in_chunk_z += CHUNK_SIZE_Z;
 
-    ChunkInfo* chunk = getChunkProtected(chunk_x, chunk_z);
-    if (chunk == nullptr) return;
+	ChunkInfo* chunk = getChunkProtected(chunk_x, chunk_z);
+	if (chunk == nullptr) return;
 
-    Block* block = chunk->chunk->getBlock({ in_chunk_x, in_chunk_y, in_chunk_z });
-    if (block == nullptr) return;
+	Block* block = chunk->chunk->getBlock({ in_chunk_x, in_chunk_y, in_chunk_z });
+	if (block == nullptr) return;
 
-    block->setBlockID(block_id);
+	block->setBlockID(block_id);
 
-    std::lock_guard<std::mutex> lock(m_chunks_mutex);
+	chunk->chunk->markDirty();
 
-    if (in_chunk_x == 0) {
-        auto it = m_chunks.find(pack_chunk_coords(chunk_x - 1, chunk_z));
-        if (it != m_chunks.end()) {
-            pushUpdateMeshQueue(it->second, true);
-        }
-    }
+	addEvent(
+		std::make_unique<UpdateMeshEvent>(ChunkCoord(chunk_x, chunk_z))
+		, true);
 
-    if (in_chunk_x == CHUNK_SIZE_X - 1) {
-        auto it = m_chunks.find(pack_chunk_coords(chunk_x + 1, chunk_z));
-        if (it != m_chunks.end()) {
-            pushUpdateMeshQueue(it->second, true);
-        }
-    }
+	if (in_chunk_x == 0) {
+		auto chunk = getChunk(chunk_x - 1, chunk_z);
+		if (chunk != nullptr) {
+			chunk->markDirty();
+			addEvent(
+				std::make_unique<UpdateMeshEvent>(ChunkCoord(chunk_x - 1, chunk_z))
+				, true);
+		}
+	}
 
-    if (in_chunk_z == 0) {
-        auto it = m_chunks.find(pack_chunk_coords(chunk_x, chunk_z - 1));
-        if (it != m_chunks.end()) {
-            pushUpdateMeshQueue(it->second, true);
-        }
-    }
+	if (in_chunk_x == CHUNK_SIZE_X - 1) {
+		auto chunk = getChunk(chunk_x + 1, chunk_z);
+		if (chunk != nullptr) {
+			chunk->markDirty();
+			addEvent(
+				std::make_unique<UpdateMeshEvent>(ChunkCoord(chunk_x + 1, chunk_z))
+				, true);
+		}
+	}
 
-    if (in_chunk_z == CHUNK_SIZE_Z - 1) {
-        auto it = m_chunks.find(pack_chunk_coords(chunk_x, chunk_z + 1));
-        if (it != m_chunks.end()) {
-            pushUpdateMeshQueue(it->second, true);
-        }
-    }
+	if (in_chunk_z == 0) {
+		auto chunk = getChunk(chunk_x, chunk_z - 1);
+		if (chunk != nullptr) {
+			chunk->markDirty();
+			addEvent(
+				std::make_unique<UpdateMeshEvent>(ChunkCoord(chunk_x, chunk_z - 1))
+				, true);
+		}
+	}
 
-    pushUpdateMeshQueue(chunk, true);
+	if (in_chunk_z == CHUNK_SIZE_Z - 1) {
+		auto chunk = getChunk(chunk_x, chunk_z + 1);
+		if (chunk != nullptr) {
+			chunk->markDirty();
+			addEvent(
+				std::make_unique<UpdateMeshEvent>(ChunkCoord(chunk_x, chunk_z + 1))
+				, true);
+		}
+	}
 }
 
 Entity World::CreatePlayer() {
@@ -299,13 +217,12 @@ void World::tick() {
     const float tick_delta = (float)(glfwGetTime() - last_tick_time);
     ECS* ecs = m_ecs.ecs.get();
 
-	
+    m_event_manager->process(*this);
 
     last_tick_time = glfwGetTime();
 }
 
 void World::tick_movement() {
-	// Считаем delta time В НАЧАЛЕ
 	double current_time = glfwGetTime();
 	if (last_tick_time == 0) last_tick_time = current_time;
 
@@ -338,4 +255,45 @@ double World::getMeshGenerationTime() const {
     }
 
     return (all_time / all_count);
+}
+std::vector<std::pair<int, int>> genCircleReadyA(int cx, int cz, int radius) {
+	std::vector<std::pair<int, int>> out;
+
+	for (int x = -radius; x <= radius; x++) {
+		for (int z = -radius; z <= radius; z++) {
+			if (x * x + z * z <= radius * radius) {
+				out.emplace_back(cx + x, cz + z);
+			}
+		}
+	}
+
+	std::sort(out.begin(), out.end(), [cx, cz](const auto& a, const auto& b) {
+		int dist_a = (a.first - cx) * (a.first - cx) + (a.second - cz) * (a.second - cz);
+		int dist_b = (b.first - cx) * (b.first - cx) + (b.second - cz) * (b.second - cz);
+		return dist_a < dist_b;
+		});
+
+	return out;
+}
+
+void World::generateChunks(int chunk_x, int chunk_z, int radius) {
+	auto generate_list = genCircleReadyA(chunk_x, chunk_z, radius);
+
+	for (const auto& [x, z] : generate_list) {
+        getChunk(x, z, true);
+	}
+}
+
+ChunkCoord World::worldToChunkCoords(int world_x, int world_z) {
+	return { floorDiv(world_x, CHUNK_SIZE_X), floorDiv(world_z, CHUNK_SIZE_X) };
+}
+
+void World::generateChunk(int x, int z) {
+    Chunk* chunk = getChunk(x, z);
+    m_generator->generateChunk(chunk, x, z);
+}
+
+void World::addEvent(std::unique_ptr<WorldEvent> event, bool priority)
+{
+    m_event_manager->push(std::move(event), priority);
 }

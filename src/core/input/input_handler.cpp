@@ -5,6 +5,8 @@
 #include "../../world/block/block.h"
 #include "../../ui/ui.h"
 #include "../../render/camera.hpp"
+#include <memory>
+#include "../../world/world/world_event_list.h"
 
 #include <GLFW/glfw3.h>
 
@@ -110,7 +112,9 @@ void InputHandler::processing() {
 			Block* block = m_world->getBlock(pos_x, pos_y, pos_z);
 
 			if (block != nullptr && block->getBlockID() != BlockID::EMPTY) {
-				m_world->setBlock(pos_x, pos_y, pos_z, BlockID::EMPTY);
+				m_world->addEvent(
+					std::make_unique<BreakBlockEvent>(glm::ivec3(pos_x, pos_y, pos_z), m_player_entity)
+				, true);
 				break;
 			}
 
@@ -143,7 +147,9 @@ void InputHandler::processing() {
 				pos_y = (int)floor(ray_pos.y);
 				pos_z = (int)floor(ray_pos.z);
 
-				m_world->setBlock(pos_x, pos_y, pos_z, selected_block);
+				m_world->addEvent(
+					std::make_unique<SetupBlockEvent>(glm::ivec3(pos_x, pos_y, pos_z), m_player_entity, selected_block)
+				, true);
 				break;
 			}
 

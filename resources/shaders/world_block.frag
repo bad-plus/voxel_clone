@@ -20,8 +20,10 @@ void main() {
 	vec3 finalLight = blockLight + sunLight * aoFactor;
 	
 	vec4 tex = texture(ourTexture1, TexCoord);
+	
 	if(tex.a < 0.5)
 		discard;
+	
 	
 	color = tex * vec4(finalLight, 1.0);
 }

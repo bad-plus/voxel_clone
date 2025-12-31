@@ -33,7 +33,7 @@ public:
 	void run();
 private:
 	void initGLFW() const;
-	void worldGenerationThread();
+
 	void worldUpdaterThread();
 	void movementUpdaterThread();
 

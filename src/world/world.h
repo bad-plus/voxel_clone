@@ -3,8 +3,10 @@
 #include <deque>
 #include <mutex>
 #include <memory>
-#include "../world/block/block.h"
+#include "block/block.h"
 #include "../ecs/core/entity.h"
+#include "chunk/chunk.h"
+#include "world/world_event.h"
 
 struct Chunk;
 struct WorldGenerator;
@@ -14,6 +16,7 @@ struct WorldCollisionSystem;
 struct GravitySystem;
 struct CameraUpdateSystem;
 struct PlayerCameraSystem;
+struct WorldEventManager;
 
 struct ChunkInfo {
     Chunk* chunk;
@@ -28,18 +31,8 @@ public:
 
     Chunk* getChunk(int x, int z, bool create = false);
     Block* getBlock(int world_x, int world_y, int world_z);
+
     void setBlock(int world_x, int world_y, int world_z, BlockID block_id);
-
-    void pushGenerationQueue(ChunkInfo* chunk);
-    ChunkInfo* pullGenerationQueue();
-
-    void pushToChunks(ChunkInfo* chunk_info);
-
-    void processGenerationQueue();
-
-    void pushUpdateMeshQueue(ChunkInfo* chunk_info, bool priority = false);
-    ChunkInfo* pullUpdateMeshQueue();
-    void processUpdateMeshQueue();
 
     Entity CreatePlayer();
     ECS* getECS();
@@ -50,10 +43,19 @@ public:
     const WorldGenerator* getGenerator() const { return m_generator; }
 
     double getMeshGenerationTime() const;
-private:
-    ChunkInfo* getChunkProtected(int x, int z);
+
+    void generateChunks(int chunk_x, int chunk_z, int radius = 1);
+
+    static ChunkCoord worldToChunkCoords(int world_x, int world_z);
 
     ChunkInfo* createChunk(int x, int z);
+
+    void generateChunk(int x, int z);
+
+    void addEvent(std::unique_ptr<WorldEvent> event, bool priority = false);
+private:
+    
+    ChunkInfo* getChunkProtected(int x, int z);
     double m_chunk_creation_time;
 
     std::unordered_map<long long, ChunkInfo*> m_chunks;
@@ -61,11 +63,7 @@ private:
 
     WorldGenerator* m_generator;
 
-    std::deque<ChunkInfo*> m_generation_queue;
-    std::mutex m_generation_queue_mtx;
-
-    std::deque<ChunkInfo*> m_update_mesh_queue;
-    std::mutex m_update_mesh_queue_mutex;
+    std::unique_ptr<WorldEventManager> m_event_manager;
 
     struct {
         std::unique_ptr<ECS> ecs;

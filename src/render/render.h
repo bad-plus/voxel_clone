@@ -21,8 +21,6 @@ public:
     void setDebugRenderMode(bool mode);
 
     void renderWorld(World* world, int render_dist = 5);
-
-    void renderDebug();
 private:
     Window* m_window;
     ECS* m_ecs;
