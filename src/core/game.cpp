@@ -57,8 +57,6 @@ void Game::InitSystems() {
 	LOG_INFO("World seed: {0}", seed);
 
 	m_world = std::make_unique<World>(m_world_generator.get());
-	m_world->generateChunks(0, 0, 10);
-	//m_world->tick();
 
 	m_ui = std::make_unique<UI>(m_world->getECS(), m_resources.get());
 
@@ -147,6 +145,7 @@ void Game::worldUpdaterThread() {
 
 void Game::quit() {
 	m_quit.store(true);
+	if (m_world) m_world->shutdown();
     m_window->quit();
 }
 

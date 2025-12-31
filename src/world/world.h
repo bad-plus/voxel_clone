@@ -53,6 +53,8 @@ public:
     void generateChunk(int x, int z);
 
     void addEvent(std::unique_ptr<WorldEvent> event, bool priority = false);
+
+    void shutdown();
 private:
     
     ChunkInfo* getChunkProtected(int x, int z);

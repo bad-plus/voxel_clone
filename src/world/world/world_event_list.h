@@ -25,13 +25,13 @@ struct SetupBlockEvent : WorldEvent {
 struct UpdateMeshEvent : WorldEvent {
 	ChunkCoord position;
 
-	UpdateMeshEvent(ChunkCoord pos) : position(pos) {}
+	UpdateMeshEvent(ChunkCoord pos) : position(pos) { m_dont_miss = false; }
 	void apply(World& world, WorldEventManager& manager) override;
 };
 
 struct GenerateChunkEvent : WorldEvent {
 	ChunkCoord position;
 
-	GenerateChunkEvent(ChunkCoord pos) : position(pos) {}
+	GenerateChunkEvent(ChunkCoord pos) : position(pos) { m_dont_miss = false; }
 	void apply(World& world, WorldEventManager& manager) override;
 };

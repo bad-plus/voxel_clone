@@ -11,7 +11,9 @@ public:
 
 	void push(std::unique_ptr<WorldEvent> event, bool priority = false);
 	void process(World& world);
+	void shutdown() { m_exit = true; }
 private:
+	bool m_exit = false;
 
 	std::deque<std::unique_ptr<WorldEvent>> m_events;
 };

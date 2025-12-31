@@ -192,7 +192,11 @@ void World::setBlock(int world_x, int world_y, int world_z, BlockID block_id) {
 Entity World::CreatePlayer() {
     ECS* ecs = getECS();
     Entity entity = ecs->create();
-    ecs->storage<Transform>().add(entity, { {0.0f, 350.0f, 0.0f}, {0.0f, 0.0f, 0.0f} });
+
+    glm::ivec3 spawn_position = { 0, 350, 0 };
+    ChunkCoord chunk_coord = worldToChunkCoords(spawn_position.x, spawn_position.z);
+
+    ecs->storage<Transform>().add(entity, { spawn_position, {0.0f, 0.0f, 0.0f} });
     ecs->storage<Velocity>().add(entity, { 0.0f, 0.0f, 0.0f });
     ecs->storage<Camera>().add(entity, Camera());
 	ecs->storage<PlayerControlledCamera>().add(entity, {});
@@ -203,6 +207,8 @@ Entity World::CreatePlayer() {
     ecs->storage<Collider>().add(entity, {0.4f, 0.9f, 0.4f});
     ecs->storage<Mass>().add(entity, { 1.0f });
     ecs->storage<PhysicsState>().add(entity, PhysicsState());
+
+    generateChunks(chunk_coord.x, chunk_coord.z, 3);
 
     return entity;
 }
@@ -296,4 +302,9 @@ void World::generateChunk(int x, int z) {
 void World::addEvent(std::unique_ptr<WorldEvent> event, bool priority)
 {
     m_event_manager->push(std::move(event), priority);
+}
+
+void World::shutdown()
+{
+    m_event_manager->shutdown();
 }
