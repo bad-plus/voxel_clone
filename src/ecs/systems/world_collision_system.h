@@ -10,6 +10,38 @@
 #include "../../world/block/block.h"
 #include "../../world/world.h"
 #include <cmath>
+#include <glm/glm.hpp>
+
+bool checkCollisionToWorld(World* world, glm::vec3 position, Collider collider) {
+
+	int min_check_x = (int)std::floor(position.x - collider.half_x) - 1;
+	int max_check_x = (int)std::floor(position.x + collider.half_x) + 1;
+	int min_check_y = (int)std::floor(position.y - collider.half_y) - 1;
+	int max_check_y = (int)std::floor(position.y + collider.half_y) + 1;
+	int min_check_z = (int)std::floor(position.z - collider.half_z) - 1;
+	int max_check_z = (int)std::floor(position.z + collider.half_z) + 1;
+
+	for (int by = min_check_y; by <= max_check_y; by++) {
+		for (int bz = min_check_z; bz <= max_check_z; bz++) {
+			for (int bx = min_check_x; bx <= max_check_x; bx++) {
+				Block* block = world->getBlock(bx, by, bz);
+				if (block == nullptr) continue;
+
+				BlockID block_id = block->getBlockID();
+				if (block_id == BlockID::EMPTY) continue;
+
+				const BlockInfo& block_info = GetBlockInfo(block_id);
+				if (!block_info.block_movement) continue;
+
+				if (Utils::AABBvsBlock(position.x, position.y, position.z, collider, bx, by, bz)) {
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
 
 class WorldCollisionSystem {
 public:
@@ -51,99 +83,94 @@ public:
 				continue;
 			}
 
-			float new_x = trans.position.x + vel.x * dt;
-			float new_y = trans.position.y + vel.y * dt;
-			float new_z = trans.position.z + vel.z * dt;
+			if (checkCollisionToWorld(world, trans.position, col)) {
+				trans.position.y += 1.0f;
+				continue;
+			}
 
-			int min_check_x = (int)std::floor(new_x - col.half_x) - 1;
-			int max_check_x = (int)std::floor(new_x + col.half_x) + 1;
-			int min_check_y = (int)std::floor(new_y - col.half_y) - 1;
-			int max_check_y = (int)std::floor(new_y + col.half_y) + 1;
-			int min_check_z = (int)std::floor(new_z - col.half_z) - 1;
-			int max_check_z = (int)std::floor(new_z + col.half_z) + 1;
+			float delta_x = (vel.x * dt);
+			float delta_y = (vel.y * dt);
+			float delta_z = (vel.z * dt);
 
-			bool collision_x = false;
-			bool collision_y = false;
-			bool collision_z = false;
-			phys.on_ground = false;
+			// X
+			while (delta_x != 0.0f) {
+				float current_delta = 0.0f;
 
+				if (delta_x > 1.0f) {
+					current_delta = 1.0f;
+					delta_x -= 1.0f;
+				}
+				else {
+					current_delta = delta_x;
+					delta_x = 0.0f;
+				}
 
-			for (int by = min_check_y; by <= max_check_y; by++) {
-				for (int bz = min_check_z; bz <= max_check_z; bz++) {
-					for (int bx = min_check_x; bx <= max_check_x; bx++) {
-						Block* block = world->getBlock(bx, by, bz);
-						if (block == nullptr) continue;
+				float current_x = trans.position.x + current_delta;
 
-						BlockID block_id = block->getBlockID();
-						if (block_id == BlockID::EMPTY) continue;
+				bool collision_x = checkCollisionToWorld(world, { current_x, trans.position.y, trans.position.z }, col);
+				if (!collision_x) trans.position.x = current_x;
+			}
+			
+			// Y
+			bool was_moving_down = delta_y < 0.0f;
+			bool hit_ground_this_frame = false;
 
-						const BlockInfo& block_info = GetBlockInfo(block_id);
-						if (!block_info.is_solid_surface) continue;
+			while (delta_y != 0.0f) {
+				float current_delta = 0.0f;
 
-						if (Utils::AABBvsBlock(new_x, trans.position.y, trans.position.z, col, bx, by, bz)) {
-							collision_x = true;
-							vel.x = 0.0f;
-							new_x = trans.position.x;
-						}
+				if (delta_y > 1.0f) {
+					current_delta = 1.0f;
+					delta_y -= 1.0f;
+				}
+				else if (delta_y < -1.0f) {
+					current_delta = -1.0f;
+					delta_y += 1.0f;
+				}
+				else {
+					current_delta = delta_y;
+					delta_y = 0.0f;
+				}
+
+				float current_y = trans.position.y + current_delta;
+
+				bool collision_y = checkCollisionToWorld(world, { trans.position.x, current_y, trans.position.z }, col);
+				if (!collision_y) {
+					trans.position.y = current_y;
+				}
+				else {
+					if (was_moving_down && current_delta < 0) {
+						hit_ground_this_frame = true;
+						vel.y = 0.0f;
 					}
 				}
 			}
 
-			for (int bx = min_check_x; bx <= max_check_x; bx++) {
-				for (int bz = min_check_z; bz <= max_check_z; bz++) {
-					for (int by = min_check_y; by <= max_check_y; by++) {
-						Block* block = world->getBlock(bx, by, bz);
-						if (block == nullptr) continue;
-
-						BlockID block_id = block->getBlockID();
-						if (block_id == BlockID::EMPTY) continue;
-
-						const BlockInfo& block_info = GetBlockInfo(block_id);
-						if (!block_info.is_solid_surface) continue;
-
-						if (Utils::AABBvsBlock(new_x, new_y, trans.position.z, col, bx, by, bz)) {
-							collision_y = true;
-
-							if (vel.y < 0.0f) {
-								phys.on_ground = true;
-								trans.position.y = (float)(by + 1) + col.half_y;
-								new_y = trans.position.y;
-							}
-							else if (vel.y > 0.0f) {
-								trans.position.y = (float)by - col.half_y;
-								new_y = trans.position.y;
-							}
-
-							vel.y = 0.0f;
-						}
-					}
-				}
+			if (hit_ground_this_frame) {
+				phys.on_ground = true;
+			}
+			else if (!hit_ground_this_frame && delta_y == 0.0f && vel.y <= 0.0f) {
+				phys.on_ground = checkCollisionToWorld(world,
+					{ trans.position.x, trans.position.y - 0.01f, trans.position.z }, col);
 			}
 
-			for (int by = min_check_y; by <= max_check_y; by++) {
-				for (int bx = min_check_x; bx <= max_check_x; bx++) {
-					for (int bz = min_check_z; bz <= max_check_z; bz++) {
-						Block* block = world->getBlock(bx, by, bz);
-						if (block == nullptr) continue;
+			// Z
+			while (delta_z != 0.0f) {
+				float current_delta = 0.0f;
 
-						BlockID block_id = block->getBlockID();
-						if (block_id == BlockID::EMPTY) continue;
-
-						const BlockInfo& block_info = GetBlockInfo(block_id);
-						if (!block_info.is_solid_surface) continue;
-
-						if (Utils::AABBvsBlock(new_x, new_y, new_z, col, bx, by, bz)) {
-							collision_z = true;
-							vel.z = 0.0f;
-							new_z = trans.position.z;
-						}
-					}
+				if (delta_z > 1.0f) {
+					current_delta = 1.0f;
+					delta_z -= 1.0f;
 				}
-			}
+				else {
+					current_delta = delta_z;
+					delta_z = 0.0f;
+				}
 
-			trans.position.x = new_x;
-			trans.position.y = new_y;
-			trans.position.z = new_z;
+				float current_z = trans.position.z + current_delta;
+
+				bool collision_z = checkCollisionToWorld(world, { trans.position.x, trans.position.y, current_z }, col);
+				if (!collision_z) trans.position.z = current_z;
+			}
 		}
 	}
 };

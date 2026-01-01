@@ -11,6 +11,9 @@
 #include <glm/glm.hpp>
 #include <cmath>
 
+constexpr float DEFAULT_PLAYER_HEIGHT = 0.9f;
+constexpr float SNEAK_PLAYER_HEIGHT = 0.8f;
+
 class PlayerMovementSystem {
 public:
 	void update(ECS& ecs, World* world) const {
@@ -30,9 +33,9 @@ public:
 			glm::vec3 right = cam.right;
 
 			if (inp.sneak) {
-				col.half_y = 0.8f;
+				col.half_y = SNEAK_PLAYER_HEIGHT;
 			}
-			else col.half_y = 0.9f;
+			else col.half_y = DEFAULT_PLAYER_HEIGHT;
 
 			float speed = (st.mode == PlayerMode::SURVIVAL) ? 8.0f : (15.0f * inp.fly_speedup);
 

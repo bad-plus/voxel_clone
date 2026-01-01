@@ -19,7 +19,6 @@
 
 static constexpr long long pack_chunk_coords(int x, int z) {
     return ((long long)(x & 0xFFFFFFFF)) | ((long long)(z & 0xFFFFFFFF) << 32);
-    return ((long long)(x & 0xFFFFFFFF)) | ((long long)(z & 0xFFFFFFFF) << 32);
 }
 
 static constexpr int unpack_chunk_x(long long key) {
@@ -42,6 +41,7 @@ World::World(WorldGenerator* generator) {
     m_ecs.world_collision_system = std::make_unique<WorldCollisionSystem>();
     m_ecs.gravity_system = std::make_unique<GravitySystem>();
     m_ecs.player_movement_system = std::make_unique<PlayerMovementSystem>();
+
     m_event_manager = std::make_unique<WorldEventManager>();
 }
 
@@ -72,6 +72,7 @@ ChunkInfo* World::createChunk(int x, int z) {
     m_chunks[chunk_index] = chunk_info;
     return chunk_info;
 }
+
 ChunkInfo* World::getChunkProtected(int x, int z) {
     std::lock_guard<std::mutex> lock(m_chunks_mutex);
     const long long chunk_index = pack_chunk_coords(x, z);
@@ -193,7 +194,7 @@ Entity World::CreatePlayer() {
     ECS* ecs = getECS();
     Entity entity = ecs->create();
 
-    glm::ivec3 spawn_position = { 0, 350, 0 };
+    glm::ivec3 spawn_position = { 0, 0, 0 };
     ChunkCoord chunk_coord = worldToChunkCoords(spawn_position.x, spawn_position.z);
 
     ecs->storage<Transform>().add(entity, { spawn_position, {0.0f, 0.0f, 0.0f} });
