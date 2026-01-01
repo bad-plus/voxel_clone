@@ -19,7 +19,7 @@
 #include <random>
 #include <memory>
 
-constexpr int WORLD_MOVEMENT_TICKRATE = 60;
+constexpr int WORLD_MOVEMENT_TICKRATE = 90;
 constexpr int WORLD_UPDATER_TICKRATE = 24;
 
 Game::Game() {

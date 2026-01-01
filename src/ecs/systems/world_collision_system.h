@@ -13,6 +13,88 @@
 #include <glm/glm.hpp>
 
 class WorldCollisionSystem {
+private:
+	const float CHECK_MOVE_STEP = 1.0f;
+
+	bool handleStuckInBlock(World* world, glm::vec3& position, const Collider& collider) {
+		if (Utils::checkCollisionToWorld(world, position, collider)) {
+			position.y += 1.0f;
+			return true;
+		}
+		return false;
+	}
+
+	void handleAxisMovement(
+		World* world,
+		glm::vec3& position,
+		glm::vec3& velocity,
+		const Collider& collider,
+		PhysicsState* phys,
+		float& delta,
+		char axis) {
+
+		bool was_moving_down = (axis == 'y' && delta < 0.0f);
+		bool hit_ground_this_frame = false;
+
+		while (delta != 0.0f) {
+			float current_delta = 0.0f;
+
+			if (std::abs(delta) > CHECK_MOVE_STEP) {
+				current_delta = (delta > 0) ? CHECK_MOVE_STEP : -CHECK_MOVE_STEP;
+				delta -= current_delta;
+			}
+			else {
+				current_delta = delta;
+				delta = 0.0f;
+			}
+
+			glm::vec3 test_pos = position;
+
+			switch (axis) {
+			case 'x': test_pos.x += current_delta; break;
+			case 'y': test_pos.y += current_delta; break;
+			case 'z': test_pos.z += current_delta; break;
+			}
+
+			bool collision = Utils::checkCollisionToWorld(world, test_pos, collider);
+
+			if (!collision) {
+				switch (axis) {
+				case 'x': position.x = test_pos.x; break;
+				case 'y': position.y = test_pos.y; break;
+				case 'z': position.z = test_pos.z; break;
+				}
+			}
+			else {
+				switch (axis) {
+				case 'x': velocity.x = 0.0f; break;
+				case 'y':
+					velocity.y = 0.0f;
+					if (was_moving_down && current_delta < 0) {
+						hit_ground_this_frame = true;
+					}
+					break;
+				case 'z': velocity.z = 0.0f; break;
+				}
+				break;
+			}
+		}
+
+		if (axis == 'y' && phys != nullptr) {
+			if (hit_ground_this_frame) {
+				phys->on_ground = true;
+			}
+			else if (delta == 0.0f && velocity.y <= 0.0f) {
+				glm::vec3 ground_check_pos = {
+					position.x,
+					position.y - 0.01f,
+					position.z
+				};
+				phys->on_ground = Utils::checkCollisionToWorld(world, ground_check_pos, collider);
+			}
+		}
+	}
+
 public:
 	void update(ECS& ecs, float dt, World* world) {
 		if (world == nullptr) return;
@@ -25,10 +107,11 @@ public:
 			const auto& col = ecs.storage<Collider>().get(e);
 			auto& phys = ecs.storage<PhysicsState>().get(e);
 
+			glm::vec3 vel_vec = glm::vec3(vel.x, vel.y, vel.z);
+
 			bool has_player_state = ecs.storage<PlayerState>().has(e);
 			bool skip_collision = false;
 			bool is_survival = false;
-			bool wants_jump = false;
 
 			if (has_player_state) {
 				const auto& st = ecs.storage<PlayerState>().get(e);
@@ -41,7 +124,6 @@ public:
 
 				if (ecs.storage<PlayerInput>().has(e)) {
 					const auto& inp = ecs.storage<PlayerInput>().get(e);
-					wants_jump = inp.jump;
 				}
 			}
 
@@ -52,94 +134,21 @@ public:
 				continue;
 			}
 
-			if (Utils::checkCollisionToWorld(world, trans.position, col)) {
-				trans.position.y += 1.0f;
+			if (handleStuckInBlock(world, trans.position, col)) {
 				continue;
 			}
 
-			float delta_x = (vel.x * dt);
-			float delta_y = (vel.y * dt);
-			float delta_z = (vel.z * dt);
+			float delta_x = vel.x * dt;
+			float delta_y = vel.y * dt;
+			float delta_z = vel.z * dt;
 
-			// X
-			while (delta_x != 0.0f) {
-				float current_delta = 0.0f;
+			handleAxisMovement(world, trans.position, vel_vec, col, &phys, delta_x, 'x');
+			handleAxisMovement(world, trans.position, vel_vec, col, &phys, delta_z, 'z');
+			handleAxisMovement(world, trans.position, vel_vec, col, &phys, delta_y, 'y');
 
-				if (delta_x > 1.0f) {
-					current_delta = 1.0f;
-					delta_x -= 1.0f;
-				}
-				else {
-					current_delta = delta_x;
-					delta_x = 0.0f;
-				}
-
-				float current_x = trans.position.x + current_delta;
-
-				bool collision_x = Utils::checkCollisionToWorld(world, { current_x, trans.position.y, trans.position.z }, col);
-				if (!collision_x) trans.position.x = current_x;
-			}
-			
-			// Y
-			bool was_moving_down = delta_y < 0.0f;
-			bool hit_ground_this_frame = false;
-
-			while (delta_y != 0.0f) {
-				float current_delta = 0.0f;
-
-				if (delta_y > 1.0f) {
-					current_delta = 1.0f;
-					delta_y -= 1.0f;
-				}
-				else if (delta_y < -1.0f) {
-					current_delta = -1.0f;
-					delta_y += 1.0f;
-				}
-				else {
-					current_delta = delta_y;
-					delta_y = 0.0f;
-				}
-
-				float current_y = trans.position.y + current_delta;
-
-				bool collision_y = Utils::checkCollisionToWorld(world, { trans.position.x, current_y, trans.position.z }, col);
-				if (!collision_y) {
-					trans.position.y = current_y;
-				}
-				else {
-					if (was_moving_down && current_delta < 0) {
-						hit_ground_this_frame = true;
-						vel.y = 0.0f;
-					}
-				}
-			}
-
-			if (hit_ground_this_frame) {
-				phys.on_ground = true;
-			}
-			else if (!hit_ground_this_frame && delta_y == 0.0f && vel.y <= 0.0f) {
-				phys.on_ground = Utils::checkCollisionToWorld(world,
-					{ trans.position.x, trans.position.y - 0.01f, trans.position.z }, col);
-			}
-
-			// Z
-			while (delta_z != 0.0f) {
-				float current_delta = 0.0f;
-
-				if (delta_z > 1.0f) {
-					current_delta = 1.0f;
-					delta_z -= 1.0f;
-				}
-				else {
-					current_delta = delta_z;
-					delta_z = 0.0f;
-				}
-
-				float current_z = trans.position.z + current_delta;
-
-				bool collision_z = Utils::checkCollisionToWorld(world, { trans.position.x, trans.position.y, current_z }, col);
-				if (!collision_z) trans.position.z = current_z;
-			}
+			vel.x = vel_vec.x;
+			vel.y = vel_vec.y;
+			vel.z = vel_vec.z;
 		}
 	}
 };
