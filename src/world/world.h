@@ -11,7 +11,7 @@
 struct Chunk;
 struct WorldGenerator;
 struct ECS;
-struct PlayerMovementSystem;
+struct PlayerSystemsManager;
 struct WorldCollisionSystem;
 struct GravitySystem;
 struct CameraUpdateSystem;
@@ -70,7 +70,7 @@ private:
     struct {
         std::unique_ptr<ECS> ecs;
         std::unique_ptr<PlayerCameraSystem> player_camera_system;
-        std::unique_ptr<PlayerMovementSystem> player_movement_system;
+        std::unique_ptr<PlayerSystemsManager> player_movement_systems;
         std::unique_ptr<WorldCollisionSystem> world_collision_system;
         std::unique_ptr<GravitySystem> gravity_system;
         std::unique_ptr<CameraUpdateSystem> camera_update_system;

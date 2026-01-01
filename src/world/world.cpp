@@ -11,7 +11,7 @@
 
 #include "../ecs/systems/player_camera_system.h"
 #include "../ecs/systems/world_collision_system.h"
-#include "../ecs/systems/player_movement_system.h"
+#include "../ecs/systems/player_systems_manager.h"
 #include "../ecs/systems/gravity_system.h"
 #include "../ecs/systems/camera_update_system.h"
 #include "world/world_event_manager.h"
@@ -40,7 +40,7 @@ World::World(WorldGenerator* generator) {
     m_ecs.camera_update_system = std::make_unique<CameraUpdateSystem>();
     m_ecs.world_collision_system = std::make_unique<WorldCollisionSystem>();
     m_ecs.gravity_system = std::make_unique<GravitySystem>();
-    m_ecs.player_movement_system = std::make_unique<PlayerMovementSystem>();
+    m_ecs.player_movement_systems = std::make_unique<PlayerSystemsManager>();
 
     m_event_manager = std::make_unique<WorldEventManager>();
 }
@@ -240,7 +240,7 @@ void World::tick_movement() {
 
 	m_ecs.player_camera_system->update(*ecs);
 
-	m_ecs.player_movement_system->update(*ecs, this);
+	m_ecs.player_movement_systems->update(*ecs);
 
 	m_ecs.gravity_system->update(*ecs, delta_time);
 

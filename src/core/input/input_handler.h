@@ -1,7 +1,5 @@
 #pragma once
 #include "../../ecs/core/ecs.h"
-#include "../../ecs/systems/player_camera_system.h"
-#include "../../ecs/systems/player_movement_system.h"
 
 struct ECS;
 struct Input;
