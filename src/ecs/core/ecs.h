@@ -11,6 +11,7 @@
 #include "../components/collider.h"
 #include "../components/mass.h"
 #include "../components/physics_state.h"
+#include "../components/movement.h"
 
 #include <typeinfo>
 
@@ -28,6 +29,7 @@ public:
 		registerComponent<PhysicsState>();
 		registerComponent<PlayerControlledCamera>();
 		registerComponent<ActiveCamera>();
+		registerComponent<Movement>();
 	}
 	~ECS() {
 		for (auto& pair : m_components) {

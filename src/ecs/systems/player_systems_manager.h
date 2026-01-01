@@ -7,9 +7,9 @@
 
 class PlayerSystemsManager {
 public:
-	void update(ECS& ecs) {
-		m_collider_system.update(ecs);
-		m_survival_movement.update(ecs);
+	void update(ECS& ecs, float dt) {
+		m_collider_system.update(ecs, dt);
+		m_survival_movement.update(ecs, dt);
 		m_creative_movement.update(ecs);
 		m_spectator_movement.update(ecs);
 	}

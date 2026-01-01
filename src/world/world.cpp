@@ -208,6 +208,7 @@ Entity World::CreatePlayer() {
     ecs->storage<Collider>().add(entity, {0.4f, 0.9f, 0.4f});
     ecs->storage<Mass>().add(entity, { 1.0f });
     ecs->storage<PhysicsState>().add(entity, PhysicsState());
+    ecs->storage<Movement>().add(entity, Movement());
 
     generateChunks(chunk_coord.x, chunk_coord.z, 3);
 
@@ -240,7 +241,7 @@ void World::tick_movement() {
 
 	m_ecs.player_camera_system->update(*ecs);
 
-	m_ecs.player_movement_systems->update(*ecs);
+	m_ecs.player_movement_systems->update(*ecs, delta_time);
 
 	m_ecs.gravity_system->update(*ecs, delta_time);
 

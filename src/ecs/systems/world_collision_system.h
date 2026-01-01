@@ -6,42 +6,11 @@
 #include "../components/collider.h"
 #include "../components/player_input.h"
 #include "../components/player_mode.h"
-#include "utils/collider_vs_block.h"
+#include "utils/collider_vs_world.h"
 #include "../../world/block/block.h"
 #include "../../world/world.h"
 #include <cmath>
 #include <glm/glm.hpp>
-
-bool checkCollisionToWorld(World* world, glm::vec3 position, Collider collider) {
-
-	int min_check_x = (int)std::floor(position.x - collider.half_x) - 1;
-	int max_check_x = (int)std::floor(position.x + collider.half_x) + 1;
-	int min_check_y = (int)std::floor(position.y - collider.half_y) - 1;
-	int max_check_y = (int)std::floor(position.y + collider.half_y) + 1;
-	int min_check_z = (int)std::floor(position.z - collider.half_z) - 1;
-	int max_check_z = (int)std::floor(position.z + collider.half_z) + 1;
-
-	for (int by = min_check_y; by <= max_check_y; by++) {
-		for (int bz = min_check_z; bz <= max_check_z; bz++) {
-			for (int bx = min_check_x; bx <= max_check_x; bx++) {
-				Block* block = world->getBlock(bx, by, bz);
-				if (block == nullptr) continue;
-
-				BlockID block_id = block->getBlockID();
-				if (block_id == BlockID::EMPTY) continue;
-
-				const BlockInfo& block_info = GetBlockInfo(block_id);
-				if (!block_info.block_movement) continue;
-
-				if (Utils::AABBvsBlock(position.x, position.y, position.z, collider, bx, by, bz)) {
-					return true;
-				}
-			}
-		}
-	}
-
-	return false;
-}
 
 class WorldCollisionSystem {
 public:
@@ -83,7 +52,7 @@ public:
 				continue;
 			}
 
-			if (checkCollisionToWorld(world, trans.position, col)) {
+			if (Utils::checkCollisionToWorld(world, trans.position, col)) {
 				trans.position.y += 1.0f;
 				continue;
 			}
@@ -107,7 +76,7 @@ public:
 
 				float current_x = trans.position.x + current_delta;
 
-				bool collision_x = checkCollisionToWorld(world, { current_x, trans.position.y, trans.position.z }, col);
+				bool collision_x = Utils::checkCollisionToWorld(world, { current_x, trans.position.y, trans.position.z }, col);
 				if (!collision_x) trans.position.x = current_x;
 			}
 			
@@ -133,7 +102,7 @@ public:
 
 				float current_y = trans.position.y + current_delta;
 
-				bool collision_y = checkCollisionToWorld(world, { trans.position.x, current_y, trans.position.z }, col);
+				bool collision_y = Utils::checkCollisionToWorld(world, { trans.position.x, current_y, trans.position.z }, col);
 				if (!collision_y) {
 					trans.position.y = current_y;
 				}
@@ -149,7 +118,7 @@ public:
 				phys.on_ground = true;
 			}
 			else if (!hit_ground_this_frame && delta_y == 0.0f && vel.y <= 0.0f) {
-				phys.on_ground = checkCollisionToWorld(world,
+				phys.on_ground = Utils::checkCollisionToWorld(world,
 					{ trans.position.x, trans.position.y - 0.01f, trans.position.z }, col);
 			}
 
@@ -168,7 +137,7 @@ public:
 
 				float current_z = trans.position.z + current_delta;
 
-				bool collision_z = checkCollisionToWorld(world, { trans.position.x, trans.position.y, current_z }, col);
+				bool collision_z = Utils::checkCollisionToWorld(world, { trans.position.x, trans.position.y, current_z }, col);
 				if (!collision_z) trans.position.z = current_z;
 			}
 		}
