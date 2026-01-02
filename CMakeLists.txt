@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.2)
+﻿cmake_minimum_required(VERSION 4.2)
 
 set(PROJECT_NAME voxel_clone)
 project(${PROJECT_NAME})
@@ -74,10 +74,21 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(spdlog)
 
+# enet
+FetchContent_Declare(
+    enet
+    GIT_REPOSITORY https://github.com/lsalzman/enet.git
+    GIT_TAG 8be2368a8001f28db44e81d5939de5e613025023
+    GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(enet)
+
 set_target_properties(glfw PROPERTIES FOLDER "External")
 set_target_properties(glad PROPERTIES FOLDER "External")
 set_target_properties(freetype PROPERTIES FOLDER "External")
 set_target_properties(spdlog PROPERTIES FOLDER "External")
+set_target_properties(glm PROPERTIES FOLDER "External")
+set_target_properties(enet PROPERTIES FOLDER "External")
 
 if(TARGET update_mappings)
     set_target_properties(update_mappings PROPERTIES FOLDER "External")
@@ -100,13 +111,18 @@ endforeach()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PRIVATE ${stb_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     glad
     glm
 	freetype
     spdlog::spdlog
+    enet
 )
+
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32 winmm)
+endif()
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_directory

@@ -56,7 +56,8 @@ public:
 
     void shutdown();
 private:
-    
+    bool m_is_server = false;
+
     ChunkInfo* getChunkProtected(int x, int z);
     double m_chunk_creation_time;
 
