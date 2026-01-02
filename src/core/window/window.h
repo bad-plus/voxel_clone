@@ -7,7 +7,7 @@ struct Input;
 class Window {
 public:
     Window(const char* title, int width, int height, Input* input);
-    ~Window();
+    ~Window() = default;
 
     bool isClose();
     void eventProcessing();

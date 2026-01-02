@@ -15,16 +15,14 @@ Window::Window(const char* title, int width, int height, Input* input) {
 
     glfwMakeContextCurrent(m_glfw_window);
 
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        throw std::runtime_error("Failed to initialize OpenGL context");
+	}
 
     glfwSetWindowUserPointer(m_glfw_window, input);
     glfwSetWindowAttrib(m_glfw_window, GLFW_RESIZABLE, GLFW_TRUE);
     
     bindCallbacks();
-}
-
-Window::~Window() {
-    
 }
 
 bool Window::isClose() {
