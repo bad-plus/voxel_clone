@@ -13,6 +13,8 @@ struct World;
 struct WorldGenerator;
 struct UI;
 struct DebugOverlay;
+struct Client;
+struct Server;
 
 #include "input/input.h"
 
@@ -37,6 +39,8 @@ private:
 	void worldUpdaterThread();
 	void movementUpdaterThread();
 
+	void serverThread();
+
 	void InitSystems();
 
 	std::atomic<bool> m_quit{ false };
@@ -48,7 +52,9 @@ private:
 	std::unique_ptr<InputHandler> m_input_handler;
 	std::unique_ptr<Resources> m_resources;
 	std::unique_ptr<Loader> m_loader;
-	std::unique_ptr<World> m_world;
+	std::unique_ptr<World> m_world; // todo delete
+	std::unique_ptr<Client> m_client;
+	std::unique_ptr<Server> m_server;
 	std::unique_ptr<WorldGenerator> m_world_generator;
 	std::unique_ptr<UI> m_ui;
 	std::unique_ptr<DebugOverlay> m_debug_overlay;

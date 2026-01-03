@@ -11,6 +11,8 @@
 #include "input/input_handler.h"
 #include "../ui/ui.h"
 #include "../ui/debug_overlay.h"
+#include "../network/client/client.h"
+#include "../network/server/server.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -31,6 +33,7 @@ Game::Game() {
 
 	m_threads.emplace_back(&Game::worldUpdaterThread, this);
 	m_threads.emplace_back(&Game::movementUpdaterThread, this);
+	m_threads.emplace_back(&Game::serverThread, this);
 
 	m_window->setWindowSize(1280, 720);
 	m_window->setCursorEnabled(false);
@@ -57,6 +60,8 @@ void Game::InitSystems() {
 	LOG_INFO("World seed: {0}", seed);
 
 	m_world = std::make_unique<World>(m_world_generator.get());
+	m_server = std::make_unique<Server>();
+	m_client = std::make_unique<Client>();
 
 	m_ui = std::make_unique<UI>(m_world->getECS(), m_resources.get());
 
@@ -71,6 +76,10 @@ void Game::InitSystems() {
 
 	m_debug_overlay = std::make_unique<DebugOverlay>(m_ui.get(), m_resources.get(), m_world.get());
 	m_debug_overlay->setEntity(player_entity);
+}
+
+void Game::serverThread() {
+	m_server->run(25565, 32);
 }
 
 void Game::movementUpdaterThread() {
@@ -146,6 +155,7 @@ void Game::worldUpdaterThread() {
 void Game::quit() {
 	m_quit.store(true);
 	if (m_world) m_world->shutdown();
+	m_server->stop();
     m_window->quit();
 }
 
@@ -163,6 +173,8 @@ Game::~Game() {
 }
 
 void Game::run() {
+	m_client->connect("127.0.0.1", 25565);
+
     while (!m_quit) {
         double start_game_tick_time = glfwGetTime();
 
@@ -176,6 +188,8 @@ void Game::run() {
         m_input->update_input();
 
         double end_game_tick_time = glfwGetTime();
+
+		m_client->process();
 
 		m_debug_overlay->update(end_game_tick_time);
 

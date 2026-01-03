@@ -27,6 +27,8 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/glfw/glfw.git
     GIT_TAG 3.4
     GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -44,6 +46,8 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/g-truc/glm.git
     GIT_TAG 1.0.3
     GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 FetchContent_MakeAvailable(glm)
 
@@ -53,6 +57,8 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/nothings/stb.git
     GIT_TAG f1c79c0
     GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 FetchContent_MakeAvailable(stb)
 
@@ -62,6 +68,8 @@ FetchContent_Declare (
 	GIT_REPOSITORY https://gitlab.freedesktop.org/freetype/freetype.git
 	GIT_TAG VER-2-14-1
     GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 FetchContent_MakeAvailable(freetype)
 
@@ -71,6 +79,9 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/gabime/spdlog.git
     GIT_TAG v1.16.0
     GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+	
 )
 FetchContent_MakeAvailable(spdlog)
 
@@ -80,7 +91,10 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/lsalzman/enet.git
     GIT_TAG 8be2368a8001f28db44e81d5939de5e613025023
     GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
+set(ENET_TEST OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(enet)
 
 set_target_properties(glfw PROPERTIES FOLDER "External")
@@ -110,7 +124,10 @@ foreach(SOURCE IN ITEMS ${SOURCE_FILES})
 endforeach()
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
-target_include_directories(${PROJECT_NAME} PRIVATE ${stb_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE 
+	${stb_SOURCE_DIR}
+	${enet_SOURCE_DIR}/include
+)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     glad
