@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 
 constexpr unsigned int KEYS_COUNT =         512;
 constexpr unsigned int MOUSE_BUTTONS =      16;
@@ -34,12 +35,13 @@ public:
     double m_mouse_delta_x;
     double m_mouse_delta_y;
 
-    void getWindowSize(int* width, int* height);
+    void getWindowSize(int* width, int* height) const;
 private:
     bool m_first_move;
 
-    bool m_jkeys[KEYS_COUNT + MOUSE_BUTTONS];
-    bool m_keys[KEYS_COUNT + MOUSE_BUTTONS]; // KEYBOARD KEYS .. , MOUSE KEYS ..
+    // KEYBOARD KEYS .. , MOUSE KEYS ..
+    std::array<bool, KEYS_COUNT + MOUSE_BUTTONS> m_keys;
+    std::array<bool, KEYS_COUNT + MOUSE_BUTTONS> m_jkeys;
 
     int m_window_width;
     int m_window_height;

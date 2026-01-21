@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 4.2)
+cmake_minimum_required(VERSION 4.2)
 
 set(PROJECT_NAME voxel_clone)
 project(${PROJECT_NAME})

@@ -1,8 +1,10 @@
 ﻿#include "mesh.h"
 
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices) {
-	m_vertices.insert(m_vertices.end(), vertices.begin(), vertices.end());
-	m_indices.insert(m_indices.end(), indices.begin(), indices.end());
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices) :
+	m_vertices(vertices),
+	m_indices(indices)
+{
+
 }
 
 Mesh::Mesh(const std::vector<GLfloat>& raw_vertices, const std::vector<GLuint>& indices) {

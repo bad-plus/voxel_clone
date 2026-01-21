@@ -30,7 +30,7 @@ Render::Render(Window* window, ECS* ecs, Resources* resources, UI* ui) {
 	initRender();
 
 	m_debug_render_mode = false;
-	m_render_dist = 12;
+	m_render_dist = 20;
 
 	m_world = nullptr;
 }
@@ -130,15 +130,17 @@ void Render::renderWorld(World* world, int render_dist) {
 	int chunk_offset_x = ((player_transform.position.x) / CHUNK_SIZE_X);
 	int chunk_offset_z = ((player_transform.position.z) / CHUNK_SIZE_Z);
 
-	auto chunks_to_draw = genCircleReady(chunk_offset_x, chunk_offset_z, render_dist);
+	auto chunks_around_entity = genCircleReady(chunk_offset_x, chunk_offset_z, render_dist);
+
+	glm::mat4 model;
 
 	// Draw opaque
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 
-	for (const auto& [x, z] : chunks_to_draw) {
-		glm::mat4 model = glm::translate(
+	for (const auto& [x, z] : chunks_around_entity) {
+		model = glm::translate(
 			glm::mat4(1.0f),
 			glm::vec3((x * (float)CHUNK_SIZE_X), 0.0f, (z * (float)CHUNK_SIZE_Z)));
 
@@ -157,8 +159,8 @@ void Render::renderWorld(World* world, int render_dist) {
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 
-	for (const auto& [x, z] : chunks_to_draw) {
-		glm::mat4 model = glm::translate(
+	for (const auto& [x, z] : chunks_around_entity) {
+		model = glm::translate(
 			glm::mat4(1.0f),
 			glm::vec3((x * (float)CHUNK_SIZE_X), 0.0f, (z * (float)CHUNK_SIZE_Z)));
 
@@ -177,10 +179,10 @@ void Render::renderWorld(World* world, int render_dist) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthMask(GL_FALSE);
 
-	for (auto it = chunks_to_draw.rbegin(); it != chunks_to_draw.rend(); ++it) {
+	for (auto it = chunks_around_entity.rbegin(); it != chunks_around_entity.rend(); ++it) {
 		const auto& [x, z] = *it;
 
-		glm::mat4 model = glm::translate(
+		model = glm::translate(
 			glm::mat4(1.0f),
 			glm::vec3((x * (float)CHUNK_SIZE_X), 0.0f, (z * (float)CHUNK_SIZE_Z)));
 

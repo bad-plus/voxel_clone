@@ -8,11 +8,11 @@
 #include "../world/world.h"
 #include "../world/generation/world_generator.h"
 #include "../render/render.h"
+#include "input/input.h"
 #include "input/input_handler.h"
 #include "../ui/ui.h"
 #include "../ui/debug_overlay.h"
-#include "../network/client/client.h"
-#include "../network/server/server.h"
+#include "time.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -29,18 +29,17 @@ Game::Game() {
 	initLogger();
 
 	initGLFW();
-	InitSystems();
-
-	m_threads.emplace_back(&Game::worldUpdaterThread, this);
-	m_threads.emplace_back(&Game::movementUpdaterThread, this);
-	m_threads.emplace_back(&Game::serverThread, this);
+	initSystems();
 
 	m_window->setWindowSize(1280, 720);
 	m_window->setCursorEnabled(false);
 	m_debug_overlay->show();
+
+	m_threads.emplace_back(&Game::worldUpdaterThread, this);
+	m_threads.emplace_back(&Game::movementUpdaterThread, this);
 }
 
-void Game::InitSystems() {
+void Game::initSystems() {
 	m_input = std::make_unique<Input>();
 
 	m_window = std::make_unique<Window>("Game test", 800, 600, m_input.get());
@@ -54,14 +53,15 @@ void Game::InitSystems() {
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> dis(1, INT_MAX);
 	int seed = dis(gen);
+
+#ifdef _DEBUG
 	seed = 666;
+#endif
 
 	m_world_generator = std::make_unique<WorldGenerator>(seed);
 	LOG_INFO("World seed: {0}", seed);
 
 	m_world = std::make_unique<World>(m_world_generator.get());
-	m_server = std::make_unique<Server>();
-	m_client = std::make_unique<Client>();
 
 	m_ui = std::make_unique<UI>(m_world->getECS(), m_resources.get());
 
@@ -78,22 +78,18 @@ void Game::InitSystems() {
 	m_debug_overlay->setEntity(player_entity);
 }
 
-void Game::serverThread() {
-	m_server->run(25565, 32);
-}
-
 void Game::movementUpdaterThread() {
-	const double dt = 1.0 / WORLD_MOVEMENT_TICKRATE;
+	const auto dt = Time::fromNS(1'000'000'000 / WORLD_MOVEMENT_TICKRATE);
 
-	double accumulator = 0.0;
-	double last_time = glfwGetTime();
+	Time accumulator;
+	auto last_time = Time::now();
 
 	while (!m_quit) {
-		double current_time = glfwGetTime();
-		double frame_time = current_time - last_time;
+		auto current_time = Time::now();
+		auto frame_time = current_time - last_time;
 		last_time = current_time;
 
-		if (frame_time > 0.25) {
+		if (frame_time > Time::fromMS(250)) {
 			frame_time = dt;
 		}
 
@@ -104,9 +100,9 @@ void Game::movementUpdaterThread() {
 			accumulator -= dt;
 		}
 
-		double time_until_next_tick = dt - accumulator;
-		if (time_until_next_tick > 0.002) {
-			int sleep_ms = static_cast<int>((time_until_next_tick - 0.001) * 1000);
+		auto time_until_next_tick = dt - accumulator;
+		if (time_until_next_tick > Time::fromMS(2)) {
+			long long sleep_ms = time_until_next_tick.getMS() - 1;
 			if (sleep_ms > 0) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
 			}
@@ -118,17 +114,17 @@ void Game::movementUpdaterThread() {
 }
 
 void Game::worldUpdaterThread() {
-	const double dt = 1.0 / WORLD_UPDATER_TICKRATE;
+	const auto dt = Time::fromNS(1'000'000'000 / WORLD_UPDATER_TICKRATE);
 
-	double accumulator = 0.0;
-	double last_time = glfwGetTime();
+	auto accumulator = Time();
+	auto last_time = Time::now();
 
-	while (!m_quit) { 
-		double current_time = glfwGetTime();
-		double frame_time = current_time - last_time;
+	while (!m_quit) {
+		auto current_time = Time::now();
+		auto frame_time = current_time - last_time;
 		last_time = current_time;
 
-		if (frame_time > 0.25) {
+		if (frame_time > Time::fromMS(250)) {
 			frame_time = dt;
 		}
 
@@ -139,9 +135,9 @@ void Game::worldUpdaterThread() {
 			accumulator -= dt;
 		}
 
-		double time_until_next_tick = dt - accumulator;
-		if (time_until_next_tick > 0.002) {
-			int sleep_ms = static_cast<int>((time_until_next_tick - 0.001) * 1000);
+		auto time_until_next_tick = dt - accumulator;
+		if (time_until_next_tick > Time::fromMS(2)) {
+			long long sleep_ms = time_until_next_tick.getMS() - 1;
 			if (sleep_ms > 0) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
 			}
@@ -155,12 +151,11 @@ void Game::worldUpdaterThread() {
 void Game::quit() {
 	m_quit.store(true);
 	if (m_world) m_world->shutdown();
-	m_server->stop();
-    m_window->quit();
+	m_window->quit();
 }
 
 Game::~Game() {
-    LOG_INFO("Closing application...");
+	LOG_INFO("Closing application...");
 	quit();
 
 	for (auto& thread : m_threads) {
@@ -169,47 +164,43 @@ Game::~Game() {
 		}
 	}
 
-    glfwTerminate();
+	glfwTerminate();
 }
 
 void Game::run() {
-	m_client->connect("127.0.0.1", 25565);
+	while (!m_quit) {
+		double start_game_tick_time = glfwGetTime();
 
-    while (!m_quit) {
-        double start_game_tick_time = glfwGetTime();
+		m_window->eventProcessing();
+		m_input_handler->processing();
 
-        m_window->eventProcessing();
-        m_input_handler->processing();
+		double start_render_time = glfwGetTime();
+		m_render->render();
+		double end_render_time = glfwGetTime();
 
-        double start_render_time = glfwGetTime();
-        m_render->render();
-        double end_render_time = glfwGetTime();
+		m_input->update_input();
 
-        m_input->update_input();
-
-        double end_game_tick_time = glfwGetTime();
-
-		m_client->process();
+		double end_game_tick_time = glfwGetTime();
 
 		m_debug_overlay->update(end_game_tick_time);
 
-        m_game_system_info.update_tick_time = end_game_tick_time - start_game_tick_time;
-        m_game_system_info.render_time = end_render_time - start_render_time;
-    }
+		m_game_system_info.update_tick_time = end_game_tick_time - start_game_tick_time;
+		m_game_system_info.render_time = end_render_time - start_render_time;
+	}
 }
 
 GameSystemInfo Game::getSystemInfo() const {
-    return m_game_system_info;
+	return m_game_system_info;
 }
 
 void Game::initGLFW() const {
-    LOG_INFO("Starting application...");
+	LOG_INFO("Starting application...");
 	if (!glfwInit()) {
 		throw std::runtime_error("Failed to initialize GLFW");
-    }
+	}
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 }

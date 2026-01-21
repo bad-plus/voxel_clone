@@ -1,7 +1,6 @@
 #pragma once
 
 struct GLFWwindow;
-struct Camera;
 struct Input;
 
 class Window {

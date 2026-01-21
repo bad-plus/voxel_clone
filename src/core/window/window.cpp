@@ -1,7 +1,6 @@
 ﻿#include "window.h"
 #include "../logger.h"
-#include "../../render/camera.hpp"
-#include "../game.h"
+#include "../input/input.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

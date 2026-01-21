@@ -1,22 +1,19 @@
 #include "input.h"
 #include "../logger.h"
 
-Input::Input() {
-    m_mouse_pos_x = 0.0f;
-    m_mouse_pos_y = 0.0f;
-
-    m_mouse_delta_x = 0.0f;
-    m_mouse_delta_y = 0.0f;
-
+Input::Input() :
+    m_mouse_pos_x(0.0f),
+    m_mouse_pos_y(0.0f),
+    m_mouse_delta_x(0.0f),
+    m_mouse_delta_y(0.0f),
+    m_first_move(true),
+    m_window_width(0),
+    m_window_height(0)
+{
     for(int i = 0; i < KEYS_COUNT + MOUSE_BUTTONS; i++) {
         m_jkeys[i] = false;
         m_keys[i] = false;
     }
-
-    m_first_move = true;
-
-    m_window_width = 0;
-    m_window_height = 0;
 }
 Input::~Input() = default;
 
@@ -118,7 +115,7 @@ void Input::update_window_size(const int width, const int height) {
     m_window_height = height;
 }
 
-void Input::getWindowSize(int* width, int* height) {
+void Input::getWindowSize(int* width, int* height) const {
     *width = m_window_width;
     *height = m_window_height;
 }
