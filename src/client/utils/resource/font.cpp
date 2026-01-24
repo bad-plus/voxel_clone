@@ -5,7 +5,7 @@ Font::Font(const std::string& path, int pixel_size) {
 	if (FT_Init_FreeType(&m_ft)) {
 		throw std::runtime_error("Failed to init freetype");
 	}
-	const std::string font_base_path = "../resources/fonts/";
+	const std::string font_base_path = std::string(RESOURCES_PATH) + "fonts/";
 
 	if (FT_New_Face(m_ft, (font_base_path + path).c_str(), 0, &m_face)) {
 		throw std::runtime_error("Failed to load font");

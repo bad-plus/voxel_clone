@@ -100,7 +100,7 @@ namespace Biome {
             .top_block = BlockID::GRASS,
             .under_block = BlockID::DIRT,
 
-            .rarity = 550.5f
+            .rarity = 0.5f
         }},
         {BiomeID::WINTER, {
             .base_height = 95.0f,
@@ -120,7 +120,7 @@ namespace Biome {
             .top_block = BlockID::SNOW_GRASS,
             .under_block = BlockID::DIRT,
 
-            .rarity = 1.0f
+            .rarity = 100.0f
         }},
         {BiomeID::DESERT, {
             .base_height = 68.0f,

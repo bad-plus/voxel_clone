@@ -20,6 +20,8 @@ struct ChunkCoord {
 	int z;
 
 	ChunkCoord(int x_, int z_) : x(x_), z(z_) {}
+
+
 };
 
 class Chunk {

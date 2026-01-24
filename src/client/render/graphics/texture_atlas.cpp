@@ -17,7 +17,7 @@
 
 namespace fs = std::filesystem;
 
-constexpr char TEXTURES_PATH[] = "../resources/textures/blocks/";
+constexpr char TEXTURES_PATH[] = RESOURCES_PATH "textures/blocks/";
 
 constexpr unsigned int ATLAS_SIZE =             1280; // px
 constexpr unsigned int ATLAS_CHANNELS =         4; // color channels

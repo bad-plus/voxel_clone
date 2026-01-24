@@ -42,7 +42,7 @@ Game::Game() {
 void Game::initSystems() {
 	m_input = std::make_unique<Input>();
 
-	m_window = std::make_unique<Window>("Game test", 800, 600, m_input.get());
+	m_window = std::make_unique<Window>("Voxel clone", 800, 600, m_input.get());
 
 	m_resources = std::make_unique<Resources>();
 
