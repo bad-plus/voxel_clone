@@ -1,6 +1,6 @@
 #include "window.h"
 #include "../../render/camera.hpp"
-#include "../logger.h"
+#include <core/logger.hpp>
 #include "../input/input.h"
 #include "../game.h"
 

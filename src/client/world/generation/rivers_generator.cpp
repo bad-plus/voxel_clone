@@ -2,7 +2,7 @@
 #include "../block/block.h"
 #include "../chunk/chunk.h"
 #include "biome.hpp"
-#include "../../core/logger.h"
+#include <core/logger.hpp>
 #include "perlin_2d.h"
 #include <cmath>
 

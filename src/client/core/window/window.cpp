@@ -1,5 +1,5 @@
 ﻿#include "window.h"
-#include "../logger.h"
+#include <core/logger.hpp>
 #include "../input/input.h"
 
 #include <glad/glad.h>

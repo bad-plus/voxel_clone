@@ -1,5 +1,5 @@
 ﻿#include "text.h"
-#include "../../core/logger.h"
+#include <core/logger.hpp>
 
 #include <glm/gtc/matrix_transform.hpp>
 

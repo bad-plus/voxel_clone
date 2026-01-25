@@ -1,5 +1,5 @@
 #include "font.h"
-#include "../../core/logger.h"
+#include <core/logger.hpp>
 
 Font::Font(const std::string& path, int pixel_size) {
 	if (FT_Init_FreeType(&m_ft)) {

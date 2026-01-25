@@ -1,7 +1,7 @@
 ﻿#include "world.h"
 #include "chunk/chunk.h"
 #include "block/block.h"
-#include "../core/logger.h"
+#include <core/logger.hpp>
 #include <GLFW/glfw3.h>
 #include "generation/world_generator.h"
 #include <thread>

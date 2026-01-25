@@ -1,5 +1,5 @@
 ﻿#include "text.h"
-#include "../../core/logger.h"
+#include <core/logger.hpp>
 
 UIText::UIText(const std::string& str, const int x, const int y, const glm::vec3& color, Font* font, Shader* shader)
 	: m_current_string(str), m_current_color(color), m_current_scale(1.0f)

@@ -1,7 +1,7 @@
 #include "world_event_list.h"
 #include "../chunk/chunk_storage.h"
 #include "../world.h"
-#include "../../core/logger.h"
+#include <core/logger.hpp>
 
 void BreakBlockEvent::apply(World& world, WorldEventManager& manager)
 {

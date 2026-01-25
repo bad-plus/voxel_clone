@@ -3,7 +3,7 @@
 #include "graphics/texture_atlas.h"
 #include "graphics/shader.h"
 #include "../world/chunk/chunk.h"
-#include "../core/logger.h"
+#include <core/logger.hpp>
 #include "../world/world.h"
 #include "../ecs/core/ecs.h"
 #include "../core/window/window.h"

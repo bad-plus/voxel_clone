@@ -2,7 +2,7 @@
 #include "../ui/ui.h"
 #include "../ui/elements/text.h"
 #include "../utils/resource/resources.h"
-#include "../core/logger.h"
+#include <core/logger.hpp>
 #include "../ecs/core/ecs.h"
 #include "../world/world.h"
 #include "../world/generation/world_generator.h"

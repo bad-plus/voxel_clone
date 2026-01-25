@@ -1,6 +1,7 @@
 #include "world_event_manager.h"
 
-#include "../../core/logger.h"	
+#include <core/logger.hpp>
+
 void WorldEventManager::push(std::unique_ptr<WorldEvent> event, bool priority)
 {
 	std::lock_guard<std::mutex> lock(m_event_list_mutex);

@@ -1,8 +1,8 @@
 ﻿#include "game.h"
-#include "logger.h"
+#include <core/logger.hpp>
 
 #include "window/window.h"
-#include "../ecs/core/ecs.h" 
+#include "../ecs/core/ecs.h"
 #include "../utils/resource/resources.h"
 #include "../utils/resource/loader.h"
 #include "../world/world.h"
@@ -26,7 +26,6 @@ constexpr int WORLD_UPDATER_TICKRATE = 24;
 
 Game::Game() {
 	m_quit.store(false);
-	initLogger();
 
 	initGLFW();
 	initSystems();

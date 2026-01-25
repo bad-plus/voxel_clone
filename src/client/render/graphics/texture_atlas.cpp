@@ -1,5 +1,5 @@
 #include "texture_atlas.h"
-#include "../../core/logger.h"
+#include <core/logger.hpp>
 
 #include "../../world/block/block.h"
 

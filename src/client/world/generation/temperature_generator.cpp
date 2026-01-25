@@ -1,7 +1,7 @@
 #include "world_generator.h"
 #include "../block/block.h"
 #include "../chunk/chunk.h"
-#include "../../core/logger.h"
+#include <core/logger.hpp>
 #include "perlin_2d.h"
 #include <cmath>
 

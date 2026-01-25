@@ -2,7 +2,7 @@
 #include "../block/block.h"
 #include "../chunk/chunk.h"
 #include "biome.hpp"
-#include "../../core/logger.h"
+#include <core/logger.hpp>
 
 void WorldGenerator::generateTerrain(Chunk* chunk, int x, int z) {
 	for (int px = 0; px < CHUNK_SIZE_X; px++) {

@@ -1,5 +1,5 @@
 ﻿#include "chunk.h"
-#include "../../core/logger.h"
+#include <core/logger.hpp>
 
 #include <GLFW/glfw3.h>
 

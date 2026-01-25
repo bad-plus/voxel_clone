@@ -1,5 +1,5 @@
 #include "input.h"
-#include "../logger.h"
+#include <core/logger.hpp>
 
 Input::Input() :
     m_mouse_pos_x(0.0f),
