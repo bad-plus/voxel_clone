@@ -12,7 +12,7 @@
 #include "input/input_handler.h"
 #include "../ui/ui.h"
 #include "../ui/debug_overlay.h"
-#include "time.h"
+#include <core/time.hpp>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
