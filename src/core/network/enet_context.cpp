@@ -1,4 +1,4 @@
-#include "enet_context.h"
+#include <core/network/enet_context.h>
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <enet/enet.h>
