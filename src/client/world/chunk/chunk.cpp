@@ -3,6 +3,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include <core/time.hpp>
+
 Chunk::Chunk() {
 	m_neighbors.x_p.store(nullptr);
 	m_neighbors.z_p.store(nullptr);
@@ -68,7 +70,7 @@ Block* Chunk::setBlock(glm::ivec3 position, BlockID block, bool mark) {
 void Chunk::calculateMesh() {
 	if (!m_dirty) return;
 
-	double start_generation_time = glfwGetTime();
+	Time start_generation_time = Time::now();
 
 	ChunkStorage* neighbor_x_p = nullptr;
 	ChunkStorage* neighbor_z_p = nullptr;
@@ -95,7 +97,7 @@ void Chunk::calculateMesh() {
 		m_dirty = false;
 	}
 
-	m_mesh_build_time = glfwGetTime() - start_generation_time;
+	m_mesh_build_time = Time::now() - start_generation_time;
 }
 
 void Chunk::uploadMeshToGPU() {
@@ -148,8 +150,8 @@ int Chunk::getTopBlockPosition(int x, int z) {
 	return m_storage->getTopBlockY(x, z);
 }
 
-double Chunk::getChunkBuildTime() {
-	if (m_ready_gpu.ready) return 0.0f;
+Time Chunk::getChunkBuildTime() {
+	if (m_ready_gpu.ready) return Time();
 	
 	return m_mesh_build_time;
 }

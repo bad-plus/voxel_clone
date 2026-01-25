@@ -9,6 +9,7 @@
 #include <mutex>
 #include <atomic>
 #include <memory>
+#include <core/time.hpp>
 
 #include "../../render/graphics/mesh.h"
 #include "../../render/graphics/mesh_renderer.h"
@@ -48,7 +49,7 @@ public:
 
 	ChunkStorage* getStorage() { return m_storage.get(); }
 
-	double getChunkBuildTime();
+	Time getChunkBuildTime();
 private:
 	Block* getBlockLocal(glm::ivec3 position);
 
@@ -75,5 +76,5 @@ private:
 		std::atomic<Chunk*> z_m;
 	} m_neighbors;
 
-	double m_mesh_build_time;
+	Time m_mesh_build_time;
 };

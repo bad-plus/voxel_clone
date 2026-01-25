@@ -11,6 +11,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <string>
 
 DebugOverlay::DebugOverlay(UI* ui, Resources* resources, World* world)
 	: m_ui(ui), m_resources(resources), m_world(world), m_ecs(m_world->getECS())
@@ -81,7 +82,7 @@ void DebugOverlay::toggle() {
 }
 
 
-void DebugOverlay::update(const float delta_time) {
+void DebugOverlay::update(const Time& delta_time) {
 	updateFPS();
 	updatePlayerInfo();
 	updateWorldGeneratorInfo();
@@ -138,7 +139,7 @@ void DebugOverlay::updateWorldGeneratorInfo() {
 
 	std::string output_str = std::format(
 		"Chunk generation time: {:.2f} ms",
-		m_world->getGenerator()->getChunkGenerationTime() * 1000
+		m_world->getGenerator()->getChunkGenerationTime().getMS<float>()
 	);
 
 	world_info_text->setString(output_str);
@@ -149,7 +150,7 @@ void DebugOverlay::updateMeshGeneratorInfo() {
 
 	std::string output_str = std::format(
 		"Chunk mesh generation time: {:.2f} ms",
-		m_world->getMeshGenerationTime() * 1000
+		m_world->getMeshGenerationTime().getMS<float>()
 	);
 
 	world_info_text->setString(output_str);

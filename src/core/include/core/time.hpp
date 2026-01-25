@@ -23,11 +23,19 @@ public:
 	long long getNS() const {
 		return m_time;
 	}
-	long long getMS() const {
-		return m_time / 1'000'000;
+
+	template <typename T>
+	T getMS() const {
+		return static_cast<T>(m_time) / 1'000'000;
 	}
-	long long getS() const {
-		return m_time / 1'000'000'000;
+
+	template <typename T>
+	T getS() const {
+		return static_cast<T>(m_time) / 1'000'000'000;
+	}
+
+	Time getElapsedTime() const {
+		return Time(Time::nowNS() - m_time);
 	}
 
 	Time operator + (const Time& other) const {
@@ -36,6 +44,10 @@ public:
 
 	Time operator - (const Time& other) const {
 		return Time(m_time - other.m_time);
+	}
+
+	Time operator / (const int value) const {
+		return Time(m_time / value);
 	}
 
 	bool operator > (const Time& other) const {

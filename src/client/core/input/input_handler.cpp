@@ -31,7 +31,7 @@ BlockID selected_block = BlockID::BLUE;
 void InputHandler::processing() {
 	const float mouse_sensivty = 0.3f;
 
-	double system_tick_time = m_game->getSystemInfo().update_tick_time;
+	Time system_tick_time = m_game->getSystemInfo().update_tick_time;
 
 	if (m_input->jpressed(GLFW_KEY_ESCAPE)) m_game->quit();
 

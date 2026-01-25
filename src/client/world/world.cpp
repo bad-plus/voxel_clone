@@ -220,48 +220,59 @@ ECS* World::getECS() {
 }
 
 void World::tick() {
-    if (last_tick_time == 0) last_tick_time = glfwGetTime();
+    if (last_tick_time == Time{}) {
+        last_tick_time = Time::now();
+        return;
+    }
 
-    const float tick_delta = (float)(glfwGetTime() - last_tick_time);
+    Time current_time = Time::now();
+    Time delta_time = current_time - last_tick_time;
+    last_tick_time = current_time;
+
     ECS* ecs = m_ecs.ecs.get();
 
     m_event_manager->process(*this);
-
-    last_tick_time = glfwGetTime();
 }
 
 void World::tick_movement() {
-	double current_time = glfwGetTime();
-	if (last_tick_time == 0) last_tick_time = current_time;
+    if (last_tick_time == Time{}) {
+        last_tick_time = Time::now();
+        return;
+    }
 
-	float delta_time = (float)(current_time - last_tick_time);
-	last_tick_time = current_time;
+    Time current_time = Time::now();
+    Time delta_time = current_time - last_tick_time;
+    last_tick_time = current_time;
 
-	ECS* ecs = m_ecs.ecs.get();
+    ECS* ecs = m_ecs.ecs.get();
 
-	m_ecs.player_camera_system->update(*ecs);
+    double dt = delta_time.getS<double>();
 
-	m_ecs.player_movement_systems->update(*ecs, delta_time);
+    m_ecs.player_camera_system->update(*ecs);
 
-	m_ecs.gravity_system->update(*ecs, delta_time);
+    m_ecs.player_movement_systems->update(*ecs, dt);
 
-	m_ecs.world_collision_system->update(*ecs, delta_time, this);
+    m_ecs.gravity_system->update(*ecs, dt);
 
-	m_ecs.camera_update_system->update(*ecs);
+    m_ecs.world_collision_system->update(*ecs, dt, this);
+
+    m_ecs.camera_update_system->update(*ecs);
 }
 
-double World::getMeshGenerationTime() const {
-    double all_time = 0.0f;
+
+Time World::getMeshGenerationTime() const {
+    auto all_time = Time();
     int all_count = 0;
 
     for (const auto& [key, value] : m_chunks) {
-        double time = value->chunk->getChunkBuildTime();
+        auto time = value->chunk->getChunkBuildTime();
         if (time != 0.0f) {
             all_time += time;
             all_count++;
         }
     }
 
+    if (all_count == 0) return Time(0);
     return (all_time / all_count);
 }
 std::vector<std::pair<int, int>> genCircleReadyA(int cx, int cz, int radius) {

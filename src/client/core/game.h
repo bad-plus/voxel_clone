@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include <thread>
+#include <core/time.hpp>
 
 struct Window;
 struct Input;
@@ -17,9 +18,9 @@ struct Client;
 struct Server;
 
 struct GameSystemInfo {
-	double update_tick_time;
-	double render_time;
-	double chunk_creation_time;
+	Time update_tick_time;
+	Time render_time;
+	Time chunk_creation_time;
 };
 
 class Game {

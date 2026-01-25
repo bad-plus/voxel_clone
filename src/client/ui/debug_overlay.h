@@ -2,6 +2,7 @@
 #include <string>
 #include <memory>
 #include <glm/glm.hpp>
+#include <core/time.hpp>
 
 #include "../ecs/core/entity.h"
 
@@ -20,7 +21,7 @@ public:
 	void hide();
 	void toggle();
 
-	void update(const float delta_time);
+	void update(const Time& delta_time);
 	
 	void setColor(const glm::vec3& color);
 	void setScale(float scale);

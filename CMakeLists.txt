@@ -84,7 +84,7 @@ FetchContent_Declare(
 set(ENET_TEST OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(enet)
 
-# Folders (Visual Studio)
+# External folders (Visual Studio)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_target_properties(glfw     PROPERTIES FOLDER "External")
 set_target_properties(glad     PROPERTIES FOLDER "External")

@@ -3,6 +3,7 @@
 #include "perlin_2d.h"
 
 #include <memory>
+#include <core/time.hpp>
 
 enum class TEMPERATURE_T {
     VERY_COLD = 0,
@@ -22,7 +23,7 @@ public:
 
     Chunk* generateChunk(Chunk* chunk, int x, int z);
 
-    double getChunkGenerationTime() const { return m_chunk_generation_time; }
+    Time getChunkGenerationTime() const { return m_chunk_generation_time; }
 private:
     TEMPERATURE_T getTemperature(int world_block_x, int world_block_z);
 
@@ -40,5 +41,5 @@ private:
     std::unique_ptr<Perlin2D> m_perlin_canyon;
     std::unique_ptr<Perlin2D> m_perlin_temperature;
 
-    double m_chunk_generation_time;
+    Time m_chunk_generation_time;
 };

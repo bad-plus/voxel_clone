@@ -101,7 +101,7 @@ void Game::movementUpdaterThread() {
 
 		auto time_until_next_tick = dt - accumulator;
 		if (time_until_next_tick > Time::fromMS(2)) {
-			long long sleep_ms = time_until_next_tick.getMS() - 1;
+			long long sleep_ms = time_until_next_tick.getMS<long long>() - 1;
 			if (sleep_ms > 0) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
 			}
@@ -136,7 +136,7 @@ void Game::worldUpdaterThread() {
 
 		auto time_until_next_tick = dt - accumulator;
 		if (time_until_next_tick > Time::fromMS(2)) {
-			long long sleep_ms = time_until_next_tick.getMS() - 1;
+			long long sleep_ms = time_until_next_tick.getMS<long long>() - 1;
 			if (sleep_ms > 0) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
 			}
@@ -168,18 +168,18 @@ Game::~Game() {
 
 void Game::run() {
 	while (!m_quit) {
-		double start_game_tick_time = glfwGetTime();
+		auto start_game_tick_time = Time::now();
 
 		m_window->eventProcessing();
 		m_input_handler->processing();
 
-		double start_render_time = glfwGetTime();
+		auto start_render_time = Time::now();
 		m_render->render();
-		double end_render_time = glfwGetTime();
+		auto end_render_time = Time::now();
 
 		m_input->update_input();
 
-		double end_game_tick_time = glfwGetTime();
+		auto end_game_tick_time = Time::now();
 
 		m_debug_overlay->update(end_game_tick_time);
 

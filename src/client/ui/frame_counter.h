@@ -1,4 +1,5 @@
 #pragma once
+#include <core/time.hpp>
 
 class FrameCounter {
 public:
@@ -10,5 +11,5 @@ public:
 private:
 	int m_fps;
 	int m_frames_count;
-	int m_prev_fps_time;
+	Time m_prev_fps_time;
 };

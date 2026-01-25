@@ -1,6 +1,7 @@
 #include <iostream>
+#include <core/logger.hpp>
 
 int main() {
-	std::cout << "Hello from server" << std::endl;
+	LOG_INFO("Test");
 	return 0;
 }

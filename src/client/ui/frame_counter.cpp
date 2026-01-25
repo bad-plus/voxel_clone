@@ -9,7 +9,7 @@ FrameCounter::FrameCounter() {
 }
 
 void FrameCounter::frame() {
-	int current_time = static_cast<int>(glfwGetTime());
+	auto current_time = Time::now().getS<int>();
 
 	if (current_time != m_prev_fps_time) {
 		m_fps = m_frames_count;

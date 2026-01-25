@@ -7,6 +7,7 @@
 #include "../ecs/core/entity.h"
 #include "chunk/chunk.h"
 #include "world/world_event.h"
+#include <core/time.hpp>
 
 struct Chunk;
 struct WorldGenerator;
@@ -42,7 +43,7 @@ public:
 
     const WorldGenerator* getGenerator() const { return m_generator; }
 
-    double getMeshGenerationTime() const;
+    Time getMeshGenerationTime() const;
 
     void generateChunks(int chunk_x, int chunk_z, int radius = 1);
 
@@ -76,5 +77,5 @@ private:
         std::unique_ptr<CameraUpdateSystem> camera_update_system;
     } m_ecs;
 
-    double last_tick_time;
+    Time last_tick_time;
 };

@@ -25,11 +25,11 @@ WorldGenerator::WorldGenerator(int seed) {
 WorldGenerator::~WorldGenerator() = default;
 
 Chunk* WorldGenerator::generateChunk(Chunk* chunk, int x, int z) {
-    double start_generation_time = glfwGetTime();
+    auto start_generation_time = Time::now();
     generateTerrain(chunk, x, z);
     //generateRivers(chunk, x, z);
     //generateCanyon(chunk, x, z);
     generateBedrock(chunk, x, z);
-    m_chunk_generation_time = glfwGetTime() - start_generation_time;
+    m_chunk_generation_time = Time::now() - start_generation_time;
     return chunk;
 }
