@@ -1,73 +1,35 @@
-﻿#include "chunk.h"
-#include <core/logger.hpp>
+#include "client_chunk.h"
 
 #include <GLFW/glfw3.h>
 
-#include <core/time.hpp>
-
-Chunk::Chunk() {
+ClientChunk::ClientChunk()
+{
 	m_neighbors.x_p.store(nullptr);
 	m_neighbors.z_p.store(nullptr);
 	m_neighbors.x_m.store(nullptr);
 	m_neighbors.z_m.store(nullptr);
 	m_dirty = true;
 
-	m_storage = std::make_unique<ChunkStorage>();
 	m_mesh_renderer_opaque = std::make_unique<MeshRenderer>();
 	m_mesh_renderer_cutout = std::make_unique<MeshRenderer>();
 	m_mesh_renderer_transparent = std::make_unique<MeshRenderer>();
 
 	m_ready_gpu.ready = false;
-	
+
 	m_mesh_build_time = 0.0f;
 }
 
-Chunk::~Chunk() {
+ClientChunk::~ClientChunk()
+{
+
 }
 
-void Chunk::markDirty() {
+void ClientChunk::markDirty() {
 	std::lock_guard<std::mutex> lock(m_dirty_mutex);
 	m_dirty = true;
 }
 
-Block* Chunk::getBlock(glm::ivec3 position) {
-	if (position.y < 0 || position.y >= Constants::CHUNK_SIZE_Y) return nullptr;
-
-	if (position.x < 0) {
-		Chunk* neighbor = m_neighbors.x_m.load();
-		if (neighbor == nullptr) return nullptr;
-		return neighbor->getBlock({ Constants::CHUNK_SIZE_X + position.x, position.y, position.z });
-	}
-	if (position.z < 0) {
-		Chunk* neighbor = m_neighbors.z_m.load();
-		if (neighbor == nullptr) return nullptr;
-		return neighbor->getBlock({ position.x, position.y, Constants::CHUNK_SIZE_Z + position.z });
-	}
-	if (position.x >= Constants::CHUNK_SIZE_X) {
-		Chunk* neighbor = m_neighbors.x_p.load();
-		if (neighbor == nullptr) return nullptr;
-		return neighbor->getBlock({ position.x - Constants::CHUNK_SIZE_X, position.y, position.z });
-	}
-	if (position.z >= Constants::CHUNK_SIZE_Z) {
-		Chunk* neighbor = m_neighbors.z_p.load();
-		if (neighbor == nullptr) return nullptr;
-		return neighbor->getBlock({ position.x, position.y, position.z - Constants::CHUNK_SIZE_Z });
-	}
-
-	return m_storage->getBlock(position);
-}
-
-Block* Chunk::getBlockLocal(glm::ivec3 position) {
-	return m_storage->getBlock(position);
-}
-
-Block* Chunk::setBlock(glm::ivec3 position, BlockID block, bool mark) {
-	if (!m_storage->setBlock(position, block)) return nullptr;
-	if (mark) markDirty();
-	return m_storage->getBlock(position);
-}
-
-void Chunk::calculateMesh() {
+void ClientChunk::calculateMesh() {
 	if (!m_dirty) return;
 
 	Time start_generation_time = Time::now();
@@ -100,7 +62,7 @@ void Chunk::calculateMesh() {
 	m_mesh_build_time = Time::now() - start_generation_time;
 }
 
-void Chunk::uploadMeshToGPU() {
+void ClientChunk::uploadMeshToGPU() {
 	if (!m_ready_gpu.ready) return;
 
 	if (!m_ready_gpu.mesh.opaque.isEmpty()) {
@@ -119,39 +81,35 @@ void Chunk::uploadMeshToGPU() {
 	m_ready_gpu.ready = false;
 }
 
-void Chunk::drawOpaque() {
+void ClientChunk::drawOpaque() {
 	if (m_ready_gpu.ready) uploadMeshToGPU();
 	m_mesh_renderer_opaque->draw();
 }
 
-void Chunk::drawCutout() {
+void ClientChunk::drawCutout() {
 	if (m_ready_gpu.ready) uploadMeshToGPU();
 	m_mesh_renderer_cutout->draw();
 }
 
-void Chunk::drawTransparent() {
+void ClientChunk::drawTransparent() {
 	if (m_ready_gpu.ready) uploadMeshToGPU();
 	m_mesh_renderer_transparent->draw();
 }
 
-void Chunk::updateNeighbors(Chunk* x_p, Chunk* z_p, Chunk* x_m, Chunk* z_m) {
+void ClientChunk::updateNeighbors(Chunk* x_p, Chunk* z_p, Chunk* x_m, Chunk* z_m) {
 	if (x_p != nullptr) m_neighbors.x_p.store(x_p);
 	if (z_p != nullptr) m_neighbors.z_p.store(z_p);
 	if (x_m != nullptr) m_neighbors.x_m.store(x_m);
 	if (z_m != nullptr) m_neighbors.z_m.store(z_m);
 }
 
-bool Chunk::isDirty() {
+bool ClientChunk::isDirty() {
 	std::lock_guard<std::mutex> lock(m_dirty_mutex);
 	return m_dirty;
 }
 
-int Chunk::getTopBlockPosition(int x, int z) {
-	return m_storage->getTopBlockY(x, z);
-}
-
-Time Chunk::getChunkBuildTime() {
+Time ClientChunk::getChunkBuildTime() {
 	if (m_ready_gpu.ready) return Time();
-	
+
 	return m_mesh_build_time;
 }

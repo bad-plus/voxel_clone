@@ -2,7 +2,7 @@
 #include "../core/game.h"
 #include "graphics/texture_atlas.h"
 #include "graphics/shader.h"
-#include "../world/chunk/chunk.h"
+#include <core/world/chunk/chunk.h>
 #include <core/logger.hpp>
 #include "../world/world.h"
 #include "../ecs/core/ecs.h"
@@ -33,7 +33,7 @@ Render::Render(Window* window, ECS* ecs, Resources* resources, UI* ui) {
 	initRender();
 
 	m_debug_render_mode = false;
-	m_render_dist = 20;
+	m_render_dist = 15;
 
 	m_world = nullptr;
 }
@@ -150,7 +150,7 @@ void Render::renderWorld(World* world, int render_dist) {
 		glm::mat4 mat = projection * view * model;
 		world_block_shader->uniformmat4fv("transform", mat);
 
-		Chunk* chunk = world->getChunk(x, z, true);
+		ClientChunk* chunk = world->getChunk(x, z, true);
 		if (chunk != nullptr) {
 			chunk->drawOpaque();
 		}
@@ -170,7 +170,7 @@ void Render::renderWorld(World* world, int render_dist) {
 		glm::mat4 mat = projection * view * model;
 		world_block_shader->uniformmat4fv("transform", mat);
 
-		Chunk* chunk = world->getChunk(x, z, true);
+		ClientChunk* chunk = world->getChunk(x, z, true);
 		if (chunk != nullptr) {
 			chunk->drawCutout();
 		}
@@ -192,7 +192,7 @@ void Render::renderWorld(World* world, int render_dist) {
 		glm::mat4 mat = projection * view * model;
 		world_block_shader->uniformmat4fv("transform", mat);
 
-		Chunk* chunk = world->getChunk(x, z, true);
+		ClientChunk* chunk = world->getChunk(x, z, true);
 		if (chunk != nullptr) {
 			chunk->drawTransparent();
 		}

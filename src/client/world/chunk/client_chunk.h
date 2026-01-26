@@ -1,37 +1,20 @@
 #pragma once
+#include <core/world/chunk/chunk.h>
 
-#include <core/world/block/block.h>
-#include "chunk_storage.h"
 #include "mesh_generator.h"
 
-#include <glm/glm.hpp>
 #include <glad/glad.h>
 #include <mutex>
 #include <atomic>
-#include <memory>
 #include <core/time.hpp>
 
 #include "../../render/graphics/mesh.h"
 #include "../../render/graphics/mesh_renderer.h"
 
-struct Chunk;
-
-struct ChunkCoord {
-	int x;
-	int z;
-
-	ChunkCoord(int x_, int z_) : x(x_), z(z_) {}
-};
-
-class Chunk {
+class ClientChunk : public Chunk {
 public:
-	Chunk();
-	~Chunk();
-
-	int getTopBlockPosition(int x, int z);
-
-	Block* getBlock(glm::ivec3 position);
-	Block* setBlock(glm::ivec3 position, BlockID block, bool mark = false);
+	ClientChunk();
+	~ClientChunk();
 
 	void drawOpaque();
 	void drawCutout();
@@ -45,18 +28,12 @@ public:
 	void calculateMesh();
 	void uploadMeshToGPU();
 
-	ChunkStorage* getStorage() { return m_storage.get(); }
-
 	Time getChunkBuildTime();
 private:
-	Block* getBlockLocal(glm::ivec3 position);
-
 	struct {
 		ChunkMesh mesh;
 		std::atomic<bool> ready;
 	} m_ready_gpu;
-
-	std::unique_ptr<ChunkStorage> m_storage;
 
 	std::unique_ptr<MeshRenderer> m_mesh_renderer_opaque;
 	std::unique_ptr<MeshRenderer> m_mesh_renderer_cutout;

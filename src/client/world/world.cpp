@@ -1,5 +1,5 @@
 ﻿#include "world.h"
-#include "chunk/chunk.h"
+#include <core/world/chunk/chunk.h>
 #include <core/world/block/block.h>
 #include <core/logger.hpp>
 #include <GLFW/glfw3.h>
@@ -68,7 +68,7 @@ ChunkInfo* World::createChunk(int x, int z) {
     ChunkInfo* chunk_info = new ChunkInfo;
     chunk_info->x = x;
     chunk_info->z = z;
-    chunk_info->chunk = new Chunk;
+    chunk_info->chunk = new ClientChunk;
 
     m_chunks[chunk_index] = chunk_info;
     return chunk_info;
@@ -84,7 +84,7 @@ ChunkInfo* World::getChunkProtected(int x, int z) {
     return nullptr;
 }
 
-Chunk* World::getChunk(int x, int z, bool create) {
+ClientChunk* World::getChunk(int x, int z, bool create) {
     ChunkInfo* chunk_info = getChunkProtected(x, z);
 
     if (chunk_info != nullptr) return chunk_info->chunk;

@@ -5,7 +5,8 @@
 #include <memory>
 #include <core/world/block/block.h>
 #include "../ecs/core/entity.h"
-#include "chunk/chunk.h"
+#include <core/world/chunk/chunk.h>
+#include "chunk/client_chunk.h"
 #include "world/world_event.h"
 #include <core/time.hpp>
 
@@ -20,7 +21,7 @@ struct PlayerCameraSystem;
 struct WorldEventManager;
 
 struct ChunkInfo {
-    Chunk* chunk;
+    ClientChunk* chunk;
     int x;
     int z;
 };
@@ -30,7 +31,7 @@ public:
     World(WorldGenerator* generator);
     ~World();
 
-    Chunk* getChunk(int x, int z, bool create = false);
+    ClientChunk* getChunk(int x, int z, bool create = false);
     Block* getBlock(int world_x, int world_y, int world_z);
 
     void setBlock(int world_x, int world_y, int world_z, BlockID block_id);

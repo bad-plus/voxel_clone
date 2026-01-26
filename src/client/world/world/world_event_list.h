@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 #include "../../ecs/core/entity.h"
 #include "world_event_manager.h"
-#include "../chunk/chunk.h"
+#include <core/world/chunk/chunk.h>
 
 struct BreakBlockEvent : WorldEvent {
 	glm::ivec3 position;

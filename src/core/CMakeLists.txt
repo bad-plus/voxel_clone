@@ -4,6 +4,8 @@ project(${PROJECT_NAME})
 add_library(${PROJECT_NAME} STATIC
     network/enet_context.cpp
     world/block/block.cpp
+    world/chunk/chunk.cpp
+    world/chunk/chunk_storage.cpp
 )
 
 target_sources(${PROJECT_NAME}
@@ -16,6 +18,8 @@ target_sources(${PROJECT_NAME}
         include/core/world/block/block_list.h
         include/core/world/lighting/light.h
         include/core/constants.h
+        include/core/world/chunk/chunk.h
+        include/core/world/chunk/chunk_storage.h
 )
 
 target_include_directories(${PROJECT_NAME}

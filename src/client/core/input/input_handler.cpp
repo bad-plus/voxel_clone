@@ -1,7 +1,7 @@
 ﻿#include "input_handler.h"
 #include "../game.h"
 #include "input.h"
-#include "../../world/chunk/chunk.h"
+#include <core/world/chunk/chunk.h>
 #include <core/world/block/block.h>
 #include "../../ui/ui.h"
 #include "../../render/camera.hpp"

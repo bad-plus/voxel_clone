@@ -1,5 +1,5 @@
 #include "world_event_list.h"
-#include "../chunk/chunk_storage.h"
+#include <core/world/chunk/chunk_storage.h>
 #include "../world.h"
 #include <core/logger.hpp>
 
@@ -19,7 +19,7 @@ void SetupBlockEvent::apply(World& world, WorldEventManager& manager)
 
 void UpdateMeshEvent::apply(World& world, WorldEventManager& manager)
 {
-	Chunk* chunk = world.getChunk(position.x, position.z);
+	ClientChunk* chunk = world.getChunk(position.x, position.z);
 
 	if (chunk == nullptr) return;
 
@@ -28,7 +28,7 @@ void UpdateMeshEvent::apply(World& world, WorldEventManager& manager)
 
 void GenerateChunkEvent::apply(World& world, WorldEventManager& manager) 
 {
-	Chunk* chunk = world.getChunk(position.x, position.z);
+	ClientChunk* chunk = world.getChunk(position.x, position.z);
 
 	if (chunk == nullptr) {
 		chunk = world.createChunk(position.x, position.z)->chunk;

@@ -27,6 +27,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${stb_SOURCE_DIR}
 	${enet_SOURCE_DIR}/include
 )
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     glad

@@ -89,6 +89,5 @@ public:
 		return *this;
 	}
 private:
-
 	long long m_time;
 };

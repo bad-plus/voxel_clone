@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "../../render/graphics/mesh.h"
-#include "chunk_storage.h"
+#include <core/world/chunk/chunk_storage.h>
 #include <unordered_map>
 
 struct ChunkMesh {
