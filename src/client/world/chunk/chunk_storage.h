@@ -1,12 +1,8 @@
 #pragma once
 #include <core/world/block/block.h>
+#include <core/constants.h>
 
 #include <array>
-
-constexpr unsigned int CHUNK_SIZE_X = 16;
-constexpr unsigned int CHUNK_SIZE_Y = 512; // height
-constexpr unsigned int CHUNK_SIZE_Z = 16;
-constexpr unsigned int CHUNK_SIZE_VOLUME = CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z;
 
 class ChunkStorage {
 public:
@@ -19,16 +15,11 @@ public:
 	Block* getBlockUnsafe(glm::ivec3 position);
 	void setBlockUnsafe(glm::ivec3 position, BlockID block_id);
 
-	static constexpr int getSizeX() { return CHUNK_SIZE_X; }
-	static constexpr int getSizeY() { return CHUNK_SIZE_Y; }
-	static constexpr int getSizeZ() { return CHUNK_SIZE_Z; }
-	static constexpr int getVolume() { return CHUNK_SIZE_VOLUME; }
-
 	int getTopBlockY(int x, int z);
 	bool isValidPosition(glm::ivec3 position) const;
 
 	static size_t toIndex(int x, int y, int z) {
-		return x + z * CHUNK_SIZE_X + y * CHUNK_SIZE_X * CHUNK_SIZE_Z;
+		return x + z * Constants::CHUNK_SIZE_X + y * Constants::CHUNK_SIZE_X * Constants::CHUNK_SIZE_Z;
 	}
 
 	static size_t toIndex(glm::ivec3 position) {
@@ -37,11 +28,11 @@ public:
 
 	static glm::ivec3 toBlockPos(const unsigned int index) {
 		return {
-			index % CHUNK_SIZE_X,                      // x
-			index / (CHUNK_SIZE_X * CHUNK_SIZE_Z),     // y
-			(index / CHUNK_SIZE_X) % CHUNK_SIZE_Z      // z
+			index % Constants::CHUNK_SIZE_X,								// x
+			index / (Constants::CHUNK_SIZE_X * Constants::CHUNK_SIZE_Z),    // y
+			(index / Constants::CHUNK_SIZE_X) % Constants::CHUNK_SIZE_Z     // z
 		};
 	}
 private:
-	std::array<Block, CHUNK_SIZE_VOLUME> m_blocks;
+	std::array<Block, Constants::CHUNK_SIZE_VOLUME> m_blocks;
 };

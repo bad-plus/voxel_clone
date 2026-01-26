@@ -5,14 +5,14 @@
 
 void BreakBlockEvent::apply(World& world, WorldEventManager& manager)
 {
-	if (position.y < 0 || position.y >= ChunkStorage::getSizeY()) return;
+	if (position.y < 0 || position.y >= Constants::CHUNK_SIZE_Y) return;
 
 	world.setBlock(position.x, position.y, position.z, BlockID::EMPTY);
 }
 
 void SetupBlockEvent::apply(World& world, WorldEventManager& manager)
 {
-	if (position.y < 0 || position.y >= ChunkStorage::getSizeY()) return;
+	if (position.y < 0 || position.y >= Constants::CHUNK_SIZE_Y) return;
 
 	world.setBlock(position.x, position.y, position.z, block_id);
 }

@@ -17,9 +17,12 @@
 #include "../ecs/components/transform.h"
 #include "../ecs/components/player_camera.h"
 #include "../ui/ui.h"
+#include <core/constants.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+using namespace Constants;
 
 Render::Render(Window* window, ECS* ecs, Resources* resources, UI* ui) {
 	m_window = window;

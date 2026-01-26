@@ -4,6 +4,7 @@
 #include "biome.hpp"
 #include <core/logger.hpp>
 #include "perlin_2d.h"
+#include <core/constants.h>
 
 constexpr float frequency_canyon = 0.001f;
 constexpr float amplitude_canyon = 130.0f;
@@ -12,10 +13,10 @@ constexpr float len_canyon = 0.1f;
 constexpr float canyon_start_noise_value = 0.85f;
 
 void WorldGenerator::generateCanyon(Chunk* chunk, int x, int z) {
-    for (int px = 0; px < CHUNK_SIZE_X; px++) {
-        for (int pz = 0; pz < CHUNK_SIZE_Z; pz++) {
-            int world_x = x * CHUNK_SIZE_X + px;
-            int world_z = z * CHUNK_SIZE_Z + pz;
+    for (int px = 0; px < Constants::CHUNK_SIZE_X; px++) {
+        for (int pz = 0; pz < Constants::CHUNK_SIZE_Z; pz++) {
+            int world_x = x * Constants::CHUNK_SIZE_X + px;
+            int world_z = z * Constants::CHUNK_SIZE_Z + pz;
 
             float canyon_noise = (m_perlin_canyon->noise(
                 (float)world_x * frequency_canyon,

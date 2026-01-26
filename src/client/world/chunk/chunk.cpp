@@ -31,27 +31,27 @@ void Chunk::markDirty() {
 }
 
 Block* Chunk::getBlock(glm::ivec3 position) {
-	if (position.y < 0 || position.y >= CHUNK_SIZE_Y) return nullptr;
+	if (position.y < 0 || position.y >= Constants::CHUNK_SIZE_Y) return nullptr;
 
 	if (position.x < 0) {
 		Chunk* neighbor = m_neighbors.x_m.load();
 		if (neighbor == nullptr) return nullptr;
-		return neighbor->getBlock({ CHUNK_SIZE_X + position.x, position.y, position.z });
+		return neighbor->getBlock({ Constants::CHUNK_SIZE_X + position.x, position.y, position.z });
 	}
 	if (position.z < 0) {
 		Chunk* neighbor = m_neighbors.z_m.load();
 		if (neighbor == nullptr) return nullptr;
-		return neighbor->getBlock({ position.x, position.y, CHUNK_SIZE_Z + position.z });
+		return neighbor->getBlock({ position.x, position.y, Constants::CHUNK_SIZE_Z + position.z });
 	}
-	if (position.x >= CHUNK_SIZE_X) {
+	if (position.x >= Constants::CHUNK_SIZE_X) {
 		Chunk* neighbor = m_neighbors.x_p.load();
 		if (neighbor == nullptr) return nullptr;
-		return neighbor->getBlock({ position.x - CHUNK_SIZE_X, position.y, position.z });
+		return neighbor->getBlock({ position.x - Constants::CHUNK_SIZE_X, position.y, position.z });
 	}
-	if (position.z >= CHUNK_SIZE_Z) {
+	if (position.z >= Constants::CHUNK_SIZE_Z) {
 		Chunk* neighbor = m_neighbors.z_p.load();
 		if (neighbor == nullptr) return nullptr;
-		return neighbor->getBlock({ position.x, position.y, position.z - CHUNK_SIZE_Z });
+		return neighbor->getBlock({ position.x, position.y, position.z - Constants::CHUNK_SIZE_Z });
 	}
 
 	return m_storage->getBlock(position);

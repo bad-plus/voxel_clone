@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <vector>
 #include "../ecs/core/ecs.h"
+#include <core/constants.h>
 
 #include "../ecs/systems/player_camera_system.h"
 #include "../ecs/systems/world_collision_system.h"
@@ -106,16 +107,16 @@ static inline int floorDiv(int a, int b) {
 }
 
 Block* World::getBlock(int world_x, int world_y, int world_z) {
-    int chunk_x = floorDiv(world_x, CHUNK_SIZE_X);
-    int chunk_z = floorDiv(world_z, CHUNK_SIZE_Z);
+    int chunk_x = floorDiv(world_x, Constants::CHUNK_SIZE_X);
+    int chunk_z = floorDiv(world_z, Constants::CHUNK_SIZE_Z);
 
-    int in_chunk_x = world_x % CHUNK_SIZE_X;
-    if (in_chunk_x < 0) in_chunk_x += CHUNK_SIZE_X;
+    int in_chunk_x = world_x % Constants::CHUNK_SIZE_X;
+    if (in_chunk_x < 0) in_chunk_x += Constants::CHUNK_SIZE_X;
 
     int in_chunk_y = world_y;
 
-    int in_chunk_z = world_z % CHUNK_SIZE_Z;
-    if (in_chunk_z < 0) in_chunk_z += CHUNK_SIZE_Z;
+    int in_chunk_z = world_z % Constants::CHUNK_SIZE_Z;
+    if (in_chunk_z < 0) in_chunk_z += Constants::CHUNK_SIZE_Z;
 
     Chunk* chunk = getChunk(chunk_x, chunk_z);
     if (chunk == nullptr) return nullptr;
@@ -124,16 +125,16 @@ Block* World::getBlock(int world_x, int world_y, int world_z) {
 }
 
 void World::setBlock(int world_x, int world_y, int world_z, BlockID block_id) {
-	int chunk_x = floorDiv(world_x, CHUNK_SIZE_X);
-	int chunk_z = floorDiv(world_z, CHUNK_SIZE_Z);
+	int chunk_x = floorDiv(world_x, Constants::CHUNK_SIZE_X);
+	int chunk_z = floorDiv(world_z, Constants::CHUNK_SIZE_Z);
 
-	int in_chunk_x = world_x % CHUNK_SIZE_X;
-	if (in_chunk_x < 0) in_chunk_x += CHUNK_SIZE_X;
+	int in_chunk_x = world_x % Constants::CHUNK_SIZE_X;
+	if (in_chunk_x < 0) in_chunk_x += Constants::CHUNK_SIZE_X;
 
 	int in_chunk_y = world_y;
 
-	int in_chunk_z = world_z % CHUNK_SIZE_Z;
-	if (in_chunk_z < 0) in_chunk_z += CHUNK_SIZE_Z;
+	int in_chunk_z = world_z % Constants::CHUNK_SIZE_Z;
+	if (in_chunk_z < 0) in_chunk_z += Constants::CHUNK_SIZE_Z;
 
 	ChunkInfo* chunk = getChunkProtected(chunk_x, chunk_z);
 	if (chunk == nullptr) return;
@@ -159,7 +160,7 @@ void World::setBlock(int world_x, int world_y, int world_z, BlockID block_id) {
 		}
 	}
 
-	if (in_chunk_x == CHUNK_SIZE_X - 1) {
+	if (in_chunk_x == Constants::CHUNK_SIZE_X - 1) {
 		auto chunk = getChunk(chunk_x + 1, chunk_z);
 		if (chunk != nullptr) {
 			chunk->markDirty();
@@ -179,7 +180,7 @@ void World::setBlock(int world_x, int world_y, int world_z, BlockID block_id) {
 		}
 	}
 
-	if (in_chunk_z == CHUNK_SIZE_Z - 1) {
+	if (in_chunk_z == Constants::CHUNK_SIZE_Z - 1) {
 		auto chunk = getChunk(chunk_x, chunk_z + 1);
 		if (chunk != nullptr) {
 			chunk->markDirty();
@@ -304,7 +305,7 @@ void World::generateChunks(int chunk_x, int chunk_z, int radius) {
 }
 
 ChunkCoord World::worldToChunkCoords(int world_x, int world_z) {
-	return { floorDiv(world_x, CHUNK_SIZE_X), floorDiv(world_z, CHUNK_SIZE_X) };
+	return { floorDiv(world_x,  Constants::CHUNK_SIZE_X), floorDiv(world_z,  Constants::CHUNK_SIZE_X) };
 }
 
 void World::generateChunk(int x, int z) {

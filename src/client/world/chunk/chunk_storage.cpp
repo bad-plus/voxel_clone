@@ -1,4 +1,5 @@
 #include "chunk_storage.h"
+#include <core/constants.h>
 
 ChunkStorage::ChunkStorage() {
 	m_blocks.fill(BlockID::EMPTY);
@@ -32,7 +33,7 @@ void ChunkStorage::setBlockUnsafe(glm::ivec3 position, BlockID block_id) {
 }
 
 int ChunkStorage::getTopBlockY(int x, int z) {
-	for (int y = CHUNK_SIZE_Y - 1; y >= 0; y--) {
+	for (int y = Constants::CHUNK_SIZE_Y - 1; y >= 0; y--) {
 		Block* block = getBlockUnsafe({ x, y, z });
 
 		if (block->getBlockID() != BlockID::EMPTY) {
@@ -43,8 +44,8 @@ int ChunkStorage::getTopBlockY(int x, int z) {
 }
 
 bool ChunkStorage::isValidPosition(glm::ivec3 position) const {
-	if (position.x < 0 || position.x >= CHUNK_SIZE_X) return false;
-	if (position.y < 0 || position.y >= CHUNK_SIZE_Y) return false;
-	if (position.z < 0 || position.z >= CHUNK_SIZE_Z) return false;
+	if (position.x < 0 || position.x >= Constants::CHUNK_SIZE_X) return false;
+	if (position.y < 0 || position.y >= Constants::CHUNK_SIZE_Y) return false;
+	if (position.z < 0 || position.z >= Constants::CHUNK_SIZE_Z) return false;
 	return true;
 }

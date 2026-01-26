@@ -2,6 +2,7 @@
 #include "../../render/graphics/mesh.h"
 
 #include <glm/glm.hpp>
+#include <core/constants.h>
 
 ChunkMesh MeshGenerator::generateMesh(
 	ChunkStorage* storage,
@@ -20,9 +21,9 @@ ChunkMesh MeshGenerator::generateMesh(
 
 	if (m_storage == nullptr) return result;
 
-	for (int x = 0; x < ChunkStorage::getSizeX(); x++) {
-		for (int y = 0; y < ChunkStorage::getSizeY(); y++) {
-			for (int z = 0; z < ChunkStorage::getSizeZ(); z++) {
+	for (int x = 0; x < Constants::CHUNK_SIZE_X; x++) {
+		for (int y = 0; y < Constants::CHUNK_SIZE_Y; y++) {
+			for (int z = 0; z < Constants::CHUNK_SIZE_Z; z++) {
 				const glm::ivec3 block_pos = { x, y, z };
 				const BlockID block_id = m_storage->getBlockUnsafe(block_pos)->getBlockID();
 
@@ -87,7 +88,7 @@ ChunkMesh MeshGenerator::generateMesh(
 }
 
 bool MeshGenerator::shouldRenderFace(BlockID current_block_id, BlockType current_block_type, glm::ivec3 neighbor_position) const {
-	if (neighbor_position.y < 0 || neighbor_position.y >= ChunkStorage::getSizeY()) {
+	if (neighbor_position.y < 0 || neighbor_position.y >= Constants::CHUNK_SIZE_Y) {
 		return true;
 	}
 
@@ -96,7 +97,7 @@ bool MeshGenerator::shouldRenderFace(BlockID current_block_id, BlockType current
 	if (neighbor_position.x < 0) {
 		if (m_neighbor_x_minus != nullptr) {
 			neighbor_block = m_neighbor_x_minus->getBlockUnsafe({
-				ChunkStorage::getSizeX() + neighbor_position.x,
+				Constants::CHUNK_SIZE_X + neighbor_position.x,
 				neighbor_position.y,
 				neighbor_position.z
 				})->getBlockID();
@@ -107,25 +108,25 @@ bool MeshGenerator::shouldRenderFace(BlockID current_block_id, BlockType current
 			neighbor_block = m_neighbor_z_minus->getBlockUnsafe({
 				neighbor_position.x,
 				neighbor_position.y,
-				ChunkStorage::getSizeZ() + neighbor_position.z
+				Constants::CHUNK_SIZE_Z + neighbor_position.z
 				})->getBlockID();
 		}
 	}
-	else if (neighbor_position.x >= ChunkStorage::getSizeX()) {
+	else if (neighbor_position.x >= Constants::CHUNK_SIZE_X) {
 		if (m_neighbor_x_plus != nullptr) {
 			neighbor_block = m_neighbor_x_plus->getBlockUnsafe({
-				neighbor_position.x - ChunkStorage::getSizeX(),
+				neighbor_position.x - Constants::CHUNK_SIZE_X,
 				neighbor_position.y,
 				neighbor_position.z
 				})->getBlockID();
 		}
 	}
-	else if (neighbor_position.z >= ChunkStorage::getSizeZ()) {
+	else if (neighbor_position.z >= Constants::CHUNK_SIZE_Z) {
 		if (m_neighbor_z_plus != nullptr) {
 			neighbor_block = m_neighbor_z_plus->getBlockUnsafe({
 				neighbor_position.x,
 				neighbor_position.y,
-				neighbor_position.z - ChunkStorage::getSizeZ()
+				neighbor_position.z - Constants::CHUNK_SIZE_Z
 				})->getBlockID();
 		}
 	}
@@ -158,7 +159,7 @@ bool MeshGenerator::shouldRenderFace(BlockID current_block_id, BlockType current
 }
 
 bool MeshGenerator::isBlockTransparent(glm::ivec3 block_position) const {
-	if (block_position.y < 0 || block_position.y >= ChunkStorage::getSizeY()) {
+	if (block_position.y < 0 || block_position.y >= Constants::CHUNK_SIZE_Y) {
 		return true;
 	} 
 
@@ -168,19 +169,19 @@ bool MeshGenerator::isBlockTransparent(glm::ivec3 block_position) const {
 
 	if (block_position.x < 0) {
 		target_chunk = m_neighbor_x_minus;
-		local_pos.x = ChunkStorage::getSizeX() + block_position.x;
+		local_pos.x = Constants::CHUNK_SIZE_X + block_position.x;
 	}
-	else if (block_position.x >= ChunkStorage::getSizeX()) {
+	else if (block_position.x >= Constants::CHUNK_SIZE_X) {
 		target_chunk = m_neighbor_x_plus;
-		local_pos.x = block_position.x - ChunkStorage::getSizeX();
+		local_pos.x = block_position.x - Constants::CHUNK_SIZE_X;
 	}
 	else if (block_position.z < 0) {
 		target_chunk = m_neighbor_z_minus;
-		local_pos.z = ChunkStorage::getSizeZ() + block_position.z;
+		local_pos.z = Constants::CHUNK_SIZE_Z + block_position.z;
 	}
-	else if (block_position.z >= ChunkStorage::getSizeZ()) {
+	else if (block_position.z >= Constants::CHUNK_SIZE_Z) {
 		target_chunk = m_neighbor_z_plus;
-		local_pos.z = block_position.z - ChunkStorage::getSizeZ();
+		local_pos.z = block_position.z - Constants::CHUNK_SIZE_Z;
 	}
 	else {
 		target_chunk = m_storage;
@@ -190,9 +191,9 @@ bool MeshGenerator::isBlockTransparent(glm::ivec3 block_position) const {
 		return true;
 	}
 
-	if (local_pos.x < 0 || local_pos.x >= ChunkStorage::getSizeX() ||
-		local_pos.y < 0 || local_pos.y >= ChunkStorage::getSizeY() ||
-		local_pos.z < 0 || local_pos.z >= ChunkStorage::getSizeZ()) {
+	if (local_pos.x < 0 || local_pos.x >= Constants::CHUNK_SIZE_X ||
+		local_pos.y < 0 || local_pos.y >= Constants::CHUNK_SIZE_Y ||
+		local_pos.z < 0 || local_pos.z >= Constants::CHUNK_SIZE_Z) {
 		return true;
 	}
 

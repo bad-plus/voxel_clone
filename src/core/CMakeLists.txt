@@ -14,6 +14,8 @@ target_sources(${PROJECT_NAME}
         include/core/world/block/block.h
         include/core/world/block/block_data.h
         include/core/world/block/block_list.h
+        include/core/world/lighting/light.h
+        include/core/constants.h
 )
 
 target_include_directories(${PROJECT_NAME}

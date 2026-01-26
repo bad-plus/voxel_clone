@@ -5,6 +5,7 @@
 #include <core/logger.hpp>
 #include "perlin_2d.h"
 #include <cmath>
+#include <core/constants.h>
 
 const float frenquency_rivers = 0.001f;
 const float amplitude_rivers = 15.0f;
@@ -16,10 +17,10 @@ void WorldGenerator::generateRivers(Chunk* chunk, int x, int z) {
     const float start_river_noise_value = river_center - river_half_width;
     const float end_river_noise_value = river_center + river_half_width;
 
-    for (int px = 0; px < CHUNK_SIZE_X; px++) {
-        for (int pz = 0; pz < CHUNK_SIZE_Z; pz++) {
-            int world_x = x * CHUNK_SIZE_X + px;
-            int world_z = z * CHUNK_SIZE_Z + pz;
+    for (int px = 0; px < Constants::CHUNK_SIZE_X; px++) {
+        for (int pz = 0; pz < Constants::CHUNK_SIZE_Z; pz++) {
+            int world_x = x * Constants::CHUNK_SIZE_X + px;
+            int world_z = z * Constants::CHUNK_SIZE_Z + pz;
 
             float river_noise = (m_perlin_river->noise(
                 (float)world_x * frenquency_rivers,

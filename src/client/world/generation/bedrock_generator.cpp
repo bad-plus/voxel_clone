@@ -3,12 +3,13 @@
 #include "../chunk/chunk.h"
 #include "biome.hpp"
 #include <core/logger.hpp>
+#include <core/constants.h>
 
 void WorldGenerator::generateBedrock(Chunk* chunk, int x, int z) {
-    for (int px = 0; px < CHUNK_SIZE_X; px++) {
-        for (int pz = 0; pz < CHUNK_SIZE_Z; pz++) {
-            int world_pos_x = (x * CHUNK_SIZE_X) + px;
-            int world_pos_z = (z * CHUNK_SIZE_Z) + pz;
+    for (int px = 0; px < Constants::CHUNK_SIZE_X; px++) {
+        for (int pz = 0; pz < Constants::CHUNK_SIZE_Z; pz++) {
+            int world_pos_x = (x * Constants::CHUNK_SIZE_X) + px;
+            int world_pos_z = (z * Constants::CHUNK_SIZE_Z) + pz;
 
             const float base_frequency = 1.1f;
     
