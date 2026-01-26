@@ -2,7 +2,7 @@
 #include <vector>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-#include "../../world/lighting/light.h"
+#include <core/world/lighting/light.h>
 
 struct Vertex {
 	glm::vec3 position;
