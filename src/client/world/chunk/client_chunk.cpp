@@ -19,11 +19,6 @@ ClientChunk::ClientChunk()
 	m_mesh_build_time = 0.0f;
 }
 
-ClientChunk::~ClientChunk()
-{
-
-}
-
 void ClientChunk::markDirty() {
 	std::lock_guard<std::mutex> lock(m_dirty_mutex);
 	m_dirty = true;

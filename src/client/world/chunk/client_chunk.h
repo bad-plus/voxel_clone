@@ -14,7 +14,7 @@
 class ClientChunk : public Chunk {
 public:
 	ClientChunk();
-	~ClientChunk();
+	~ClientChunk() = default;
 
 	void drawOpaque();
 	void drawCutout();

@@ -1,10 +1,21 @@
-set(PROJECT_NAME server)
+﻿set(PROJECT_NAME server)
 
 project(${PROJECT_NAME})
 
-add_executable(${PROJECT_NAME}
-	main.cpp
+file(GLOB_RECURSE SOURCE_FILES 
+    "*.cpp"
+    "*.h"
+    "*.hpp"
 )
+
+add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+
+foreach(SOURCE IN ITEMS ${SOURCE_FILES})
+    get_filename_component(SOURCE_PATH "${SOURCE}" PATH)
+    file(RELATIVE_PATH SOURCE_PATH_REL "${CMAKE_CURRENT_SOURCE_DIR}" "${SOURCE_PATH}")
+    string(REPLACE "/" "\\" GROUP_PATH "${SOURCE_PATH_REL}")
+    source_group("${GROUP_PATH}" FILES "${SOURCE}")
+endforeach()
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
@@ -27,6 +38,5 @@ if(WIN32)
             winmm
     )
 endif()
-
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE GAME_SERVER)

@@ -1,26 +1,20 @@
-set(PROJECT_NAME core)
+﻿set(PROJECT_NAME core)
 project(${PROJECT_NAME})
 
-add_library(${PROJECT_NAME} STATIC
-    network/enet_context.cpp
-    world/block/block.cpp
-    world/chunk/chunk.cpp
-    world/chunk/chunk_storage.cpp
+file(GLOB_RECURSE SOURCE_FILES 
+    "*.cpp"
+    "*.h"
+    "*.hpp"
 )
 
-target_sources(${PROJECT_NAME}
-    PUBLIC
-        include/core/time.hpp
-        include/core/logger.hpp
-        include/core/network/enet_context.h
-        include/core/world/block/block.h
-        include/core/world/block/block_data.h
-        include/core/world/block/block_list.h
-        include/core/world/lighting/light.h
-        include/core/constants.h
-        include/core/world/chunk/chunk.h
-        include/core/world/chunk/chunk_storage.h
-)
+add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
+
+foreach(SOURCE IN ITEMS ${SOURCE_FILES})
+    get_filename_component(SOURCE_PATH "${SOURCE}" PATH)
+    file(RELATIVE_PATH SOURCE_PATH_REL "${CMAKE_CURRENT_SOURCE_DIR}" "${SOURCE_PATH}")
+    string(REPLACE "/" "\\" GROUP_PATH "${SOURCE_PATH_REL}")
+    source_group("${GROUP_PATH}" FILES "${SOURCE}")
+endforeach()
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
