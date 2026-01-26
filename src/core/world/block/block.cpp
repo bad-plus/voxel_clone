@@ -1,4 +1,4 @@
-﻿#include "block.h"
+﻿#include <core/world/block/block.h>
 
 Block::Block(BlockID block_id, uint8_t metadata) {
 	m_block_id = block_id;
@@ -23,7 +23,7 @@ uint8_t Block::getLayerCount() const {
 		return 0;
 	}
 
-	return (m_layers_data & 0x07) + 1; // 0-7 → 1-8 слоёв
+	return (m_layers_data & 0x07) + 1; // 0-7 → 1-8 layers
 }
 
 void Block::setLayerCount(uint8_t layers) {

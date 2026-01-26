@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../block/block.h"
+#include <core/world/block/block.h>
 #include "chunk_storage.h"
 #include "mesh_generator.h"
 

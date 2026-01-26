@@ -3,6 +3,7 @@ project(${PROJECT_NAME})
 
 add_library(${PROJECT_NAME} STATIC
     network/enet_context.cpp
+    world/block/block.cpp
 )
 
 target_sources(${PROJECT_NAME}
@@ -10,6 +11,9 @@ target_sources(${PROJECT_NAME}
         include/core/time.hpp
         include/core/logger.hpp
         include/core/network/enet_context.h
+        include/core/world/block/block.h
+        include/core/world/block/block_data.h
+        include/core/world/block/block_list.h
 )
 
 target_include_directories(${PROJECT_NAME}

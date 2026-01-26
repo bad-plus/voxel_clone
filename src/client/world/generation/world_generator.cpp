@@ -1,5 +1,5 @@
 ﻿#include "world_generator.h"
-#include "../block/block.h"
+#include <core/world/block/block.h>
 #include "../chunk/chunk.h"
 #include <core/logger.hpp>
 #include "biome.hpp"

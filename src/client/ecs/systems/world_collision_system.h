@@ -7,7 +7,7 @@
 #include "../components/player_input.h"
 #include "../components/player_mode.h"
 #include "utils/collider_vs_world.h"
-#include "../../world/block/block.h"
+#include <core/world/block/block.h>
 #include "../../world/world.h"
 #include <cmath>
 #include <glm/glm.hpp>

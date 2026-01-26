@@ -3,7 +3,7 @@
 #include <deque>
 #include <mutex>
 #include <memory>
-#include "block/block.h"
+#include <core/world/block/block.h>
 #include "../ecs/core/entity.h"
 #include "chunk/chunk.h"
 #include "world/world_event.h"

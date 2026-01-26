@@ -1,7 +1,7 @@
 #include "texture_atlas.h"
 #include <core/logger.hpp>
 
-#include "../../world/block/block.h"
+#include <core/world/block/block.h>
 
 #include "stb_image.h"
 #include "stb_rect_pack.h"
