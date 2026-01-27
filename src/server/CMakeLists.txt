@@ -29,6 +29,7 @@ target_link_libraries(${PROJECT_NAME}
         core
         spdlog::spdlog
         glm
+        enet
 )
 
 if(WIN32)
