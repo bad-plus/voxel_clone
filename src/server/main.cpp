@@ -1,7 +1,8 @@
 #include <iostream>
-#include <core/logger.hpp>
+#include "core/server.h"
 
 int main() {
-	LOG_INFO("Test");
+	Server server;
+	server.run();
 	return 0;
 }

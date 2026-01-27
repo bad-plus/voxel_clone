@@ -16,4 +16,8 @@ namespace Constants {
 	constexpr unsigned int CHUNK_SIZE_Y = 512; // height
 	constexpr unsigned int CHUNK_SIZE_Z = 16;
 	constexpr unsigned int CHUNK_SIZE_VOLUME = CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z;
+
+	// Server
+	constexpr uint16_t	DEFAULT_SERVER_PORT = 25417;
+	constexpr size_t	DEFAULT_MAX_CLIENTS = 32;
 }
