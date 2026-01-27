@@ -6,9 +6,7 @@
 #include "../components/player_mode.h"
 #include "../components/player_camera.h"
 #include <glm/glm.hpp>
-
-constexpr float SPECTATOR_PLAYER_SPEED = 15.0f;
-
+#include <core/constants.h>
 
 class SpectatorMovementSystem {
 public:
@@ -29,7 +27,7 @@ public:
 			glm::vec3 forward_flat = glm::normalize(glm::vec3(forward.x, 0.0f, forward.z));
 			glm::vec3 right = cam.right;
 
-			float speed = SPECTATOR_PLAYER_SPEED * inp.fly_speedup;
+			float speed = Constants::SPECTATOR_PLAYER_SPEED * inp.fly_speedup;
 
 			vel.x = forward.x * inp.move_forward * speed + right.x * inp.move_right * speed;
 			vel.y = forward.y * inp.move_forward * speed;

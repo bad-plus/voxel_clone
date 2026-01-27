@@ -6,8 +6,7 @@
 #include "../components/player_mode.h"
 #include "../components/player_camera.h"
 #include <glm/glm.hpp>
-
-constexpr float CREATIVE_PLAYER_SPEED = 15.0f;
+#include <core/constants.h>
 
 class CreativeMovementSystem {
 public:
@@ -27,7 +26,7 @@ public:
 			glm::vec3 forward_flat = glm::normalize(glm::vec3(forward.x, 0.0f, forward.z));
 			glm::vec3 right = cam.right;
 
-			float speed = CREATIVE_PLAYER_SPEED;
+			float speed = Constants::CREATIVE_PLAYER_SPEED;
 
 			float delta_y = 0.0f;
 

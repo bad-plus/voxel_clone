@@ -8,6 +8,8 @@
 #include <memory>
 #include "../../world/world/world_event_list.h"
 
+#include <core/constants.h>
+
 #include <GLFW/glfw3.h>
 
 InputHandler::InputHandler(Game* game, Input* input, ECS* ecs, UI* ui, World* world) {
@@ -83,11 +85,25 @@ void InputHandler::processing() {
 	else player_input.sneak = false;
 
 	if (m_input->pressed(GLFW_KEY_O)) {
-		player_input.fly_speedup += (player_input.fly_speedup * 0.01f);
+		float new_speed = player_input.fly_speedup + (player_input.fly_speedup * 0.05f);
+		
+		if (
+			new_speed < Constants::MAX_SPECTATOR_PLAYER_SPEED_MULTIPLIER &&
+			new_speed > Constants::MIN_SPECTATOR_PLAYER_SPEED_MULTIPLIER) {
+
+			player_input.fly_speedup = new_speed;
+		}
 	}
 
 	if (m_input->pressed(GLFW_KEY_P)) {
-		player_input.fly_speedup -= (player_input.fly_speedup * 0.01f);
+		float new_speed = player_input.fly_speedup - (player_input.fly_speedup * 0.05f);
+
+		if (
+			new_speed < Constants::MAX_SPECTATOR_PLAYER_SPEED_MULTIPLIER &&
+			new_speed > Constants::MIN_SPECTATOR_PLAYER_SPEED_MULTIPLIER) {
+
+			player_input.fly_speedup = new_speed;
+		}
 	}
 
 	auto& player_camera = m_ecs->storage<Camera>().get(m_player_entity);

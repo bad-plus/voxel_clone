@@ -5,9 +5,7 @@
 #include "../components/player_input.h"
 #include "../components/movement.h"
 #include <glm/glm.hpp>
-
-constexpr float DEFAULT_PLAYER_HEIGHT = 0.9f;
-constexpr float SNEAK_PLAYER_HEIGHT = 0.8f;
+#include <core/constants.h>
 
 class PlayerColliderSystem {
 public:
@@ -19,7 +17,7 @@ public:
 			const auto& inp = ecs.storage<PlayerInput>().get(e);
 			auto& move = ecs.storage<Movement>().get(e);
 
-			move.target_collider_height = inp.sneak ? SNEAK_PLAYER_HEIGHT : DEFAULT_PLAYER_HEIGHT;
+			move.target_collider_height = inp.sneak ? Constants::SNEAK_PLAYER_HEIGHT : Constants::DEFAULT_PLAYER_HEIGHT;
 
 			col.half_y = glm::mix(
 				col.half_y,

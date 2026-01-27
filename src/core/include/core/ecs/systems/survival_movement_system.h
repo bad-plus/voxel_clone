@@ -7,8 +7,7 @@
 #include "../components/player_camera.h"
 #include "../components/movement.h"
 #include <glm/glm.hpp>
-
-constexpr float SURVIVAL_PLAYER_SPEED = 8.0f;
+#include <core/constants.h>
 
 class SurvivalMovementSystem {
 public:
@@ -30,7 +29,7 @@ public:
 			glm::vec3 forward_flat = glm::normalize(glm::vec3(forward.x, 0.0f, forward.z));
 			glm::vec3 right = cam.right;
 
-			float speed = SURVIVAL_PLAYER_SPEED;
+			float speed = Constants::SURVIVAL_PLAYER_SPEED;
 
 			move.target_velocity_x = (forward_flat.x * inp.move_forward + right.x * inp.move_right) * speed;
 			move.target_velocity_z = (forward_flat.z * inp.move_forward + right.z * inp.move_right) * speed;
