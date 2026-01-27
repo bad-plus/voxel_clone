@@ -7,14 +7,14 @@
 #include <thread>
 #include <algorithm>
 #include <vector>
-#include "../ecs/core/ecs.h"
+#include <core/ecs/core/ecs.h>
 #include <core/constants.h>
 
-#include "../ecs/systems/player_camera_system.h"
-#include "../ecs/systems/world_collision_system.h"
-#include "../ecs/systems/player_systems_manager.h"
-#include "../ecs/systems/gravity_system.h"
-#include "../ecs/systems/camera_update_system.h"
+#include <core/ecs/systems/player_camera_system.h>
+#include <core/ecs/systems/world_collision_system.h>
+#include <core/ecs/systems/player_systems_manager.h>
+#include <core/ecs/systems/gravity_system.h>
+#include <core/ecs/systems/camera_update_system.h>
 #include "world/world_event_manager.h"
 #include "world/world_event_list.h"
 

@@ -1,5 +1,5 @@
 ﻿#include "ui.h"
-#include "../ecs/core/ecs.h"
+#include <core/ecs/core/ecs.h>
 #include "../utils/resource/resources.h"
 #include <core/logger.hpp>
 

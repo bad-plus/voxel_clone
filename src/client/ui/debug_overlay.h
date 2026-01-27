@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <core/time.hpp>
 
-#include "../ecs/core/entity.h"
+#include <core/ecs/core/entity.h>
 
 class UI;
 class UIText;

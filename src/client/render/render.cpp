@@ -5,7 +5,7 @@
 #include <core/world/chunk/chunk.h>
 #include <core/logger.hpp>
 #include "../world/world.h"
-#include "../ecs/core/ecs.h"
+#include <core/ecs/core/ecs.h>
 #include "../core/window/window.h"
 #include "../utils/resource/resources.h"
 #include "camera.hpp"
@@ -14,8 +14,8 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
-#include "../ecs/components/transform.h"
-#include "../ecs/components/player_camera.h"
+#include <core/ecs/components/transform.h>
+#include <core/ecs/components/player_camera.h>
 #include "../ui/ui.h"
 #include <core/constants.h>
 

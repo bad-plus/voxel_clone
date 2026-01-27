@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "../../components/collider.h"
 #include <core/world/block/block.h>
-#include "../../world/world.h"
 
 namespace Utils {
 	inline bool AABBvsBlock(float x, float y, float z, const Collider& collider, int bx, int by, int bz) {

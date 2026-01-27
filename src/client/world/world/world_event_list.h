@@ -1,6 +1,6 @@
 #include "world_event.h"
 #include <glm/glm.hpp>
-#include "../../ecs/core/entity.h"
+#include <core/ecs/core/entity.h>
 #include "world_event_manager.h"
 #include <core/world/chunk/chunk.h>
 

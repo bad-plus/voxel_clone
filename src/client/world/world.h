@@ -4,7 +4,7 @@
 #include <mutex>
 #include <memory>
 #include <core/world/block/block.h>
-#include "../ecs/core/entity.h"
+#include <core/ecs/core/entity.h>
 #include <core/world/chunk/chunk.h>
 #include "chunk/client_chunk.h"
 #include "world/world_event.h"

@@ -1,9 +1,10 @@
 #pragma once
 #include "../../components/collider.h"
 #include <core/world/block/block.h>
-#include "../../world/world.h"
 #include "collider_vs_block.h"
 #include <glm/glm.hpp>
+
+struct World;
 
 namespace Utils {	
 	bool checkCollisionToWorld(World* world, const glm::vec3& position, const Collider& collider) {

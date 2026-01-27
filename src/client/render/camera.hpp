@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "../ecs/core/ecs.h"
-#include "../ecs/components/player_camera.h"
+#include <core/ecs/core/ecs.h>
+#include <core/ecs/components/player_camera.h>
 
 inline glm::mat4 getCameraViewMatrix(ECS* ecs, Entity entity) {
 	if (!ecs->storage<Camera>().has(entity)) {

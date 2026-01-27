@@ -1,5 +1,5 @@
 #pragma once
-#include "../../ecs/core/ecs.h"
+#include <core/ecs/core/ecs.h>
 
 struct ECS;
 struct Input;

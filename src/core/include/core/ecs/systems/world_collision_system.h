@@ -8,9 +8,10 @@
 #include "../components/player_mode.h"
 #include "utils/collider_vs_world.h"
 #include <core/world/block/block.h>
-#include "../../world/world.h"
 #include <cmath>
 #include <glm/glm.hpp>
+
+struct World;
 
 class WorldCollisionSystem {
 private:

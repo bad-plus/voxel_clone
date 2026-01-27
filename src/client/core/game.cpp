@@ -2,7 +2,7 @@
 #include <core/logger.hpp>
 
 #include "window/window.h"
-#include "../ecs/core/ecs.h"
+#include <core/ecs/core/ecs.h>
 #include "../utils/resource/resources.h"
 #include "../utils/resource/loader.h"
 #include "../world/world.h"

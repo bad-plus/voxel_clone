@@ -1,6 +1,5 @@
 #pragma once
-
-#include "../ecs/core/entity.h"
+#include <core/ecs/core/entity.h>
 
 struct World;
 struct Window;
