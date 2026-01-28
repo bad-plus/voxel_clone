@@ -15,7 +15,6 @@ struct WorldGenerator;
 struct UI;
 struct DebugOverlay;
 struct Client;
-struct Server;
 
 struct GameSystemInfo {
 	Time update_tick_time;
@@ -53,4 +52,5 @@ private:
 	std::unique_ptr<WorldGenerator> m_world_generator;
 	std::unique_ptr<UI> m_ui;
 	std::unique_ptr<DebugOverlay> m_debug_overlay;
+	std::unique_ptr<Client> m_client;
 };

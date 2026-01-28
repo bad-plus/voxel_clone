@@ -109,7 +109,7 @@ void NetServer::handleEvent(const ENetEvent& event)
                 event.peer->address.host,
                 event.peer->address.port);
 
-            event.peer->data = NULL;
+            event.peer->data = nullptr;
             break;
         }
         case ENET_EVENT_TYPE_NONE:

@@ -13,6 +13,7 @@
 #include "../ui/ui.h"
 #include "../ui/debug_overlay.h"
 #include <core/time.hpp>
+#include "client.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -75,6 +76,8 @@ void Game::initSystems() {
 
 	m_debug_overlay = std::make_unique<DebugOverlay>(m_ui.get(), m_resources.get(), m_world.get());
 	m_debug_overlay->setEntity(player_entity);
+
+	m_client = std::make_unique<Client>();
 }
 
 void Game::movementUpdaterThread() {
@@ -167,6 +170,8 @@ Game::~Game() {
 }
 
 void Game::run() {
+	m_client->connect("127.0.0.1");
+
 	while (!m_quit) {
 		auto start_game_tick_time = Time::now();
 
