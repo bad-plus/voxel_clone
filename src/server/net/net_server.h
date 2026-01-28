@@ -9,6 +9,9 @@ typedef _ENetHost ENetHost;
 struct _ENetEvent;
 typedef _ENetEvent ENetEvent;
 
+struct _ENetPeer;
+typedef _ENetPeer ENetPeer;
+
 class NetServer {
 public:
     NetServer();
@@ -22,6 +25,9 @@ public:
 
     void shutdown();
 private:
+    void sendToPeer(ENetPeer* peer, const void* data, size_t size, bool reliable = true);
+    void broadcastPeers(const void* data, size_t size, bool reliable = true);
+
     void handleEvent(const ENetEvent& event);
 
     std::atomic<bool> m_stop;

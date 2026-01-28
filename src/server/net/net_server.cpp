@@ -47,6 +47,24 @@ void NetServer::shutdown()
     m_stop.store(true);
 }
 
+void NetServer::sendToPeer(ENetPeer* peer, const void* data, size_t size, bool reliable)
+{
+    ENetPacket* packet = enet_packet_create(
+        data, size,
+        reliable ? ENET_PACKET_FLAG_RELIABLE : 0
+    );
+    enet_peer_send(peer, 0, packet);
+}
+
+void NetServer::broadcastPeers(const void* data, size_t size, bool reliable)
+{
+    ENetPacket* packet = enet_packet_create(
+        data, size,
+        reliable ? ENET_PACKET_FLAG_RELIABLE : 0
+    );
+    enet_host_broadcast(m_host, 0, packet);
+}
+
 void NetServer::runNetHandler()
 {
     ENetEvent event;
@@ -71,12 +89,7 @@ void NetServer::handleEvent(const ENetEvent& event)
 
 
             const char* welcome = "Welcome to server!";
-            ENetPacket* packet = enet_packet_create(
-                welcome,
-                strlen(welcome) + 1,
-                ENET_PACKET_FLAG_RELIABLE
-            );
-            enet_peer_send(event.peer, 0, packet);
+            sendToPeer(event.peer, welcome, strlen(welcome) + 1);
             break;
         }
 
@@ -90,14 +103,7 @@ void NetServer::handleEvent(const ENetEvent& event)
             LOG_INFO("Message: {0}\n", data);
 
             const char* response = "Message received!";
-            ENetPacket* packet = enet_packet_create(
-                response,
-                strlen(response) + 1,
-                ENET_PACKET_FLAG_RELIABLE
-            );
-            enet_peer_send(event.peer, 0, packet);
-
-            // enet_host_broadcast(server, 0, packet);
+            sendToPeer(event.peer, response, strlen(response) + 1);
 
             enet_packet_destroy(event.packet);
             break;

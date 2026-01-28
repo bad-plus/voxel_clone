@@ -26,6 +26,8 @@ public:
 private:
 	void handleEvent(const ENetEvent& event);
 
+	void sendToServer(const void* data, size_t size, bool reliable = true);
+
 	ENetHost* m_host;
 	ENetPeer* m_peer;
 

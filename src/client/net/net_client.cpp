@@ -100,3 +100,14 @@ void NetClient::handleEvent(const ENetEvent& event)
         break;
     }
 }
+
+void NetClient::sendToServer(const void* data, size_t size, bool reliable)
+{
+    if (!isConnected()) return;
+
+    ENetPacket* packet = enet_packet_create(
+        data, size,
+        reliable ? ENET_PACKET_FLAG_RELIABLE : 0
+    );
+    enet_peer_send(m_peer, 0, packet);
+}
