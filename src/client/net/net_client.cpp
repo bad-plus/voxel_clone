@@ -112,10 +112,11 @@ void NetClient::handleEvent(const ENetEvent& event)
             break;
         }
 
-    case ENET_EVENT_TYPE_DISCONNECT:
-        LOG_INFO("Disconnected from server");
-        m_connected.store(false);
-        break;
+        case ENET_EVENT_TYPE_DISCONNECT: {
+            LOG_INFO("Disconnected from server");
+            m_connected.store(false);
+            break;
+        }
 
     default:
         break;

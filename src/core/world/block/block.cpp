@@ -62,3 +62,17 @@ float Block::getHeight() const {
 		return 1.0f;
 	}
 }
+
+std::vector<uint8_t> Block::to_bytes()
+{
+	std::vector<uint8_t> result;
+	result.push_back(static_cast<uint8_t>(m_block_id));
+	result.push_back(static_cast<uint8_t>(m_layers_data));
+	return result;
+}
+
+void Block::from_bytes(const std::vector<uint8_t>& bytes)
+{
+	m_block_id = static_cast<BlockID>(bytes[0]);
+	m_layers_data = bytes[1];
+}

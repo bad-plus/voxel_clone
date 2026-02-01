@@ -18,6 +18,16 @@ Block* Chunk::getBlock(glm::ivec3 position) {
 	return m_storage->getBlock(position);
 }
 
+std::vector<uint8_t> Chunk::to_bytes()
+{
+	return m_storage->to_bytes();
+}
+
+void Chunk::from_bytes(const std::vector<uint8_t>& bytes)
+{
+	return m_storage->from_bytes(bytes);
+}
+
 Block* Chunk::getBlockLocal(glm::ivec3 position) {
 	return m_storage->getBlock(position);
 }

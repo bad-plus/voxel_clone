@@ -13,6 +13,7 @@ struct ChunkCoord {
 	int x;
 	int z;
 
+	ChunkCoord() : x(0), z(0) {}
 	ChunkCoord(int x_, int z_) : x(x_), z(z_) {}
 };
 
@@ -27,6 +28,9 @@ public:
 	Block* setBlock(glm::ivec3 position, BlockID block);
 
 	ChunkStorage* getStorage() { return m_storage.get(); }
+
+	std::vector<uint8_t> to_bytes();
+	void from_bytes(const std::vector<uint8_t>& bytes);
 protected:
 	Block* getBlockLocal(glm::ivec3 position);
 

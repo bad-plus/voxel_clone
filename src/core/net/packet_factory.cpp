@@ -21,9 +21,14 @@ std::unique_ptr<Packet> Packet::create(const uint8_t* data, size_t size) {
     case PacketType::SERVER_INFO_RESPONSE:
         packet = std::make_unique<PacketServerInfoResponse>();
         break;
-
+    case PacketType::GET_CHUNK:
+        packet = std::make_unique<PacketGetChunk>();
+        break;
+    case PacketType::GET_CHUNK_RESPONSE:
+        packet = std::make_unique<PacketGetChunkResponse>();
+        break;
     default:
-        throw std::runtime_error("Unknown packet type");
+        throw std::runtime_error("Unknown packet type in factory");
     }
 
     packet->deserialize(buffer);

@@ -16,6 +16,21 @@ Client::Client() : m_net_client(std::make_unique<NetClient>())
                 response->m_players_count);
             break;
         }
+        case PacketType::GET_CHUNK_RESPONSE: {
+            auto* response = static_cast<const PacketGetChunkResponse*>(&packet);
+            
+            std::string data;
+            for (auto i : response->m_chunk_storage) {
+                data += std::to_string(i) + " ";
+            }
+            LOG_INFO("Receive chunk: {0} {1} (size {2})\nData: {3}",
+                response->m_chunk_position.x,
+                response->m_chunk_position.z,
+                response->m_chunk_storage.size(),
+                data);
+            break;
+        }
+        
         default:
             LOG_WARN("Unknown packet type: {0}", (int)packet.getType());
             break;
@@ -43,6 +58,12 @@ bool Client::connect(const char* host, uint16_t port)
         // TODO: test
         auto packet = PacketServerInfo();
         m_net_client->sendPacket(packet);
+
+        auto packet2 = PacketGetChunk();
+        packet2.m_chunk_position.x = 333;
+        packet2.m_chunk_position.z = -333;
+
+        m_net_client->sendPacket(packet2);
     }
     else {
         LOG_ERROR("Failed connect to server");

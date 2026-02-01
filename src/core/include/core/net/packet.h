@@ -8,9 +8,11 @@
 enum class PacketType : uint8_t {
 	// Client -> Server
 	SERVER_INFO,
+	GET_CHUNK,
 
 	// Server -> Client
 	SERVER_INFO_RESPONSE,
+	GET_CHUNK_RESPONSE,
 };
 
 class Packet {

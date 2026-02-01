@@ -1,6 +1,6 @@
 #include <core/world/chunk/chunk_storage.h>
 #include <core/constants.h>
-
+#include <core/logger.hpp>
 
 ChunkStorage::ChunkStorage() {
 	m_blocks.fill(BlockID::EMPTY);
@@ -49,4 +49,32 @@ bool ChunkStorage::isValidPosition(glm::ivec3 position) const {
 	if (position.y < 0 || position.y >= Constants::CHUNK_SIZE_Y) return false;
 	if (position.z < 0 || position.z >= Constants::CHUNK_SIZE_Z) return false;
 	return true;
+}
+
+std::vector<uint8_t> ChunkStorage::to_bytes()
+{
+	std::vector<uint8_t> result;
+	for (size_t i = 0; i < Constants::CHUNK_SIZE_VOLUME; i++) {
+		auto block_data = m_blocks[i].to_bytes();
+		result.insert(result.end(), block_data.begin(), block_data.end());
+	}
+	return result;
+}
+
+void ChunkStorage::from_bytes(const std::vector<uint8_t>& bytes)
+{
+	constexpr size_t BLOCK_SIZE = 2; 
+	constexpr size_t EXPECTED_SIZE = Constants::CHUNK_SIZE_VOLUME * BLOCK_SIZE;
+
+	if (bytes.size() < EXPECTED_SIZE) {
+		LOG_ERROR("Invalid chunk data size: {} (expected {})", bytes.size(), EXPECTED_SIZE);
+		return;
+	}
+
+	size_t pos = 0;
+	for (size_t i = 0; i < Constants::CHUNK_SIZE_VOLUME; i++) {
+		std::vector<uint8_t> block_data(bytes.begin() + pos, bytes.begin() + pos + BLOCK_SIZE);
+		m_blocks[i].from_bytes(block_data);
+		pos += BLOCK_SIZE;
+	}
 }

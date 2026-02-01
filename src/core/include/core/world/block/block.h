@@ -21,6 +21,8 @@ public:
 
 	float getHeight() const;
 
+	std::vector<uint8_t> to_bytes();
+	void from_bytes(const std::vector<uint8_t>& bytes);
 private:
 	BlockID m_block_id;
 	uint8_t m_layers_data;

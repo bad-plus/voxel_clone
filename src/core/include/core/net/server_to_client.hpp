@@ -1,5 +1,6 @@
 #pragma once
 #include "packet.h"
+#include <core/world/chunk/chunk.h>
 
 class PacketServerInfoResponse : public Packet {
 public:
@@ -23,5 +24,31 @@ public:
         m_server_name = buffer.read_string();
         m_players_count = buffer.read_i32();
         m_max_players = buffer.read_i32();
+    }
+};
+
+class PacketGetChunkResponse: public Packet {
+public:
+    ChunkCoord m_chunk_position;
+    std::vector<uint8_t> m_chunk_storage;
+
+    PacketGetChunkResponse()
+        : Packet(PacketType::GET_CHUNK_RESPONSE) {
+    }
+
+    void serialize(PacketBuffer& buffer) const override {
+        buffer.write_i32(m_chunk_position.x);
+        buffer.write_i32(m_chunk_position.z);
+        buffer.write_i32(m_chunk_storage.size());
+
+        buffer.insert(m_chunk_storage);
+    }
+
+    void deserialize(PacketBuffer& buffer) override {
+        m_chunk_position.x = buffer.read_i32();
+        m_chunk_position.z = buffer.read_i32();
+        int storage_size = buffer.read_i32();
+
+        m_chunk_storage = buffer.get(storage_size);
     }
 };

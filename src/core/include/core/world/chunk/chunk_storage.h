@@ -33,6 +33,9 @@ public:
 			(index / Constants::CHUNK_SIZE_X) % Constants::CHUNK_SIZE_Z     // z
 		};
 	}
+
+	std::vector<uint8_t> to_bytes();
+	void from_bytes(const std::vector<uint8_t>& bytes);
 private:
 	std::array<Block, Constants::CHUNK_SIZE_VOLUME> m_blocks;
 };

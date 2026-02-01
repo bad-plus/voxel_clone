@@ -70,6 +70,15 @@ public:
 		return result;
 	}
 
+	void insert(const std::vector<uint8_t>& data) {
+		m_data.insert(m_data.end(), data.begin(), data.end());
+		m_read_pos += data.size();
+	}
+
+	std::vector<uint8_t> get(size_t size) {
+		return std::vector<uint8_t>(m_data.begin() + m_read_pos, m_data.begin() + m_read_pos + size);
+	}
+
 	const uint8_t* data() const { return m_data.data(); }
 	size_t size() const { return m_data.size(); }
 
