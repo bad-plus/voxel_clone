@@ -83,13 +83,34 @@ void NetClient::shutdown()
     disconnect();
 }
 
+void NetClient::sendPacket(const Packet& packet, bool reliable)
+{
+    auto data = packet.to_bytes();
+
+    sendBytes(data.data(), data.size(), reliable);
+}
+
 void NetClient::handleEvent(const ENetEvent& event)
 {
     switch (event.type) {
-    case ENET_EVENT_TYPE_RECEIVE:
-        LOG_INFO("Recived from server {0}", (char*)event.packet->data);
-        enet_packet_destroy(event.packet);
-        break;
+        case ENET_EVENT_TYPE_RECEIVE: {
+            try {
+                auto packet = Packet::create(
+                    event.packet->data,
+                    event.packet->dataLength
+                );
+
+                if (handlePacketCallback) {
+                    handlePacketCallback(*packet);
+                }
+            }
+            catch (const std::exception& e) {
+                printf("Error processing packet: %s\n", e.what());
+            }
+
+            enet_packet_destroy(event.packet);
+            break;
+        }
 
     case ENET_EVENT_TYPE_DISCONNECT:
         LOG_INFO("Disconnected from server");
@@ -101,12 +122,13 @@ void NetClient::handleEvent(const ENetEvent& event)
     }
 }
 
-void NetClient::sendToServer(const void* data, size_t size, bool reliable)
+void NetClient::sendBytes(const void* data, size_t size, bool reliable)
 {
     if (!isConnected()) return;
 
     ENetPacket* packet = enet_packet_create(
         data, size,
+
         reliable ? ENET_PACKET_FLAG_RELIABLE : 0
     );
     enet_peer_send(m_peer, 0, packet);

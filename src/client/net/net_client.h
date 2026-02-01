@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
 #include <atomic>
+#include <functional>
+#include <memory>
+#include <core/net/packet.h>
 
 struct _ENetHost;
 typedef _ENetHost ENetHost;
@@ -23,10 +26,13 @@ public:
 
 	void handleNetEvents();
 	void shutdown();
+
+	void sendPacket(const Packet& packet, bool reliable = true);
+	std::function <void(const Packet&)> handlePacketCallback;
 private:
 	void handleEvent(const ENetEvent& event);
 
-	void sendToServer(const void* data, size_t size, bool reliable = true);
+	void sendBytes(const void* data, size_t size, bool reliable = true);
 
 	ENetHost* m_host;
 	ENetPeer* m_peer;

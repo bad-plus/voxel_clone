@@ -47,22 +47,36 @@ void NetServer::shutdown()
     m_stop.store(true);
 }
 
-void NetServer::sendToPeer(ENetPeer* peer, const void* data, size_t size, bool reliable)
+void NetServer::sendBytes(uint32_t client_id, const void* data, size_t size, bool reliable)
 {
     ENetPacket* packet = enet_packet_create(
         data, size,
         reliable ? ENET_PACKET_FLAG_RELIABLE : 0
     );
-    enet_peer_send(peer, 0, packet);
+    enet_peer_send(m_clients[client_id], 0, packet);
 }
 
-void NetServer::broadcastPeers(const void* data, size_t size, bool reliable)
+void NetServer::broadcastBytes(const void* data, size_t size, bool reliable)
 {
     ENetPacket* packet = enet_packet_create(
         data, size,
         reliable ? ENET_PACKET_FLAG_RELIABLE : 0
     );
     enet_host_broadcast(m_host, 0, packet);
+}
+
+void NetServer::sendPacket(uint32_t client_id, const Packet& packet, bool reliable)
+{
+    auto data = packet.to_bytes();
+
+    sendBytes(client_id, data.data(), data.size(), reliable);
+}
+
+void NetServer::broadcastPacket(const Packet& packet, bool reliable)
+{
+    auto data = packet.to_bytes();
+
+    broadcastBytes(data.data(), data.size(), reliable);
 }
 
 void NetServer::runNetHandler()
@@ -73,6 +87,7 @@ void NetServer::runNetHandler()
         while (enet_host_service(m_host, &event, 1000) > 0) {
             handleEvent(event);
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 
@@ -85,25 +100,25 @@ void NetServer::handleEvent(const ENetEvent& event)
                 event.peer->address.host,
                 event.peer->address.port);
 
-            event.peer->data = (void*)"Client info";
-
-
-            const char* welcome = "Welcome to server!";
-            sendToPeer(event.peer, welcome, strlen(welcome) + 1);
+            m_clients[event.peer->connectID] = event.peer;
             break;
         }
 
         case ENET_EVENT_TYPE_RECEIVE:
         {
-            LOG_INFO("Recived packet {0} bytes, channel {1}\n",
-                event.packet->dataLength,
-                event.channelID);
+            try {
+                auto packet = Packet::create(
+                    event.packet->data,
+                    event.packet->dataLength
+                );
 
-            char* data = (char*)event.packet->data;
-            LOG_INFO("Message: {0}\n", data);
-
-            const char* response = "Message received!";
-            sendToPeer(event.peer, response, strlen(response) + 1);
+                if (handlePacketCallback) {
+                    handlePacketCallback(event.peer->connectID, *packet);
+                }
+            }
+            catch (const std::exception& e) {
+                printf("Error processing packet: %s\n", e.what());
+            }
 
             enet_packet_destroy(event.packet);
             break;
@@ -116,6 +131,7 @@ void NetServer::handleEvent(const ENetEvent& event)
                 event.peer->address.port);
 
             event.peer->data = nullptr;
+            m_clients.erase(event.peer->connectID);
             break;
         }
         case ENET_EVENT_TYPE_NONE:
