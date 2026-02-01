@@ -48,8 +48,6 @@ public:
 
     void generateChunks(int chunk_x, int chunk_z, int radius = 1);
 
-    static ChunkCoord worldToChunkCoords(int world_x, int world_z);
-
     ChunkInfo* createChunk(int x, int z);
 
     void generateChunk(int x, int z);

@@ -18,18 +18,6 @@
 #include "world/world_event_manager.h"
 #include "world/world_event_list.h"
 
-static constexpr long long pack_chunk_coords(int x, int z) {
-    return ((long long)(x & 0xFFFFFFFF)) | ((long long)(z & 0xFFFFFFFF) << 32);
-}
-
-static constexpr int unpack_chunk_x(long long key) {
-    return (int)(key & 0xFFFFFFFF);
-}
-
-static constexpr int unpack_chunk_z(long long key) {
-    return (int)((key >> 32) & 0xFFFFFFFF);
-}
-
 World::World(WorldGenerator* generator) {
     m_generator = generator;
     m_chunk_creation_time = 0.0;
@@ -56,7 +44,7 @@ World::~World() {
 }
 
 ChunkInfo* World::createChunk(int x, int z) {
-    const long long chunk_index = pack_chunk_coords(x, z);
+    const long long chunk_index = ChunkCoord(x, z).getIndex();
 
     std::lock_guard<std::mutex> lock(m_chunks_mutex);
 
@@ -76,7 +64,7 @@ ChunkInfo* World::createChunk(int x, int z) {
 
 ChunkInfo* World::getChunkProtected(int x, int z) {
     std::lock_guard<std::mutex> lock(m_chunks_mutex);
-    const long long chunk_index = pack_chunk_coords(x, z);
+    const long long chunk_index = ChunkCoord(x, z).getIndex();
     auto it = m_chunks.find(chunk_index);
     if (it != m_chunks.end()) {
         return it->second;
@@ -100,10 +88,6 @@ ClientChunk* World::getChunk(int x, int z, bool create) {
 	);
 
     return chunk_info->chunk;
-}
-
-static inline int floorDiv(int a, int b) {
-    return (a / b) - (a % b < 0 ? 1 : 0);
 }
 
 Block* World::getBlock(int world_x, int world_y, int world_z) {
@@ -196,7 +180,7 @@ Entity World::CreatePlayer() {
     Entity entity = ecs->create();
 
     glm::ivec3 spawn_position = { 0, 0, 0 };
-    ChunkCoord chunk_coord = worldToChunkCoords(spawn_position.x, spawn_position.z);
+    ChunkCoord chunk_coord = ChunkCoord::fromWorldPosition(spawn_position.x, spawn_position.z);
 
     ecs->storage<Transform>().add(entity, { spawn_position, {0.0f, 0.0f, 0.0f} });
     ecs->storage<Velocity>().add(entity, { 0.0f, 0.0f, 0.0f });
@@ -302,10 +286,6 @@ void World::generateChunks(int chunk_x, int chunk_z, int radius) {
 	for (const auto& [x, z] : generate_list) {
         getChunk(x, z, true);
 	}
-}
-
-ChunkCoord World::worldToChunkCoords(int world_x, int world_z) {
-	return { floorDiv(world_x,  Constants::CHUNK_SIZE_X), floorDiv(world_z,  Constants::CHUNK_SIZE_X) };
 }
 
 void World::generateChunk(int x, int z) {
