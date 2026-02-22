@@ -18,15 +18,15 @@
 #include <core/ecs/components/player_camera.h>
 #include "../ui/ui.h"
 #include <core/constants.h>
+#include "../core/client.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 using namespace Constants;
 
-Render::Render(Window* window, ECS* ecs, Resources* resources, UI* ui) {
+Render::Render(Window* window, Client* client, Resources* resources, UI* ui) {
 	m_window = window;
-	m_ecs = ecs;
 	m_resources = resources;
 	m_ui = ui;
 
@@ -35,7 +35,7 @@ Render::Render(Window* window, ECS* ecs, Resources* resources, UI* ui) {
 	m_debug_render_mode = false;
 	m_render_dist = 15;
 
-	m_world = nullptr;
+	m_client = client;
 }
 
 Render::~Render() = default;
@@ -62,7 +62,7 @@ void Render::render() {
 
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
-	renderWorld(m_world, m_render_dist);
+	renderWorld(m_client->getWorld(), m_render_dist);
 
 	glEnable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
@@ -72,9 +72,6 @@ void Render::render() {
 	glfwSwapBuffers(window);
 }
 
-void Render::setWorld(World* world) {
-	m_world = world;
-}
 
 void Render::setDebugRenderMode(bool mode) {
 	m_debug_render_mode = mode;
@@ -121,11 +118,13 @@ void Render::renderWorld(World* world, int render_dist) {
 	atlas->bind();
 	world_block_shader->uniformi1("ourTexture1", 0);
 
-	glm::mat4 view(1.0f);
-	view = getCameraViewMatrix(ecs, m_player_entity);
+	Entity player_entity = m_client->getPlayerEntity();
 
-	const auto& player_transform = ecs->storage<Transform>().get(m_player_entity);
-	const auto& player_camera = ecs->storage<Camera>().get(m_player_entity);
+	glm::mat4 view(1.0f);
+	view = getCameraViewMatrix(ecs, player_entity);
+
+	const auto& player_transform = ecs->storage<Transform>().get(player_entity);
+	const auto& player_camera = ecs->storage<Camera>().get(player_entity);
 
 	glm::mat4 projection(1.0f);
 	projection = glm::perspective(player_camera.zoom, (float)m_render_width / (float)m_render_height, 0.1f, 1000.0f);
@@ -199,8 +198,4 @@ void Render::renderWorld(World* world, int render_dist) {
 	}
 
 	glDepthMask(GL_TRUE);
-}
-
-void Render::setPlayerEntity(Entity entity) {
-	m_player_entity = entity;
 }

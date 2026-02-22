@@ -87,6 +87,16 @@ World* Client::getWorld() const
     return m_world.get();
 }
 
+Entity Client::getPlayerEntity() const
+{
+    return m_player_entity;
+}
+
+void Client::setPlayerEntity(Entity entity)
+{
+    m_player_entity = entity;
+}
+
 void Client::runNetHandler()
 {
     while (m_net_client->isConnected()) {

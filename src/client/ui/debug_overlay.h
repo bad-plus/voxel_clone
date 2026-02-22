@@ -9,12 +9,12 @@
 class UI;
 class UIText;
 struct Resources;
-struct ECS;
+struct Client;
 struct World;
 
 class DebugOverlay {
 public:
-	DebugOverlay(UI* ui, Resources* resources, World* world);
+	DebugOverlay(UI* ui, Resources* resources, Client* client);
 	~DebugOverlay();
 
 	void show();
@@ -25,8 +25,6 @@ public:
 	
 	void setColor(const glm::vec3& color);
 	void setScale(float scale);
-
-	void setEntity(Entity entity);
 private:
 	void createElements();
 	void updateFPS();
@@ -36,9 +34,7 @@ private:
 
 	UI* m_ui;
 	Resources* m_resources;
-	World* m_world;
-	ECS* m_ecs;
-	Entity m_player_entity;
+	Client* m_client;
 
 	bool m_visible = true;
 };

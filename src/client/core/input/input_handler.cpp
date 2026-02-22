@@ -7,19 +7,17 @@
 #include "../../render/camera.hpp"
 #include <memory>
 #include "../../world/world/world_event_list.h"
+#include "../client.h"
 
 #include <core/constants.h>
 
 #include <GLFW/glfw3.h>
 
-InputHandler::InputHandler(Game* game, Input* input, ECS* ecs, UI* ui, World* world) {
-    m_player_entity = INVALID_ENTITY;
-
-    m_input = input;
-    m_ecs = ecs;
-    m_game = game;
-    m_ui = ui;
-	m_world = world;
+InputHandler::InputHandler(Game* game, Input* input, UI* ui, Client* client) {
+	m_input = input;
+	m_game = game;
+	m_ui = ui;
+	m_client = client;
 
     m_window_width = 0;
     m_window_height = 0;
@@ -31,6 +29,10 @@ bool current_render_debug_mode = false;
 BlockID selected_block = BlockID::BLUE;
 
 void InputHandler::processing() {
+	auto world = m_client->getWorld();
+	auto ecs = world->getECS();
+	auto player_entity = m_client->getPlayerEntity();
+
 	const float mouse_sensivty = 0.3f;
 
 	Time system_tick_time = m_game->getSystemInfo().update_tick_time;
@@ -47,7 +49,7 @@ void InputHandler::processing() {
 		m_ui->updateScreenSize(m_window_width, m_window_height);
 	}
 
-	auto& player_input = m_ecs->storage<PlayerInput>().get(m_player_entity);
+	auto& player_input = ecs->storage<PlayerInput>().get(player_entity);
 
 	if (m_input->pressed(GLFW_KEY_W)) player_input.move_forward = 1.0f;
 	else if (m_input->pressed(GLFW_KEY_S)) player_input.move_forward = -1.0f;
@@ -67,7 +69,7 @@ void InputHandler::processing() {
 	player_input.mouse_delta_y = -m_input->m_mouse_delta_y * mouse_sensivty;
 
 	if (m_input->jpressed(GLFW_KEY_M)) {
-		auto& player_state = m_ecs->storage<PlayerState>().get(m_player_entity);
+		auto& player_state = ecs->storage<PlayerState>().get(player_entity);
 
 		if (player_state.mode == PlayerMode::CREATIVE) player_state.mode = PlayerMode::SURVIVAL;
 		else if (player_state.mode == PlayerMode::SURVIVAL) player_state.mode = PlayerMode::SPECTATOR;
@@ -106,7 +108,7 @@ void InputHandler::processing() {
 		}
 	}
 
-	auto& player_camera = m_ecs->storage<Camera>().get(m_player_entity);
+	auto& player_camera = ecs->storage<Camera>().get(player_entity);
 
 	if (m_input->clicked(GLFW_MOUSE_BUTTON_1)) {
 
@@ -116,7 +118,7 @@ void InputHandler::processing() {
 		float curr_dist = 0.0f;
 
 		glm::vec3 start_pos = player_camera.position;
-		glm::vec3 direction = getCameraFront(m_ecs, m_player_entity);
+		glm::vec3 direction = getCameraFront(ecs, player_entity);
 
 		while (curr_dist < max_dist) {
 			glm::vec3 ray_pos = start_pos + direction * curr_dist;
@@ -125,11 +127,11 @@ void InputHandler::processing() {
 			int pos_y = (int)floor(ray_pos.y);
 			int pos_z = (int)floor(ray_pos.z);
 
-			Block* block = m_world->getBlock(pos_x, pos_y, pos_z);
+			Block* block = world->getBlock(pos_x, pos_y, pos_z);
 
 			if (block != nullptr && block->getBlockID() != BlockID::EMPTY) {
-				m_world->addEvent(
-					std::make_unique<BreakBlockEvent>(glm::ivec3(pos_x, pos_y, pos_z), m_player_entity)
+				world->addEvent(
+					std::make_unique<BreakBlockEvent>(glm::ivec3(pos_x, pos_y, pos_z), player_entity)
 				, true);
 				break;
 			}
@@ -145,7 +147,7 @@ void InputHandler::processing() {
 		float curr_dist = 0.0f;
 
 		glm::vec3 start_pos = player_camera.position;
-		glm::vec3 direction = getCameraFront(m_ecs, m_player_entity);
+		glm::vec3 direction = getCameraFront(ecs, player_entity);
 
 		while (curr_dist < max_dist) {
 			glm::vec3 ray_pos = start_pos + direction * curr_dist;
@@ -154,7 +156,7 @@ void InputHandler::processing() {
 			int pos_y = (int)floor(ray_pos.y);
 			int pos_z = (int)floor(ray_pos.z);
 
-			Block* block = m_world->getBlock(pos_x, pos_y, pos_z);
+			Block* block = world->getBlock(pos_x, pos_y, pos_z);
 
 			if (block != nullptr && block->getBlockID() != BlockID::EMPTY) {
 				curr_dist -= step;
@@ -163,8 +165,8 @@ void InputHandler::processing() {
 				pos_y = (int)floor(ray_pos.y);
 				pos_z = (int)floor(ray_pos.z);
 
-				m_world->addEvent(
-					std::make_unique<SetupBlockEvent>(glm::ivec3(pos_x, pos_y, pos_z), m_player_entity, selected_block)
+				world->addEvent(
+					std::make_unique<SetupBlockEvent>(glm::ivec3(pos_x, pos_y, pos_z), player_entity, selected_block)
 				, true);
 				break;
 			}
@@ -180,7 +182,7 @@ void InputHandler::processing() {
 		float curr_dist = 0.0f;
 
 		glm::vec3 start_pos = player_camera.position;
-		glm::vec3 direction = getCameraFront(m_ecs, m_player_entity);
+		glm::vec3 direction = getCameraFront(ecs, player_entity);
 
 		while (curr_dist < max_dist) {
 			glm::vec3 ray_pos = start_pos + direction * curr_dist;
@@ -189,7 +191,7 @@ void InputHandler::processing() {
 			int pos_y = (int)floor(ray_pos.y);
 			int pos_z = (int)floor(ray_pos.z);
 
-			Block* block = m_world->getBlock(pos_x, pos_y, pos_z);
+			Block* block = world->getBlock(pos_x, pos_y, pos_z);
 
 			if (block != nullptr && block->getBlockID() != BlockID::EMPTY) {
 				selected_block = block->getBlockID();
@@ -200,9 +202,4 @@ void InputHandler::processing() {
 		}
 
 	}
-}
-
-
-void InputHandler::setPlayerEntity(Entity entity) {
-    m_player_entity = entity;
 }

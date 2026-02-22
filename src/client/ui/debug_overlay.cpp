@@ -8,13 +8,14 @@
 #include "../world/generation/world_generator.h"
 #include "elements/vertical_layout.h"
 #include "elements/crosshair.h"
+#include "../core/client.h"
 
 #include <sstream>
 #include <iomanip>
 #include <string>
 
-DebugOverlay::DebugOverlay(UI* ui, Resources* resources, World* world)
-	: m_ui(ui), m_resources(resources), m_world(world), m_ecs(m_world->getECS())
+DebugOverlay::DebugOverlay(UI* ui, Resources* resources, Client* client)
+	: m_ui(ui), m_resources(resources), m_client(client)
 {
 	createElements();
 
@@ -99,16 +100,15 @@ void DebugOverlay::updateFPS() {
 	else fps_text->setColor({ 0.0f, 1.0f, 0.0f });
 }
 
-void DebugOverlay::setEntity(Entity entity) {
-	m_player_entity = entity;
-}
-
 void DebugOverlay::updatePlayerInfo() {
+	auto ecs = m_client->getWorld()->getECS();
+	auto player_entity = m_client->getPlayerEntity();
+
 	UIText* player_info_text = m_ui->getElementById<UIText>("debug_player_info");
 
-	auto& player_camera = m_ecs->storage<Camera>().get(m_player_entity);
-	auto& player_transform = m_ecs->storage<Transform>().get(m_player_entity);
-	auto& player_collider = m_ecs->storage<Collider>().get(m_player_entity);
+	auto& player_camera = ecs->storage<Camera>().get(player_entity);
+	auto& player_transform = ecs->storage<Transform>().get(player_entity);
+	auto& player_collider = ecs->storage<Collider>().get(player_entity);
 
 	std::string output_str = std::format(
 		"Position: {:.2f} {:.2f} {:.2f} / Rotate: {:.2f} {:.2f}",
@@ -139,7 +139,7 @@ void DebugOverlay::updateWorldGeneratorInfo() {
 
 	std::string output_str = std::format(
 		"Chunk generation time: {:.2f} ms",
-		m_world->getGenerator()->getChunkGenerationTime().getMS<float>()
+		m_client->getWorld()->getGenerator()->getChunkGenerationTime().getMS<float>()
 	);
 
 	world_info_text->setString(output_str);
@@ -150,7 +150,7 @@ void DebugOverlay::updateMeshGeneratorInfo() {
 
 	std::string output_str = std::format(
 		"Chunk mesh generation time: {:.2f} ms",
-		m_world->getMeshGenerationTime().getMS<float>()
+		m_client->getWorld()->getMeshGenerationTime().getMS<float>()
 	);
 
 	world_info_text->setString(output_str);

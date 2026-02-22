@@ -51,20 +51,16 @@ void Game::initSystems() {
 	
 	m_client = std::make_unique<Client>();
 
-	m_ui = std::make_unique<UI>(m_client->getWorld()->getECS(), m_resources.get());
+	m_ui = std::make_unique<UI>(m_client.get(), m_resources.get());
 
-	m_render = std::make_unique<Render>(m_window.get(), m_client->getWorld()->getECS(), m_resources.get(), m_ui.get());
-	m_render->setWorld(m_client->getWorld());
+	m_render = std::make_unique<Render>(m_window.get(), m_client.get(), m_resources.get(), m_ui.get());
 
 	Entity player_entity = m_client->getWorld()->CreatePlayer();
-	m_render->setPlayerEntity(player_entity);
+	m_client->setPlayerEntity(player_entity);
 
-	m_input_handler = std::make_unique<InputHandler>(this, m_input.get(), m_client->getWorld()->getECS(), m_ui.get(), m_client->getWorld());
-	m_input_handler->setPlayerEntity(player_entity);
+	m_input_handler = std::make_unique<InputHandler>(this, m_input.get(), m_ui.get(), m_client.get());
 
-	m_debug_overlay = std::make_unique<DebugOverlay>(m_ui.get(), m_resources.get(), m_client->getWorld());
-	m_debug_overlay->setEntity(player_entity);
-
+	m_debug_overlay = std::make_unique<DebugOverlay>(m_ui.get(), m_resources.get(), m_client.get());
 }
 
 void Game::movementUpdaterThread() {

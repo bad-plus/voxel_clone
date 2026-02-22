@@ -5,13 +5,13 @@
 #include "elements/base_element.h"
 #include "frame_counter.h"
 
-struct ECS;
+struct Client;
 struct Resources;
 class UIText;
 
 class UI {
 public:
-	UI(ECS* ecs, Resources* resources);
+	UI(Client* client, Resources* resources);
 	~UI();
 
 	void draw();
@@ -40,7 +40,7 @@ public:
 private:
 	std::vector<std::unique_ptr<UIElement>> m_elements;
 
-	ECS* m_ecs;
+	Client* m_client;
 	Resources* m_resources;
 
 	int m_screen_width = 800;

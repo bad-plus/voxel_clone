@@ -1,4 +1,5 @@
 ﻿#include "ui.h"
+#include "../core/client.h"
 #include <core/ecs/core/ecs.h>
 #include "../utils/resource/resources.h"
 #include <core/logger.hpp>
@@ -12,8 +13,8 @@
 #include <memory>
 #include <algorithm>
 
-UI::UI(ECS* ecs, Resources* resources) {
-	m_ecs = ecs;
+UI::UI(Client* client, Resources* resources) {
+	m_client = client;
 	m_resources = resources;
 }
 
