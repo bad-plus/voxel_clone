@@ -62,6 +62,20 @@ void RenderParams::blend(bool state) const
     }
 }
 
+void RenderParams::debugLines(bool state) const
+{
+    static bool current_state = false;
+    if (current_state != state) {
+        if (state) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        else {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+        current_state = state;
+    }
+}
+
 RenderParams::RenderParams()
 {
 }

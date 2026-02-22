@@ -13,9 +13,11 @@
 #include <memory>
 #include <algorithm>
 
-UI::UI(Client* client, Resources* resources) {
-	m_client = client;
-	m_resources = resources;
+UI::UI(Client* client, Resources* resources) :
+	m_client(client),
+	m_resources(resources)
+{
+
 }
 
 UI::~UI() {

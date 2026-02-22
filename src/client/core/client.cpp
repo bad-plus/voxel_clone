@@ -7,10 +7,10 @@
 #include <memory>
 #include "../world/generation/world_generator.h"
 
-Client::Client() : m_net_client(std::make_unique<NetClient>())
+Client::Client() : 
+    m_net_client(std::make_unique<NetClient>()),
+    m_world(std::make_unique<World>())
 {
-    m_world = std::make_unique<World>();
-
     // TODO: test
     m_net_client->handlePacketCallback = [](const Packet& packet) {
     switch (packet.getType()) {

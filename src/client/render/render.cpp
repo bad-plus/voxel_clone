@@ -26,18 +26,16 @@
 
 using namespace Constants;
 
-Render::Render(Window* window, Client* client, Resources* resources, UI* ui) {
-	m_window = window;
-	m_resources = resources;
-	m_ui = ui;
-	m_render_params = RenderParams::getInstance();
-
+Render::Render(Window* window, Client* client, Resources* resources, UI* ui) :
+	m_window(window),
+	m_resources(resources),
+	m_ui(ui),
+	m_debug_render_mode(false),
+	m_client(client),
+	m_render_params(RenderParams::getInstance()),
+	m_render_dist(15)
+{
 	initRender();
-
-	m_debug_render_mode = false;
-	m_render_dist = 15;
-
-	m_client = client;
 }
 
 Render::~Render() = default;
@@ -56,8 +54,7 @@ void Render::render() {
 	glClearColor(0.25f, 0.25f, 0.75f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if (m_debug_render_mode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	m_render_params->debugLines(m_debug_render_mode);
 
 	m_render_params->blend(false);
 	m_render_params->depthTest(true);
@@ -90,7 +87,7 @@ std::vector<std::pair<int, int>> genCircleReady(int cx, int cz, int radius) {
 		int dist_a = (a.first - cx) * (a.first - cx) + (a.second - cz) * (a.second - cz);
 		int dist_b = (b.first - cx) * (b.first - cx) + (b.second - cz) * (b.second - cz);
 		return dist_a < dist_b;
-		});
+	});
 
 	return out;
 }

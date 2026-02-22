@@ -6,8 +6,9 @@
 
 #include <glfw/glfw3.h>
 
-WorldGenerator::WorldGenerator(int seed) {
-    m_seed = seed;
+WorldGenerator::WorldGenerator(int seed) : 
+    m_seed(seed)
+{
     m_perlin = std::make_unique<Perlin2D>(m_seed);
 
     m_perlin_river = std::make_unique<Perlin2D>(m_seed + 1);

@@ -5,8 +5,10 @@
 #include "resources.h"
 #include "font.h"
 
-Loader::Loader(Resources* resources) {
-    m_resources = resources;
+Loader::Loader(Resources* resources) :
+    m_resources(resources)
+{
+
 }
 Loader::~Loader() = default;
 

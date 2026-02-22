@@ -13,14 +13,15 @@
 
 #include <GLFW/glfw3.h>
 
-InputHandler::InputHandler(Game* game, Input* input, UI* ui, Client* client) {
-	m_input = input;
-	m_game = game;
-	m_ui = ui;
-	m_client = client;
-
-    m_window_width = 0;
-    m_window_height = 0;
+InputHandler::InputHandler(Game* game, Input* input, UI* ui, Client* client) :
+	m_game(game),
+	m_input(input),
+	m_ui(ui),
+	m_client(client),
+	m_window_width(0),
+	m_window_height(0)
+{
+    
 }
 InputHandler::~InputHandler() = default;
 

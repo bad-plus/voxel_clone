@@ -2,21 +2,19 @@
 
 #include <GLFW/glfw3.h>
 
-ClientChunk::ClientChunk()
+ClientChunk::ClientChunk() :
+	m_mesh_renderer_opaque(std::make_unique<MeshRenderer>()),
+	m_mesh_renderer_cutout(std::make_unique<MeshRenderer>()),
+	m_mesh_renderer_transparent(std::make_unique<MeshRenderer>()),
+	m_dirty(true),
+	m_mesh_build_time(0.0f)
 {
+
+	m_ready_gpu.ready = false;
 	m_neighbors.x_p.store(nullptr);
 	m_neighbors.z_p.store(nullptr);
 	m_neighbors.x_m.store(nullptr);
 	m_neighbors.z_m.store(nullptr);
-	m_dirty = true;
-
-	m_mesh_renderer_opaque = std::make_unique<MeshRenderer>();
-	m_mesh_renderer_cutout = std::make_unique<MeshRenderer>();
-	m_mesh_renderer_transparent = std::make_unique<MeshRenderer>();
-
-	m_ready_gpu.ready = false;
-
-	m_mesh_build_time = 0.0f;
 }
 
 void ClientChunk::markDirty() {

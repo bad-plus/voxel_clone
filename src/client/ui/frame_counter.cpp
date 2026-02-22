@@ -2,10 +2,12 @@
 
 #include <glfw/glfw3.h>
 
-FrameCounter::FrameCounter() {
-	m_fps = 0;
-	m_frames_count = 0;
-	m_prev_fps_time = 0;
+FrameCounter::FrameCounter() :
+	m_fps(0),
+	m_frames_count(0),
+	m_prev_fps_time(0)
+{
+
 }
 
 void FrameCounter::frame() {
