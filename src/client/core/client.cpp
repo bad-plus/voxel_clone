@@ -3,9 +3,14 @@
 #include <core/net/client_to_server.hpp>
 #include <core/net/server_to_client.hpp>
 #include <core/logger.hpp>
+#include "../world/world.h"
+#include <memory>
+#include "../world/generation/world_generator.h"
 
 Client::Client() : m_net_client(std::make_unique<NetClient>())
 {
+    m_world = std::make_unique<World>();
+
     // TODO: test
     m_net_client->handlePacketCallback = [](const Packet& packet) {
     switch (packet.getType()) {
@@ -41,6 +46,7 @@ Client::Client() : m_net_client(std::make_unique<NetClient>())
 Client::~Client()
 {
     disconnect();
+    m_world->shutdown();
     for (auto& thread : m_threads) {
         if (thread.joinable()) {
             thread.join();
@@ -74,6 +80,11 @@ bool Client::connect(const char* host, uint16_t port)
 void Client::disconnect()
 {
     m_net_client->disconnect();
+}
+
+World* Client::getWorld() const
+{
+    return m_world.get();
 }
 
 void Client::runNetHandler()

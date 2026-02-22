@@ -48,36 +48,23 @@ void Game::initSystems() {
 
 	m_loader = std::make_unique<Loader>(m_resources.get());
 	m_loader->loadResources();
+	
+	m_client = std::make_unique<Client>();
 
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> dis(1, INT_MAX);
-	int seed = dis(gen);
+	m_ui = std::make_unique<UI>(m_client->getWorld()->getECS(), m_resources.get());
 
-#ifdef _DEBUG
-	seed = 666;
-#endif
+	m_render = std::make_unique<Render>(m_window.get(), m_client->getWorld()->getECS(), m_resources.get(), m_ui.get());
+	m_render->setWorld(m_client->getWorld());
 
-	m_world_generator = std::make_unique<WorldGenerator>(seed);
-	LOG_INFO("World seed: {0}", seed);
-
-	m_world = std::make_unique<World>(m_world_generator.get());
-
-	m_ui = std::make_unique<UI>(m_world->getECS(), m_resources.get());
-
-	m_render = std::make_unique<Render>(m_window.get(), m_world->getECS(), m_resources.get(), m_ui.get());
-	m_render->setWorld(m_world.get());
-
-	Entity player_entity = m_world->CreatePlayer();
+	Entity player_entity = m_client->getWorld()->CreatePlayer();
 	m_render->setPlayerEntity(player_entity);
 
-	m_input_handler = std::make_unique<InputHandler>(this, m_input.get(), m_world->getECS(), m_ui.get(), m_world.get());
+	m_input_handler = std::make_unique<InputHandler>(this, m_input.get(), m_client->getWorld()->getECS(), m_ui.get(), m_client->getWorld());
 	m_input_handler->setPlayerEntity(player_entity);
 
-	m_debug_overlay = std::make_unique<DebugOverlay>(m_ui.get(), m_resources.get(), m_world.get());
+	m_debug_overlay = std::make_unique<DebugOverlay>(m_ui.get(), m_resources.get(), m_client->getWorld());
 	m_debug_overlay->setEntity(player_entity);
 
-	m_client = std::make_unique<Client>();
 }
 
 void Game::movementUpdaterThread() {
@@ -98,7 +85,7 @@ void Game::movementUpdaterThread() {
 		accumulator += frame_time;
 
 		while (accumulator >= dt) {
-			m_world->tick_movement();
+			m_client->getWorld()->tick_movement();
 			accumulator -= dt;
 		}
 
@@ -133,7 +120,7 @@ void Game::worldUpdaterThread() {
 		accumulator += frame_time;
 
 		while (accumulator >= dt) {
-			m_world->tick();
+			m_client->getWorld()->tick();
 			accumulator -= dt;
 		}
 
@@ -152,7 +139,6 @@ void Game::worldUpdaterThread() {
 
 void Game::quit() {
 	m_quit.store(true);
-	if (m_world) m_world->shutdown();
 	m_window->quit();
 }
 

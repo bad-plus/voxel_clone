@@ -28,7 +28,7 @@ struct ChunkInfo {
 
 class World {
 public:
-    World(WorldGenerator* generator);
+    World(WorldGenerator* generator = nullptr);
     ~World();
 
     ClientChunk* getChunk(int x, int z, bool create = false);

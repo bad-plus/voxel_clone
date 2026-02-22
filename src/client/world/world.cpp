@@ -7,6 +7,7 @@
 #include <thread>
 #include <algorithm>
 #include <vector>
+#include <memory>
 #include <core/ecs/core/ecs.h>
 #include <core/constants.h>
 
@@ -19,7 +20,10 @@
 #include "world/world_event_list.h"
 
 World::World(WorldGenerator* generator) {
-    m_generator = generator;
+    if (generator == nullptr) {
+        m_generator = new WorldGenerator(666);
+    }
+    else m_generator = generator;
     m_chunk_creation_time = 0.0;
     last_tick_time = 0;
 
