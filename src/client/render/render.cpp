@@ -19,6 +19,7 @@
 #include "../ui/ui.h"
 #include <core/constants.h>
 #include "../core/client.h"
+#include "graphics/render_params.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -29,6 +30,7 @@ Render::Render(Window* window, Client* client, Resources* resources, UI* ui) {
 	m_window = window;
 	m_resources = resources;
 	m_ui = ui;
+	m_render_params = RenderParams::getInstance();
 
 	initRender();
 
@@ -41,11 +43,8 @@ Render::Render(Window* window, Client* client, Resources* resources, UI* ui) {
 Render::~Render() = default;
 
 void Render::initRender() const {
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
-	glEnable(GL_DEPTH_TEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	m_render_params->setup();
+	m_render_params->depthTest(true);
 }
 
 void Render::render() {
@@ -60,13 +59,12 @@ void Render::render() {
 	if (m_debug_render_mode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	glDisable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
+	m_render_params->blend(false);
+	m_render_params->depthTest(true);
 	renderWorld(m_client->getWorld(), m_render_dist);
 
-	glEnable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
-
+	m_render_params->blend(true);
+	m_render_params->depthTest(false);
 	m_ui->draw();
 
 	glfwSwapBuffers(window);
@@ -137,9 +135,9 @@ void Render::renderWorld(World* world, int render_dist) {
 	glm::mat4 model;
 
 	// Draw opaque
-	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_TRUE);
-	glDisable(GL_BLEND);
+	m_render_params->depthTest(true);
+	m_render_params->depthMask(true);
+	m_render_params->blend(false);
 
 	for (const auto& [x, z] : chunks_around_entity) {
 		model = glm::translate(
@@ -157,9 +155,9 @@ void Render::renderWorld(World* world, int render_dist) {
 
 	// Draw cutout
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_TRUE);
-	glDisable(GL_BLEND);
+	m_render_params->depthTest(true);
+	m_render_params->depthMask(true);
+	m_render_params->blend(false);
 
 	for (const auto& [x, z] : chunks_around_entity) {
 		model = glm::translate(
@@ -177,9 +175,9 @@ void Render::renderWorld(World* world, int render_dist) {
 
 	// Draw transparent
 
-	glEnable(GL_BLEND);
+	m_render_params->blend(true);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDepthMask(GL_FALSE);
+	m_render_params->depthMask(false);
 
 	for (auto it = chunks_around_entity.rbegin(); it != chunks_around_entity.rend(); ++it) {
 		const auto& [x, z] = *it;
@@ -197,5 +195,5 @@ void Render::renderWorld(World* world, int render_dist) {
 		}
 	}
 
-	glDepthMask(GL_TRUE);
+	m_render_params->depthMask(true);
 }

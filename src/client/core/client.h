@@ -18,6 +18,7 @@ public:
 
 	World* getWorld() const;
 	Entity getPlayerEntity() const;
+
 	void setPlayerEntity(Entity entity);
 private:
 	void runNetHandler();

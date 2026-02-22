@@ -7,6 +7,7 @@ struct ECS;
 struct Resources;
 struct UI;
 struct Client;
+struct RenderParams;
 
 class Render {
 public:
@@ -31,6 +32,8 @@ private:
     int m_render_height;
 
     Client* m_client;
+
+    RenderParams* m_render_params;
 
     int m_render_dist;
 };
