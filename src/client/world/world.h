@@ -20,12 +20,6 @@ struct CameraUpdateSystem;
 struct PlayerCameraSystem;
 struct WorldEventManager;
 
-struct ChunkInfo {
-    ClientChunk* chunk;
-    int x;
-    int z;
-};
-
 class World {
 public:
     World(WorldGenerator* generator = nullptr);
@@ -48,7 +42,7 @@ public:
 
     void generateChunks(int chunk_x, int chunk_z, int radius = 1);
 
-    ChunkInfo* createChunk(int x, int z);
+    ClientChunk* createChunk(int x, int z);
 
     void generateChunk(int x, int z);
 
@@ -57,10 +51,10 @@ public:
     void shutdown();
 private:
 
-    ChunkInfo* getChunkProtected(int x, int z);
+    ClientChunk* getChunkProtected(int x, int z);
     double m_chunk_creation_time;
 
-    std::unordered_map<long long, ChunkInfo*> m_chunks;
+    std::unordered_map<long long, ClientChunk*> m_chunks;
     std::mutex m_chunks_mutex;
 
     WorldGenerator* m_generator;

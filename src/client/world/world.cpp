@@ -39,15 +39,14 @@ World::World(WorldGenerator* generator) {
 }
 
 World::~World() {
-    for (auto& [key, chunk_info] : m_chunks) {
-        if (chunk_info != nullptr) {
-            delete chunk_info->chunk;
-            delete chunk_info;
+    for (auto& [key, chunk] : m_chunks) {
+        if (chunk != nullptr) {
+            delete chunk;
         }
     }
 }
 
-ChunkInfo* World::createChunk(int x, int z) {
+ClientChunk* World::createChunk(int x, int z) {
     const long long chunk_index = ChunkCoord(x, z).getIndex();
 
     std::lock_guard<std::mutex> lock(m_chunks_mutex);
@@ -57,16 +56,12 @@ ChunkInfo* World::createChunk(int x, int z) {
         return it->second;
     }
 
-    ChunkInfo* chunk_info = new ChunkInfo;
-    chunk_info->x = x;
-    chunk_info->z = z;
-    chunk_info->chunk = new ClientChunk;
-
-    m_chunks[chunk_index] = chunk_info;
-    return chunk_info;
+    ClientChunk* new_chunk = new ClientChunk();
+    m_chunks[chunk_index] = new_chunk;
+    return new_chunk;
 }
 
-ChunkInfo* World::getChunkProtected(int x, int z) {
+ClientChunk* World::getChunkProtected(int x, int z) {
     std::lock_guard<std::mutex> lock(m_chunks_mutex);
     const long long chunk_index = ChunkCoord(x, z).getIndex();
     auto it = m_chunks.find(chunk_index);
@@ -77,21 +72,21 @@ ChunkInfo* World::getChunkProtected(int x, int z) {
 }
 
 ClientChunk* World::getChunk(int x, int z, bool create) {
-    ChunkInfo* chunk_info = getChunkProtected(x, z);
+    ClientChunk* chunk = getChunkProtected(x, z);
 
-    if (chunk_info != nullptr) return chunk_info->chunk;
+    if (chunk != nullptr) return chunk;
 
     if (!create) {
         return nullptr;
     }
 
-    chunk_info = createChunk(x, z);
+    chunk = createChunk(x, z);
     ChunkCoord coord = { x, z };
     addEvent(
         std::make_unique<GenerateChunkEvent>(coord)
 	);
 
-    return chunk_info->chunk;
+    return chunk;
 }
 
 Block* World::getBlock(int world_x, int world_y, int world_z) {
@@ -124,15 +119,15 @@ void World::setBlock(int world_x, int world_y, int world_z, BlockID block_id) {
 	int in_chunk_z = world_z % Constants::CHUNK_SIZE_Z;
 	if (in_chunk_z < 0) in_chunk_z += Constants::CHUNK_SIZE_Z;
 
-	ChunkInfo* chunk = getChunkProtected(chunk_x, chunk_z);
+	ClientChunk* chunk = getChunkProtected(chunk_x, chunk_z);
 	if (chunk == nullptr) return;
 
-	Block* block = chunk->chunk->getBlock({ in_chunk_x, in_chunk_y, in_chunk_z });
+	Block* block = chunk->getBlock({ in_chunk_x, in_chunk_y, in_chunk_z });
 	if (block == nullptr) return;
 
 	block->setBlockID(block_id);
 
-	chunk->chunk->markDirty();
+	chunk->markDirty();
 
 	addEvent(
 		std::make_unique<UpdateMeshEvent>(ChunkCoord(chunk_x, chunk_z))
@@ -254,7 +249,7 @@ Time World::getMeshGenerationTime() const {
     int all_count = 0;
 
     for (const auto& [key, value] : m_chunks) {
-        auto time = value->chunk->getChunkBuildTime();
+        auto time = value->getChunkBuildTime();
         if (time != 0.0f) {
             all_time += time;
             all_count++;

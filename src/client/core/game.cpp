@@ -152,7 +152,7 @@ Game::~Game() {
 }
 
 void Game::run() {
-	m_client->connect("127.0.0.1");
+	//m_client->connect("127.0.0.1");
 
 	while (!m_quit) {
 		auto start_game_tick_time = Time::now();

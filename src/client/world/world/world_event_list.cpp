@@ -31,7 +31,7 @@ void GenerateChunkEvent::apply(World& world, WorldEventManager& manager)
 	ClientChunk* chunk = world.getChunk(position.x, position.z);
 
 	if (chunk == nullptr) {
-		chunk = world.createChunk(position.x, position.z)->chunk;
+		chunk = world.createChunk(position.x, position.z);
 	}
 
 	world.generateChunk(position.x, position.z);
