@@ -6,7 +6,7 @@
 #include <core/ecs/core/entity.h>
 
 struct NetClient;
-struct World;
+struct ClientWorld;
 
 class Client {
 public:
@@ -16,7 +16,7 @@ public:
 	bool connect(const char* host, uint16_t port = Constants::DEFAULT_SERVER_PORT);
 	void disconnect();
 
-	World* getWorld() const;
+	ClientWorld* getWorld() const;
 	Entity getPlayerEntity() const;
 
 	void setPlayerEntity(Entity entity);
@@ -24,7 +24,7 @@ private:
 	void runNetHandler();
 
 	std::unique_ptr<NetClient> m_net_client;
-	std::unique_ptr<World> m_world;
+	std::unique_ptr<ClientWorld> m_world;
 
 	Entity m_player_entity;
 

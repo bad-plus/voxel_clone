@@ -3,6 +3,7 @@
 #include "input.h"
 #include <core/world/chunk/chunk.h>
 #include <core/world/block/block.h>
+#include "../../world/client_world.h"
 #include "../../ui/ui.h"
 #include "../../render/camera.hpp"
 #include <memory>
@@ -10,6 +11,7 @@
 #include "../client.h"
 
 #include <core/constants.h>
+#include <core/world/world.h>
 
 #include <GLFW/glfw3.h>
 
@@ -131,9 +133,7 @@ void InputHandler::processing() {
 			Block* block = world->getBlock(pos_x, pos_y, pos_z);
 
 			if (block != nullptr && block->getBlockID() != BlockID::EMPTY) {
-				world->addEvent(
-					std::make_unique<BreakBlockEvent>(glm::ivec3(pos_x, pos_y, pos_z), player_entity)
-				, true);
+				world->addEvent(std::make_unique<BreakBlockEvent<ClientWorld>>(glm::ivec3(pos_x, pos_y, pos_z), player_entity), true);
 				break;
 			}
 
@@ -166,9 +166,7 @@ void InputHandler::processing() {
 				pos_y = (int)floor(ray_pos.y);
 				pos_z = (int)floor(ray_pos.z);
 
-				world->addEvent(
-					std::make_unique<SetupBlockEvent>(glm::ivec3(pos_x, pos_y, pos_z), player_entity, selected_block)
-				, true);
+				world->addEvent(std::make_unique<SetupBlockEvent<ClientWorld>>(glm::ivec3(pos_x, pos_y, pos_z), player_entity, selected_block), true);
 				break;
 			}
 

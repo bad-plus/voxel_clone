@@ -4,7 +4,7 @@
 #include "../utils/resource/resources.h"
 #include <core/logger.hpp>
 #include <core/ecs/core/ecs.h>
-#include "../world/world.h"
+#include "../world/client_world.h"
 #include "../world/generation/world_generator.h"
 #include "elements/vertical_layout.h"
 #include "elements/crosshair.h"
@@ -86,7 +86,6 @@ void DebugOverlay::toggle() {
 void DebugOverlay::update(const Time& delta_time) {
 	updateFPS();
 	updatePlayerInfo();
-	updateWorldGeneratorInfo();
 	updateMeshGeneratorInfo();
 }
 
@@ -134,16 +133,6 @@ void DebugOverlay::setScale(float scale) {
 	if (UIText* world_generator_info = m_ui->getElementById<UIText>("world_generator_info_create_chunk")) world_generator_info->setScale(scale);
 }
 
-void DebugOverlay::updateWorldGeneratorInfo() {
-	UIText* world_info_text = m_ui->getElementById<UIText>("world_generator_info_create_chunk");
-
-	std::string output_str = std::format(
-		"Chunk generation time: {:.2f} ms",
-		m_client->getWorld()->getGenerator()->getChunkGenerationTime().getMS<float>()
-	);
-
-	world_info_text->setString(output_str);
-}
 
 void DebugOverlay::updateMeshGeneratorInfo() {
 	UIText* world_info_text = m_ui->getElementById<UIText>("world_generator_info_create_mesh");

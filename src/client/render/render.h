@@ -1,7 +1,7 @@
 #pragma once
 #include <core/ecs/core/entity.h>
 
-struct World;
+struct ClientWorld;
 struct Window;
 struct ECS;
 struct Resources;
@@ -18,7 +18,7 @@ public:
 
     void setDebugRenderMode(bool mode);
 
-    void renderWorld(World* world, int render_dist = 5);
+    void renderWorld(ClientWorld* world, int render_dist = 5);
 private:
     Window* m_window;
     Resources* m_resources;

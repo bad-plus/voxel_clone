@@ -10,7 +10,7 @@ class UI;
 class UIText;
 struct Resources;
 struct Client;
-struct World;
+struct ClientWorld;
 
 class DebugOverlay {
 public:
@@ -29,7 +29,6 @@ private:
 	void createElements();
 	void updateFPS();
 	void updatePlayerInfo();
-	void updateWorldGeneratorInfo();
 	void updateMeshGeneratorInfo();
 
 	UI* m_ui;

@@ -4,10 +4,10 @@
 #include "collider_vs_block.h"
 #include <glm/glm.hpp>
 
-struct World;
+struct ClientWorld;
 
 namespace Utils {	
-	bool checkCollisionToWorld(World* world, const glm::vec3& position, const Collider& collider) {
+	bool checkCollisionToWorld(ClientWorld* world, const glm::vec3& position, const Collider& collider) {
 
 		int min_check_x = static_cast<int>(std::floor(position.x - collider.half_x)) - 1;
 		int max_check_x = static_cast<int>(std::floor(position.x + collider.half_x)) + 1;

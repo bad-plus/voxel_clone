@@ -6,9 +6,10 @@
 #include <core/world/block/block.h>
 #include <core/ecs/core/entity.h>
 #include <core/world/chunk/chunk.h>
+#include <core/time.hpp>
+#include <core/world/world.h>
 #include "chunk/client_chunk.h"
 #include "world/world_event.h"
-#include <core/time.hpp>
 
 struct Chunk;
 struct WorldGenerator;
@@ -18,17 +19,17 @@ struct WorldCollisionSystem;
 struct GravitySystem;
 struct CameraUpdateSystem;
 struct PlayerCameraSystem;
-struct WorldEventManager;
 
-class World {
+class ClientWorld : public World {
 public:
-    World(WorldGenerator* generator = nullptr);
-    ~World();
+    ClientWorld();
+    ~ClientWorld();
 
-    ClientChunk* getChunk(int x, int z, bool create = false);
-    Block* getBlock(int world_x, int world_y, int world_z);
+    ClientChunk* getChunk(int x, int z);
 
-    void setBlock(int world_x, int world_y, int world_z, BlockID block_id);
+    Chunk* createChunk(int x, int z) override;
+
+    void setBlock(int world_x, int world_y, int world_z, BlockID block_id) override;
 
     Entity CreatePlayer();
     ECS* getECS();
@@ -36,30 +37,17 @@ public:
     void tick();
     void tick_movement();
 
-    const WorldGenerator* getGenerator() const { return m_generator; }
-
     Time getMeshGenerationTime() const;
 
     void generateChunks(int chunk_x, int chunk_z, int radius = 1);
 
-    ClientChunk* createChunk(int x, int z);
+    void addEvent(std::unique_ptr<WorldEvent<ClientWorld>> event, bool priority = false);
 
-    void generateChunk(int x, int z);
-
-    void addEvent(std::unique_ptr<WorldEvent> event, bool priority = false);
-
-    void shutdown();
+    void shutdown() override;
 private:
-
-    ClientChunk* getChunkProtected(int x, int z);
     double m_chunk_creation_time;
 
-    std::unordered_map<long long, ClientChunk*> m_chunks;
-    std::mutex m_chunks_mutex;
-
-    WorldGenerator* m_generator;
-
-    std::unique_ptr<WorldEventManager> m_event_manager;
+    std::unique_ptr < WorldEventManager < ClientWorld >> m_event_manager;
 
     struct {
         std::unique_ptr<ECS> ecs;

@@ -1,4 +1,4 @@
-﻿#include "world.h"
+﻿#include "client_world.h"
 #include <core/world/chunk/chunk.h>
 #include <core/world/block/block.h>
 #include <core/logger.hpp>
@@ -19,11 +19,7 @@
 #include "world/world_event_manager.h"
 #include "world/world_event_list.h"
 
-World::World(WorldGenerator* generator) {
-    if (generator == nullptr) {
-        m_generator = new WorldGenerator(666);
-    }
-    else m_generator = generator;
+ClientWorld::ClientWorld() {
     m_chunk_creation_time = 0.0;
     last_tick_time = 0;
 
@@ -35,10 +31,10 @@ World::World(WorldGenerator* generator) {
     m_ecs.gravity_system = std::make_unique<GravitySystem>();
     m_ecs.player_movement_systems = std::make_unique<PlayerSystemsManager>();
 
-    m_event_manager = std::make_unique<WorldEventManager>();
+    m_event_manager = std::make_unique<WorldEventManager<ClientWorld>>();
 }
 
-World::~World() {
+ClientWorld::~ClientWorld() {
     for (auto& [key, chunk] : m_chunks) {
         if (chunk != nullptr) {
             delete chunk;
@@ -46,68 +42,46 @@ World::~World() {
     }
 }
 
-ClientChunk* World::createChunk(int x, int z) {
+ClientChunk* ClientWorld::getChunk(int x, int z)
+{
+    return dynamic_cast<ClientChunk*>(World::getChunk(x, z));
+}
+
+Chunk* ClientWorld::createChunk(int x, int z)
+{
     const long long chunk_index = ChunkCoord(x, z).getIndex();
 
     std::lock_guard<std::mutex> lock(m_chunks_mutex);
 
     auto it = m_chunks.find(chunk_index);
     if (it != m_chunks.end()) {
-        return it->second;
+        return dynamic_cast<Chunk*>(it->second);
     }
 
-    ClientChunk* new_chunk = new ClientChunk();
+    Chunk* new_chunk = new ClientChunk();
     m_chunks[chunk_index] = new_chunk;
     return new_chunk;
 }
 
-ClientChunk* World::getChunkProtected(int x, int z) {
-    std::lock_guard<std::mutex> lock(m_chunks_mutex);
-    const long long chunk_index = ChunkCoord(x, z).getIndex();
-    auto it = m_chunks.find(chunk_index);
-    if (it != m_chunks.end()) {
-        return it->second;
-    }
-    return nullptr;
-}
+//ClientChunk* ClientWorld::getChunk(int x, int z, bool create) {
+//    ClientChunk* chunk = getChunkProtected(x, z);
+//
+//    if (chunk != nullptr) return chunk;
+//
+//    if (!create) {
+//        return nullptr;
+//    }
+//
+//    chunk = createChunk(x, z);
+//    ChunkCoord coord = { x, z };
+//    addEvent(
+//        std::make_unique<GenerateChunkEvent>(coord)
+//	);
+//
+//    return chunk;
+//}
 
-ClientChunk* World::getChunk(int x, int z, bool create) {
-    ClientChunk* chunk = getChunkProtected(x, z);
-
-    if (chunk != nullptr) return chunk;
-
-    if (!create) {
-        return nullptr;
-    }
-
-    chunk = createChunk(x, z);
-    ChunkCoord coord = { x, z };
-    addEvent(
-        std::make_unique<GenerateChunkEvent>(coord)
-	);
-
-    return chunk;
-}
-
-Block* World::getBlock(int world_x, int world_y, int world_z) {
-    int chunk_x = floorDiv(world_x, Constants::CHUNK_SIZE_X);
-    int chunk_z = floorDiv(world_z, Constants::CHUNK_SIZE_Z);
-
-    int in_chunk_x = world_x % Constants::CHUNK_SIZE_X;
-    if (in_chunk_x < 0) in_chunk_x += Constants::CHUNK_SIZE_X;
-
-    int in_chunk_y = world_y;
-
-    int in_chunk_z = world_z % Constants::CHUNK_SIZE_Z;
-    if (in_chunk_z < 0) in_chunk_z += Constants::CHUNK_SIZE_Z;
-
-    Chunk* chunk = getChunk(chunk_x, chunk_z);
-    if (chunk == nullptr) return nullptr;
-
-    return chunk->getBlock({ in_chunk_x, in_chunk_y, in_chunk_z });
-}
-
-void World::setBlock(int world_x, int world_y, int world_z, BlockID block_id) {
+void ClientWorld::setBlock(int world_x, int world_y, int world_z, BlockID block_id) {
 	int chunk_x = floorDiv(world_x, Constants::CHUNK_SIZE_X);
 	int chunk_z = floorDiv(world_z, Constants::CHUNK_SIZE_Z);
 
@@ -119,7 +93,7 @@ void World::setBlock(int world_x, int world_y, int world_z, BlockID block_id) {
 	int in_chunk_z = world_z % Constants::CHUNK_SIZE_Z;
 	if (in_chunk_z < 0) in_chunk_z += Constants::CHUNK_SIZE_Z;
 
-	ClientChunk* chunk = getChunkProtected(chunk_x, chunk_z);
+	ClientChunk* chunk = getChunk(chunk_x, chunk_z);
 	if (chunk == nullptr) return;
 
 	Block* block = chunk->getBlock({ in_chunk_x, in_chunk_y, in_chunk_z });
@@ -174,7 +148,7 @@ void World::setBlock(int world_x, int world_y, int world_z, BlockID block_id) {
 	}
 }
 
-Entity World::CreatePlayer() {
+Entity ClientWorld::CreatePlayer() {
     ECS* ecs = getECS();
     Entity entity = ecs->create();
 
@@ -199,11 +173,11 @@ Entity World::CreatePlayer() {
     return entity;
 }
 
-ECS* World::getECS() {
+ECS* ClientWorld::getECS() {
     return m_ecs.ecs.get();
 }
 
-void World::tick() {
+void ClientWorld::tick() {
     if (last_tick_time == Time{}) {
         last_tick_time = Time::now();
         return;
@@ -218,7 +192,7 @@ void World::tick() {
     m_event_manager->process(*this);
 }
 
-void World::tick_movement() {
+void ClientWorld::tick_movement() {
     if (last_tick_time == Time{}) {
         last_tick_time = Time::now();
         return;
@@ -244,12 +218,16 @@ void World::tick_movement() {
 }
 
 
-Time World::getMeshGenerationTime() const {
+Time ClientWorld::getMeshGenerationTime() const {
     auto all_time = Time();
     int all_count = 0;
 
+
     for (const auto& [key, value] : m_chunks) {
-        auto time = value->getChunkBuildTime();
+        if (value == nullptr) continue;
+
+        auto time = static_cast<ClientChunk*>(value)->getChunkBuildTime();
+
         if (time != 0.0f) {
             all_time += time;
             all_count++;
@@ -279,25 +257,24 @@ std::vector<std::pair<int, int>> genCircleReadyA(int cx, int cz, int radius) {
 	return out;
 }
 
-void World::generateChunks(int chunk_x, int chunk_z, int radius) {
+void ClientWorld::generateChunks(int chunk_x, int chunk_z, int radius) {
 	auto generate_list = genCircleReadyA(chunk_x, chunk_z, radius);
 
 	for (const auto& [x, z] : generate_list) {
-        getChunk(x, z, true);
+        createChunk(x, z);
+        /*addEvent(
+            std::make_unique<GenerateChunkEvent>(ChunkCoord(x, z))
+        );*/
+
 	}
 }
 
-void World::generateChunk(int x, int z) {
-    Chunk* chunk = getChunk(x, z);
-    m_generator->generateChunk(chunk, x, z);
-}
-
-void World::addEvent(std::unique_ptr<WorldEvent> event, bool priority)
-{
+void ClientWorld::addEvent(std::unique_ptr<WorldEvent<ClientWorld>> event, bool priority) {
     m_event_manager->push(std::move(event), priority);
 }
 
-void World::shutdown()
+void ClientWorld::shutdown()
 {
     m_event_manager->shutdown();
+    World::shutdown();
 }

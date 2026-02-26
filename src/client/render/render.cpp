@@ -4,7 +4,7 @@
 #include "graphics/shader.h"
 #include <core/world/chunk/chunk.h>
 #include <core/logger.hpp>
-#include "../world/world.h"
+#include "../world/client_world.h"
 #include <core/ecs/core/ecs.h>
 #include "../core/window/window.h"
 #include "../utils/resource/resources.h"
@@ -92,7 +92,7 @@ std::vector<std::pair<int, int>> genCircleReady(int cx, int cz, int radius) {
 	return out;
 }
 
-void Render::renderWorld(World* world, int render_dist) {
+void Render::renderWorld(ClientWorld* world, int render_dist) {
 	if (world == nullptr) return;
 	ECS* ecs = world->getECS();
 	
@@ -144,7 +144,7 @@ void Render::renderWorld(World* world, int render_dist) {
 		glm::mat4 mat = projection * view * model;
 		world_block_shader->uniformmat4fv("transform", mat);
 
-		ClientChunk* chunk = world->getChunk(x, z, true);
+		ClientChunk* chunk = world->getChunk(x, z);
 		if (chunk != nullptr) {
 			chunk->drawOpaque();
 		}
@@ -164,7 +164,7 @@ void Render::renderWorld(World* world, int render_dist) {
 		glm::mat4 mat = projection * view * model;
 		world_block_shader->uniformmat4fv("transform", mat);
 
-		ClientChunk* chunk = world->getChunk(x, z, true);
+		ClientChunk* chunk = world->getChunk(x, z);
 		if (chunk != nullptr) {
 			chunk->drawCutout();
 		}
@@ -186,7 +186,7 @@ void Render::renderWorld(World* world, int render_dist) {
 		glm::mat4 mat = projection * view * model;
 		world_block_shader->uniformmat4fv("transform", mat);
 
-		ClientChunk* chunk = world->getChunk(x, z, true);
+		ClientChunk* chunk = world->getChunk(x, z);
 		if (chunk != nullptr) {
 			chunk->drawTransparent();
 		}

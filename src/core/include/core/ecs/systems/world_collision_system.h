@@ -11,13 +11,13 @@
 #include <cmath>
 #include <glm/glm.hpp>
 
-struct World;
+struct ClientWorld;
 
 class WorldCollisionSystem {
 private:
 	const float CHECK_MOVE_STEP = 1.0f;
 
-	bool handleStuckInBlock(World* world, glm::vec3& position, const Collider& collider) {
+	bool handleStuckInBlock(ClientWorld* world, glm::vec3& position, const Collider& collider) {
 		if (Utils::checkCollisionToWorld(world, position, collider)) {
 			position.y += 1.0f;
 			return true;
@@ -26,7 +26,7 @@ private:
 	}
 
 	void handleAxisMovement(
-		World* world,
+		ClientWorld* world,
 		glm::vec3& position,
 		glm::vec3& velocity,
 		const Collider& collider,
@@ -97,7 +97,7 @@ private:
 	}
 
 public:
-	void update(ECS& ecs, float dt, World* world) {
+	void update(ECS& ecs, float dt, ClientWorld* world) {
 		if (world == nullptr) return;
 
 		View<Transform, Velocity, Collider, PhysicsState> view(ecs);

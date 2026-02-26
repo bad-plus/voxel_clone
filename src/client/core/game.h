@@ -10,7 +10,7 @@ struct Render;
 struct InputHandler;
 struct Resources;
 struct Loader;
-struct World;
+struct ClientWorld;
 struct WorldGenerator;
 struct UI;
 struct DebugOverlay;

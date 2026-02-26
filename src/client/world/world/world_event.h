@@ -1,13 +1,10 @@
 #pragma once
-struct World;
-struct WorldEventManager;
 
+template<typename T> class WorldEventManager;
+
+template<typename T>
 struct WorldEvent {
-protected:
-	bool m_dont_miss = true;
 public:
-	~WorldEvent() = default;
-	virtual void apply(World& world, WorldEventManager& manager) = 0;
-
-	bool isDontMiss() const { return m_dont_miss; }
+    virtual ~WorldEvent() = default;
+    virtual void apply(T& world, WorldEventManager<T>& manager) = 0;
 };

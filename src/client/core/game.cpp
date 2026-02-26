@@ -5,7 +5,7 @@
 #include <core/ecs/core/ecs.h>
 #include "../utils/resource/resources.h"
 #include "../utils/resource/loader.h"
-#include "../world/world.h"
+#include "../world/client_world.h"
 #include "../world/generation/world_generator.h"
 #include "../render/render.h"
 #include "input/input.h"

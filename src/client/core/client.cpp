@@ -3,15 +3,16 @@
 #include <core/net/client_to_server.hpp>
 #include <core/net/server_to_client.hpp>
 #include <core/logger.hpp>
-#include "../world/world.h"
+#include "../world/client_world.h"
 #include <memory>
 #include "../world/generation/world_generator.h"
 
 Client::Client() : 
     m_net_client(std::make_unique<NetClient>()),
-    m_world(std::make_unique<World>())
+    m_world(std::make_unique<ClientWorld>())
 {
     // TODO: test
+    m_world->generateChunks(0, 0, 10);
     m_net_client->handlePacketCallback = [](const Packet& packet) {
     switch (packet.getType()) {
         case PacketType::SERVER_INFO_RESPONSE: {
@@ -82,7 +83,7 @@ void Client::disconnect()
     m_net_client->disconnect();
 }
 
-World* Client::getWorld() const
+ClientWorld* Client::getWorld() const
 {
     return m_world.get();
 }
