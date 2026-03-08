@@ -1,15 +1,11 @@
 #pragma once
-#include "world_event.h"
+#include <core/world/events/world_event.h>
 #include <glm/glm.hpp>
 #include <core/ecs/core/entity.h>
 #include <core/world/chunk/chunk.h>
 #include <vector>
 
 class World;
-class ClientWorld;
-class ServerWorld;
-
-// Global events
 
 template<typename W>
 struct BreakBlockEvent : public WorldEvent<W> {
@@ -38,30 +34,4 @@ struct SetupBlockEvent : public WorldEvent<W> {
         if (position.y < 0 || position.y >= 256) return;
         world.setBlock(position.x, position.y, position.z, block_id);
     }
-};
-
-// Client events
-
-struct UpdateMeshEvent : public WorldEvent<ClientWorld> {
-    ChunkCoord position;
-    UpdateMeshEvent(ChunkCoord pos) : position(pos) {}
-    void apply(ClientWorld& world, WorldEventManager<ClientWorld>& manager) override;
-};
-
-struct LoadChunkFromServerEvent : public WorldEvent<ClientWorld> {
-    ChunkCoord position;
-    std::vector<uint8_t> chunk_bytes;
-
-    LoadChunkFromServerEvent(ChunkCoord pos, const std::vector<uint8_t>& data)
-        : position(pos), chunk_bytes(data) {
-    }
-    void apply(ClientWorld& world, WorldEventManager<ClientWorld>& manager) override;
-};
-
-// Server events
-
-struct GenerateChunkEvent : public WorldEvent<ServerWorld> {
-    ChunkCoord position;
-    GenerateChunkEvent(ChunkCoord pos) : position(pos) {}
-    void apply(ServerWorld& world, WorldEventManager<ServerWorld>& manager) override;
 };

@@ -5,7 +5,6 @@
 #include <core/logger.hpp>
 #include <core/ecs/core/ecs.h>
 #include "../world/client_world.h"
-#include "../world/generation/world_generator.h"
 #include "elements/vertical_layout.h"
 #include "elements/crosshair.h"
 #include "../core/client.h"

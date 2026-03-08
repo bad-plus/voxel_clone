@@ -9,7 +9,7 @@
 #include <core/time.hpp>
 #include <core/world/world.h>
 #include "chunk/client_chunk.h"
-#include "world/world_event.h"
+#include <core/world/events/world_event.h>
 
 struct Chunk;
 struct WorldGenerator;

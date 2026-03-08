@@ -5,7 +5,6 @@
 #include <core/logger.hpp>
 #include "../world/client_world.h"
 #include <memory>
-#include "../world/generation/world_generator.h"
 
 Client::Client() : 
     m_net_client(std::make_unique<NetClient>()),

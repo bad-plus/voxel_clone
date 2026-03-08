@@ -3,7 +3,6 @@
 #include <core/world/block/block.h>
 #include <core/logger.hpp>
 #include <GLFW/glfw3.h>
-#include "generation/world_generator.h"
 #include <thread>
 #include <algorithm>
 #include <vector>
@@ -16,8 +15,9 @@
 #include <core/ecs/systems/player_systems_manager.h>
 #include <core/ecs/systems/gravity_system.h>
 #include <core/ecs/systems/camera_update_system.h>
-#include "world/world_event_manager.h"
-#include "world/world_event_list.h"
+#include <core/world/events/world_event.h>
+#include <core/world/events/world_event_manager.h>
+#include "events\client_events.h"
 
 ClientWorld::ClientWorld() {
     m_chunk_creation_time = 0.0;

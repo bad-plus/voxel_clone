@@ -1,13 +1,6 @@
-#include "world_event_list.h"
+#include <core/world/events/world_event.h>
+#include "client_events.h"
 #include "../client_world.h"
-#include "../server_world.h"
-
-void GenerateChunkEvent::apply(ServerWorld& world, WorldEventManager<ServerWorld>& manager) {
-	if (world.getChunk(position.x, position.z) == nullptr) {
-		world.createChunk(position.x, position.z);
-	}
-	world.generateChunk(position.x, position.z);
-}
 
 void UpdateMeshEvent::apply(ClientWorld& world, WorldEventManager<ClientWorld>& manager) {
 	auto* chunk = world.getChunk(position.x, position.z);

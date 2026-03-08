@@ -6,7 +6,6 @@
 #include "../utils/resource/resources.h"
 #include "../utils/resource/loader.h"
 #include "../world/client_world.h"
-#include "../world/generation/world_generator.h"
 #include "../render/render.h"
 #include "input/input.h"
 #include "input/input_handler.h"
@@ -152,7 +151,7 @@ Game::~Game() {
 }
 
 void Game::run() {
-	//m_client->connect("127.0.0.1");
+	m_client->connect("127.0.0.1");
 
 	while (!m_quit) {
 		auto start_game_tick_time = Time::now();

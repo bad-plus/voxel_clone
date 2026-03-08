@@ -7,11 +7,12 @@
 #include "../../ui/ui.h"
 #include "../../render/camera.hpp"
 #include <memory>
-#include "../../world/world/world_event_list.h"
+#include "../../world/events/client_events.h"
 #include "../client.h"
 
 #include <core/constants.h>
 #include <core/world/world.h>
+#include <core/world/events/base_events.h>
 
 #include <GLFW/glfw3.h>
 
