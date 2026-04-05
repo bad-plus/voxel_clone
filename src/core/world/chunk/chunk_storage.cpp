@@ -53,17 +53,18 @@ bool ChunkStorage::isValidPosition(glm::ivec3 position) const {
 
 std::vector<uint8_t> ChunkStorage::to_bytes()
 {
+	constexpr size_t BLOCK_SIZE = 2;
 	std::vector<uint8_t> result;
+	result.reserve(Constants::CHUNK_SIZE_VOLUME * BLOCK_SIZE);
 	for (size_t i = 0; i < Constants::CHUNK_SIZE_VOLUME; i++) {
 		auto block_data = m_blocks[i].to_bytes();
 		result.insert(result.end(), block_data.begin(), block_data.end());
 	}
 	return result;
 }
-
 void ChunkStorage::from_bytes(const std::vector<uint8_t>& bytes)
 {
-	constexpr size_t BLOCK_SIZE = 2; 
+	constexpr size_t BLOCK_SIZE = 2;
 	constexpr size_t EXPECTED_SIZE = Constants::CHUNK_SIZE_VOLUME * BLOCK_SIZE;
 
 	if (bytes.size() < EXPECTED_SIZE) {
@@ -71,10 +72,10 @@ void ChunkStorage::from_bytes(const std::vector<uint8_t>& bytes)
 		return;
 	}
 
-	size_t pos = 0;
+	std::vector<uint8_t> block_data(BLOCK_SIZE);
 	for (size_t i = 0; i < Constants::CHUNK_SIZE_VOLUME; i++) {
-		std::vector<uint8_t> block_data(bytes.begin() + pos, bytes.begin() + pos + BLOCK_SIZE);
+		size_t pos = i * BLOCK_SIZE;
+		std::copy(bytes.begin() + pos, bytes.begin() + pos + BLOCK_SIZE, block_data.begin());
 		m_blocks[i].from_bytes(block_data);
-		pos += BLOCK_SIZE;
 	}
 }

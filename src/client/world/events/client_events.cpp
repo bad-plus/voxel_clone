@@ -1,6 +1,7 @@
 #include <core/world/events/world_event.h>
 #include "client_events.h"
 #include "../client_world.h"
+#include <core/logger.hpp>
 
 void UpdateMeshEvent::apply(ClientWorld& world, WorldEventManager<ClientWorld>& manager) {
 	auto* chunk = world.getChunk(position.x, position.z);
@@ -13,6 +14,7 @@ void LoadChunkFromServerEvent::apply(ClientWorld& world, WorldEventManager<Clien
 		world.createChunk(position.x, position.z);
 		chunk = world.getChunk(position.x, position.z);
 	}
+	LOG_INFO("Starting loading chunk: {0} {1} -> {2}", position.x, position.z, (void*)chunk);
 
 	world.loadFromBytes(position, chunk_bytes);
 	world.addEvent(std::make_unique<UpdateMeshEvent>(position));

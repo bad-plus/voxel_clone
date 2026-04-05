@@ -20,4 +20,5 @@ namespace Constants {
 	// Server
 	constexpr uint16_t	DEFAULT_SERVER_PORT = 25417;
 	constexpr size_t	DEFAULT_MAX_CLIENTS = 32;
+	constexpr size_t	MAX_LOAD_CHUNKS_DIST = 5;
 }

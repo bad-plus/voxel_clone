@@ -39,7 +39,6 @@ public:
 
     Time getMeshGenerationTime() const;
 
-    void generateChunks(int chunk_x, int chunk_z, int radius = 1);
 
     void addEvent(std::unique_ptr<WorldEvent<ClientWorld>> event, bool priority = false);
 

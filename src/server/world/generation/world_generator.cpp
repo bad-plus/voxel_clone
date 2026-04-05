@@ -4,8 +4,6 @@
 #include <core/logger.hpp>
 #include "biome.hpp"
 
-#include <glfw/glfw3.h>
-
 WorldGenerator::WorldGenerator(int seed) : 
     m_seed(seed)
 {

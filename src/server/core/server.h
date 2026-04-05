@@ -6,6 +6,7 @@
 #include <string>
 
 struct NetServer;
+class ServerWorld;
 
 class Server {
 public:
@@ -22,6 +23,8 @@ private:
 	std::atomic<bool> m_stop;
 
 	std::unique_ptr<NetServer> m_net_server;
+
+	std::unique_ptr<ServerWorld> m_world;
 	
 	std::vector<std::thread> m_threads;
 };

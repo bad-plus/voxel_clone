@@ -34,6 +34,10 @@ struct ChunkCoord {
 	long long getIndex() const {
 		return ((long long)(x & 0xFFFFFFFF)) | ((long long)(z & 0xFFFFFFFF) << 32);
 	}
+
+	bool operator == (const ChunkCoord& other) const {
+		return x == other.x && z == other.z;
+	}
 };
 
 class Chunk {

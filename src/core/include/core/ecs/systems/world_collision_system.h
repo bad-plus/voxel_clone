@@ -150,6 +150,8 @@ public:
 			vel.x = vel_vec.x;
 			vel.y = vel_vec.y;
 			vel.z = vel_vec.z;
+
+			if (trans.position.y < -100) trans.position.y = Constants::CHUNK_SIZE_Y;
 		}
 	}
 };

@@ -1,4 +1,5 @@
 #include "client_chunk.h"
+#include <core/logger.hpp>
 
 #include <GLFW/glfw3.h>
 
@@ -72,6 +73,7 @@ void ClientChunk::uploadMeshToGPU() {
 	m_ready_gpu.mesh.cutout.clear();
 	m_ready_gpu.mesh.transparent.clear();
 	m_ready_gpu.ready = false;
+	LOG_INFO("Mesh uploaded to GPU");
 }
 
 void ClientChunk::drawOpaque() {

@@ -168,8 +168,6 @@ Entity ClientWorld::CreatePlayer() {
     ecs->storage<PhysicsState>().add(entity, PhysicsState());
     ecs->storage<Movement>().add(entity, Movement());
 
-    generateChunks(chunk_coord.x, chunk_coord.z, 3);
-
     return entity;
 }
 
@@ -257,17 +255,6 @@ std::vector<std::pair<int, int>> genCircleReadyA(int cx, int cz, int radius) {
 	return out;
 }
 
-void ClientWorld::generateChunks(int chunk_x, int chunk_z, int radius) {
-	auto generate_list = genCircleReadyA(chunk_x, chunk_z, radius);
-
-	for (const auto& [x, z] : generate_list) {
-        createChunk(x, z);
-        /*addEvent(
-            std::make_unique<GenerateChunkEvent>(ChunkCoord(x, z))
-        );*/
-
-	}
-}
 
 void ClientWorld::addEvent(std::unique_ptr<WorldEvent<ClientWorld>> event, bool priority) {
     m_event_manager->push(std::move(event), priority);

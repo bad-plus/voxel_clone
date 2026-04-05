@@ -43,7 +43,7 @@ FetchContent_MakeAvailable(glm)
 FetchContent_Declare(
     stb
     GIT_REPOSITORY https://github.com/nothings/stb.git
-    GIT_TAG f1c79c0
+    GIT_TAG master
     GIT_SHALLOW TRUE
     GIT_PROGRESS TRUE
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE

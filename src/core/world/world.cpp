@@ -7,7 +7,11 @@ World::World()
 
 World::~World()
 {
-
+    for (auto& [key, chunk] : m_chunks) {
+        if (chunk != nullptr) {
+            //delete chunk;
+        }
+    }
 }
 
 Chunk* World::getChunk(int x, int z)
@@ -69,7 +73,7 @@ Chunk* World::createChunk(int x, int z)
 
     auto it = m_chunks.find(chunk_index);
     if (it != m_chunks.end()) {
-        return dynamic_cast<Chunk*>(it->second);
+        return it->second;
     }
 
     Chunk* new_chunk = new Chunk();
@@ -84,4 +88,9 @@ void World::shutdown()
 
 void World::loadFromBytes(ChunkCoord position, const std::vector<uint8_t>& bytes)
 {
+    Chunk* chunk = getChunk(position.x, position.z);
+    if (chunk == nullptr) chunk = createChunk(position.x, position.z);
+    if (chunk) {
+        chunk->from_bytes(bytes);
+    }
 }

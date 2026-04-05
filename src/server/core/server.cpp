@@ -3,12 +3,15 @@
 #include <core/logger.hpp>
 #include <core/net/client_to_server.hpp>
 #include <core/net/server_to_client.hpp>
+#include "../world/server_world.h"
+#include "../world/generation/world_generator.h"
 
 #include <iostream>
 
 Server::Server() : 
 	m_stop(true),
-	m_net_server(std::make_unique<NetServer>())
+	m_net_server(std::make_unique<NetServer>()),
+	m_world(std::make_unique<ServerWorld>())
 {
 
 }
@@ -51,12 +54,19 @@ void Server::run()
 
             auto response_packet = PacketGetChunkResponse();
             response_packet.m_chunk_position = chunk_request->m_chunk_position;
-			for (int i = 0; i < 555; i++) {
-				//test data
-				response_packet.m_chunk_storage.push_back(i % 255);
+
+			Chunk* chunk = m_world->getChunk(chunk_request->m_chunk_position.x, chunk_request->m_chunk_position.z);
+			if (chunk == nullptr) {
+				 m_world->generateChunk(chunk_request->m_chunk_position.x, chunk_request->m_chunk_position.z);
+				 chunk = m_world->getChunk(chunk_request->m_chunk_position.x, chunk_request->m_chunk_position.z);
 			}
 
+			auto chunk_bytes = chunk->to_bytes();
+
+			response_packet.m_chunk_storage.insert(response_packet.m_chunk_storage.end(), chunk_bytes.begin(), chunk_bytes.end());
+
             m_net_server->sendPacket(client_id, response_packet);
+			LOG_INFO("Sended chunk {0} {1}", chunk_request->m_chunk_position.x, chunk_request->m_chunk_position.z);
             break;
         }
 
